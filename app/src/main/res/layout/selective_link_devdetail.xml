@@ -1,0 +1,1418 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:slideswitch="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#EFEFF2"
+    android:orientation="vertical">
+
+    <com.yanzhenjie.statusview.StatusView
+        android:id="@+id/status_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:fitsView="@+id/root_layout" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+
+        <ImageView
+            android:id="@+id/back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:paddingRight="20dp"
+            android:src="@drawable/back" />
+
+        <TextView
+            android:id="@+id/project_select"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="空调"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/next_step_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
+            android:text="保存"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/air_control_linear"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:visibility="gone"
+        android:orientation="vertical"
+        android:paddingBottom="10dp"
+        android:paddingTop="5dp"
+       >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.2"
+                android:gravity="center"
+                android:text="模式"
+                android:textColor="@color/dark_gray"
+                android:textSize="14sp" />
+
+            <android.support.percent.PercentRelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_weight="0.8">
+
+                <RadioGroup
+                    android:id="@+id/air_control_radio_model"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:checkedButton="@+id/order_process"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:paddingBottom="3dp"
+                    android:paddingTop="3dp"
+                    app:layout_widthPercent="90%">
+
+                    <RadioButton
+                        android:layout_width="fill_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1.0"
+                        android:button="@drawable/radio_group_selector"
+                        android:gravity="center"
+                        android:text="制冷"
+                        android:textColor="@color/dark_gray" />
+
+                    <RadioButton
+                        android:layout_width="fill_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1.0"
+                        android:button="@drawable/radio_group_selector"
+                        android:checked="false"
+                        android:gravity="center"
+                        android:text="制热"
+                        android:textColor="@color/dark_gray" />
+
+                    <RadioButton
+                        android:layout_width="fill_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1.0"
+                        android:button="@drawable/radio_group_selector"
+                        android:checked="false"
+                        android:gravity="center"
+                        android:text="除湿"
+                        android:textColor="@color/dark_gray" />
+
+
+                    <RadioButton
+                        android:layout_width="fill_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1.0"
+                        android:button="@drawable/radio_group_selector"
+                        android:checked="false"
+                        android:gravity="center"
+                        android:text="送风"
+                        android:textColor="@color/dark_gray" />
+                </RadioGroup>
+            </android.support.percent.PercentRelativeLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@drawable/dottedline"
+            android:padding="5dp"></View>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="5dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.2"
+                android:gravity="center"
+                android:text="温度"
+                android:textColor="@color/dark_gray"
+                android:textSize="14sp" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_weight="0.8"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/air_control_tmp_del"
+                    android:src="@drawable/icon_kt_reduce" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:gravity="center"
+                    android:text="26"
+                    android:textColor="@color/dark_gray"
+                    android:textSize="14sp" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/air_control_tmp_add"
+                    android:src="@drawable/icon_kt_add" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/dottedline"
+            android:padding="5dp"></View>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="5dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.2"
+                android:gravity="center"
+                android:text="风速"
+                android:textColor="@color/dark_gray"
+                android:textSize="14sp" />
+
+            <android.support.percent.PercentRelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_weight="0.8">
+
+                <RadioGroup
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:id="@+id/air_control_speed"
+                    android:checkedButton="@+id/order_process"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:paddingBottom="3dp"
+                    android:paddingTop="3dp"
+                    app:layout_widthPercent="90%">
+
+                    <RadioButton
+                        android:layout_width="fill_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1.0"
+                        android:button="@drawable/radio_group_selector"
+                        android:gravity="center"
+                        android:text="低风"
+                        android:textColor="@color/dark_gray" />
+
+                    <RadioButton
+                        android:layout_width="fill_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1.0"
+                        android:button="@drawable/radio_group_selector"
+                        android:checked="false"
+                        android:gravity="center"
+                        android:text="中风"
+                        android:textColor="@color/dark_gray" />
+
+                    <RadioButton
+                        android:layout_width="fill_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1.0"
+                        android:button="@drawable/radio_group_selector"
+                        android:checked="false"
+                        android:gravity="center"
+                        android:text="高风"
+                        android:textColor="@color/dark_gray" />
+
+
+                    <RadioButton
+                        android:layout_width="fill_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1.0"
+                        android:button="@drawable/radio_group_selector"
+                        android:checked="false"
+                        android:gravity="center"
+                        android:text="节能"
+                        android:textColor="@color/dark_gray" />
+                </RadioGroup>
+            </android.support.percent.PercentRelativeLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/dottedline"
+            android:padding="5dp"></View>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="5dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.2"
+                android:gravity="center"
+                android:text="开关"
+                android:textColor="@color/dark_gray"
+                android:textSize="14sp" />
+
+            <android.support.percent.PercentRelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_weight="0.8">
+
+                <RadioGroup
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:button="@drawable/radio_group_selector"
+                    android:checkedButton="@+id/order_process"
+                    android:gravity="center"
+                    android:id="@+id/air_control_radio_open_close"
+                    android:orientation="horizontal"
+                    android:paddingBottom="3dp"
+                    android:paddingTop="3dp"
+                    app:layout_widthPercent="40%">
+
+                    <RadioButton
+                        android:layout_width="fill_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1.0"
+                        android:button="@drawable/radio_group_selector"
+                        android:gravity="center"
+                        android:text="开"
+                        android:textColor="@color/dark_gray" />
+
+                    <RadioButton
+                        android:layout_width="fill_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="8dp"
+                        android:layout_weight="1.0"
+                        android:button="@drawable/radio_group_selector"
+                        android:checked="false"
+                        android:gravity="center"
+                        android:text="关"
+                        android:textColor="@color/dark_gray" />
+
+                </RadioGroup>
+            </android.support.percent.PercentRelativeLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/dottedline"
+            android:padding="5dp"></View>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/window_linear"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:paddingBottom="10dp"
+        android:paddingTop="5dp"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.2"
+                android:gravity="center"
+                android:text="内纱"
+                android:textColor="@color/dark_gray"
+                android:textSize="14sp" />
+
+            <android.support.percent.PercentRelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_weight="0.8">
+
+                <RadioGroup
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:id="@+id/window_radio_inner"
+                    android:checkedButton="@+id/order_process"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:paddingBottom="3dp"
+                    android:paddingTop="3dp"
+                    app:layout_widthPercent="50%">
+
+                    <RadioButton
+                        android:layout_width="fill_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1.0"
+                        android:button="@drawable/radio_group_selector"
+                        android:gravity="center"
+                        android:text="打开"
+                        android:textColor="@color/dark_gray" />
+
+                    <RadioButton
+                        android:layout_width="fill_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="8dp"
+                        android:layout_weight="1.0"
+                        android:button="@drawable/radio_group_selector"
+                        android:checked="false"
+                        android:gravity="center"
+                        android:text="关闭"
+                        android:textColor="@color/dark_gray" />
+                </RadioGroup>
+            </android.support.percent.PercentRelativeLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@drawable/dottedline"
+            android:padding="5dp"></View>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="5dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.2"
+                android:gravity="center"
+                android:text="外纱"
+                android:textColor="@color/dark_gray"
+                android:textSize="14sp" />
+
+            <android.support.percent.PercentRelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_weight="0.8">
+
+                <RadioGroup
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:checkedButton="@+id/order_process"
+                    android:gravity="center"
+                    android:id="@+id/window_radio_out"
+                    android:orientation="horizontal"
+                    android:paddingBottom="3dp"
+                    android:paddingTop="3dp"
+                    app:layout_widthPercent="50%">
+
+                    <RadioButton
+                        android:layout_width="fill_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1.0"
+                        android:button="@drawable/radio_group_selector"
+                        android:gravity="center"
+                        android:text="打开"
+                        android:textColor="@color/dark_gray" />
+
+                    <RadioButton
+                        android:layout_width="fill_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="8dp"
+                        android:layout_weight="1.0"
+                        android:button="@drawable/radio_group_selector"
+                        android:checked="false"
+                        android:gravity="center"
+                        android:text="关闭"
+                        android:textColor="@color/dark_gray" />
+
+                </RadioGroup>
+            </android.support.percent.PercentRelativeLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/dottedline"
+            android:padding="5dp"></View>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="5dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.2"
+                android:gravity="center_vertical|right"
+                android:paddingRight="10dp"
+                android:text="阳台灯"
+                android:textColor="@color/dark_gray"
+                android:textSize="14sp" />
+
+            <android.support.percent.PercentRelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_weight="0.8">
+
+                <RadioGroup
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:checkedButton="@+id/order_process"
+                    android:id="@+id/window_radio_light"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:paddingBottom="3dp"
+                    android:paddingTop="3dp"
+                    app:layout_widthPercent="80%">
+
+                    <RadioButton
+                        android:layout_width="fill_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1.0"
+                        android:button="@drawable/radio_group_selector"
+                        android:gravity="center"
+                        android:text="打开"
+                        android:textColor="@color/dark_gray" />
+
+                    <RadioButton
+                        android:layout_width="fill_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="8dp"
+                        android:layout_weight="1.0"
+                        android:button="@drawable/radio_group_selector"
+                        android:checked="false"
+                        android:gravity="center"
+                        android:text="关闭"
+                        android:textColor="@color/dark_gray" />
+
+                    <RadioButton
+                        android:layout_width="fill_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="8dp"
+                        android:layout_weight="1.0"
+                        android:button="@drawable/radio_group_selector"
+                        android:checked="false"
+                        android:gravity="center"
+                        android:text="切换"
+                        android:textColor="@color/dark_gray" />
+
+
+                </RadioGroup>
+            </android.support.percent.PercentRelativeLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@drawable/dottedline"
+            android:padding="5dp"></View>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/tiaoguangdeng_linear"
+        android:layout_width="match_parent"
+        android:visibility="gone"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:orientation="vertical"
+        android:paddingBottom="10dp"
+        android:paddingTop="5dp">
+
+        <LinearLayout
+            android:id="@+id/tiao_linear_light_one"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:orientation="vertical">
+
+            <android.support.percent.PercentRelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_centerVertical="true"
+                android:gravity="center">
+
+                <RadioGroup
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:checkedButton="@+id/order_process"
+                    android:gravity="center"
+                    android:id="@+id/tiao_linear_radio_one"
+                    android:orientation="horizontal"
+                    android:paddingBottom="3dp"
+                    android:paddingTop="3dp"
+                    app:layout_widthPercent="80%">
+
+                    <RadioButton
+                        android:layout_width="fill_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1.0"
+                        android:button="@drawable/radio_group_selector"
+                        android:gravity="center"
+                        android:clickable="true"
+                        android:text="打开"
+                        android:textColor="@color/dark_gray" />
+
+                    <RadioButton
+                        android:layout_width="fill_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="8dp"
+                        android:layout_weight="1.0"
+                        android:button="@drawable/radio_group_selector"
+                        android:checked="false"
+                        android:clickable="true"
+                        android:gravity="center"
+                        android:text="关闭"
+                        android:textColor="@color/dark_gray" />
+
+                    <RadioButton
+                        android:layout_width="fill_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="8dp"
+                        android:clickable="true"
+                        android:layout_weight="1.0"
+                        android:button="@drawable/radio_group_selector"
+                        android:checked="false"
+                        android:gravity="center"
+                        android:text="切换"
+                        android:textColor="@color/dark_gray" />
+                </RadioGroup>
+            </android.support.percent.PercentRelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/dottedline"
+                android:padding="5dp"></View>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/tiao_linear_light_two"
+            android:layout_width="match_parent"
+            android:visibility="gone"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <android.support.percent.PercentRelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_centerVertical="true"
+                android:gravity="center">
+
+                <RadioGroup
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:id="@+id/tiao_linear_radio_two"
+                    android:checkedButton="@+id/order_process"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:paddingBottom="3dp"
+                    android:paddingTop="3dp"
+                    app:layout_widthPercent="80%">
+
+                    <RadioButton
+                        android:layout_width="fill_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1.0"
+                        android:button="@drawable/radio_group_selector"
+                        android:gravity="center"
+                        android:text="打开"
+                        android:textColor="@color/dark_gray" />
+
+                    <RadioButton
+                        android:layout_width="fill_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="8dp"
+                        android:layout_weight="1.0"
+                        android:button="@drawable/radio_group_selector"
+                        android:checked="false"
+                        android:gravity="center"
+                        android:text="关闭"
+                        android:textColor="@color/dark_gray" />
+
+                    <RadioButton
+                        android:layout_width="fill_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="8dp"
+                        android:layout_weight="1.0"
+                        android:button="@drawable/radio_group_selector"
+                        android:checked="false"
+                        android:gravity="center"
+                        android:text="切换"
+                        android:textColor="@color/dark_gray" />
+                </RadioGroup>
+            </android.support.percent.PercentRelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/dottedline"
+                android:padding="5dp"></View>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/tiao_linear_light_three"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:orientation="vertical">
+
+            <android.support.percent.PercentRelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_centerVertical="true"
+                android:gravity="center">
+
+                <RadioGroup
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:checkedButton="@+id/order_process"
+                    android:id="@+id/tiao_linear_radio_three"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:paddingBottom="3dp"
+                    android:paddingTop="3dp"
+                    app:layout_widthPercent="80%">
+
+                    <RadioButton
+                        android:layout_width="fill_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1.0"
+                        android:button="@drawable/radio_group_selector"
+                        android:gravity="center"
+                        android:text="打开"
+                        android:textColor="@color/dark_gray" />
+
+                    <RadioButton
+                        android:layout_width="fill_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="8dp"
+                        android:layout_weight="1.0"
+                        android:button="@drawable/radio_group_selector"
+                        android:checked="false"
+                        android:gravity="center"
+                        android:text="关闭"
+                        android:textColor="@color/dark_gray" />
+
+                    <RadioButton
+                        android:layout_width="fill_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="8dp"
+                        android:layout_weight="1.0"
+                        android:button="@drawable/radio_group_selector"
+                        android:checked="false"
+                        android:gravity="center"
+                        android:text="切换"
+                        android:textColor="@color/dark_gray" />
+                </RadioGroup>
+            </android.support.percent.PercentRelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/dottedline"
+                android:padding="5dp"></View>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/tiao_linear_one"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <android.support.percent.PercentRelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginTop="15dp">
+
+                <TextView
+                    android:id="@+id/seek_bar_txt_one"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:gravity="right"
+                    android:textColor="@color/black"
+                    android:text="30"
+                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
+                    android:textSize="16sp"
+                    app:layout_widthPercent="80%" />
+
+
+                <SeekBar
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/seek_bar_txt_one"
+                    android:id="@+id/seek_bar_one"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:max="100"
+                    android:maxHeight="20dp"
+                    android:minHeight="20dp"
+                    android:progress="30"
+                    android:progressDrawable="@drawable/bg_seekbar"
+                    android:thumb="@drawable/hslide_circle"
+                    app:layout_widthPercent="90%" />
+
+                <!--<SeekBar-->
+                <!--android:id="@+id/id_seekBar"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_below="@+id/windspeedrelative"-->
+                <!--android:layout_marginTop="30dp"-->
+                <!--android:maxHeight="20dp"-->
+                <!--android:minHeight="20dp"-->
+                <!--android:paddingLeft="10dp"-->
+                <!--android:paddingRight="10dp"-->
+                <!--android:progressDrawable="@drawable/bg_seekbar"-->
+                <!--android:thumb="@drawable/hslide_circle" />-->
+            </android.support.percent.PercentRelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/dottedline"
+                android:padding="5dp"></View>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/tiao_linear_two"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:orientation="vertical">
+
+            <android.support.percent.PercentRelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                >
+
+                <TextView
+                    android:id="@+id/seek_bar_txt_two"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:gravity="right"
+                    android:textColor="@color/black"
+                    android:text="30"
+                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
+                    android:textSize="16sp"
+                    app:layout_widthPercent="80%" />
+
+
+                <SeekBar
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/seek_bar_txt_two"
+                    android:id="@+id/seek_bar_two"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:max="100"
+                    android:maxHeight="20dp"
+                    android:minHeight="20dp"
+                    android:progress="30"
+                    android:progressDrawable="@drawable/bg_seekbar"
+                    android:thumb="@drawable/hslide_circle"
+                    app:layout_widthPercent="90%" />
+
+                <!--<SeekBar-->
+                <!--android:id="@+id/id_seekBar"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_below="@+id/windspeedrelative"-->
+                <!--android:layout_marginTop="30dp"-->
+                <!--android:maxHeight="20dp"-->
+                <!--android:minHeight="20dp"-->
+                <!--android:paddingLeft="10dp"-->
+                <!--android:paddingRight="10dp"-->
+                <!--android:progressDrawable="@drawable/bg_seekbar"-->
+                <!--android:thumb="@drawable/hslide_circle" />-->
+            </android.support.percent.PercentRelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/dottedline"
+                android:padding="5dp"></View>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/tiao_linear_three"
+            android:layout_width="match_parent"
+            android:visibility="gone"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <android.support.percent.PercentRelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+             >
+
+                <TextView
+                    android:id="@+id/seek_bar_txt_three"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:gravity="right"
+                    android:textColor="@color/black"
+                    android:text="30"
+                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
+                    android:textSize="16sp"
+                    app:layout_widthPercent="80%" />
+
+
+                <SeekBar
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/seek_bar_txt_three"
+                    android:id="@+id/seek_bar_three"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:max="100"
+                    android:maxHeight="20dp"
+                    android:minHeight="20dp"
+                    android:progress="30"
+                    android:progressDrawable="@drawable/bg_seekbar"
+                    android:thumb="@drawable/hslide_circle"
+                    app:layout_widthPercent="90%" />
+
+                <!--<SeekBar-->
+                <!--android:id="@+id/id_seekBar"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_below="@+id/windspeedrelative"-->
+                <!--android:layout_marginTop="30dp"-->
+                <!--android:maxHeight="20dp"-->
+                <!--android:minHeight="20dp"-->
+                <!--android:paddingLeft="10dp"-->
+                <!--android:paddingRight="10dp"-->
+                <!--android:progressDrawable="@drawable/bg_seekbar"-->
+                <!--android:thumb="@drawable/hslide_circle" />-->
+            </android.support.percent.PercentRelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/dottedline"
+                android:padding="5dp"></View>
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/kaiguan_linear"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="bottom"
+            android:paddingBottom="8dp"
+            android:paddingLeft="8dp"
+            android:paddingTop="8dp"
+            android:text="执行开关"
+            android:textSize="12sp" />
+
+        <LinearLayout
+            android:id="@+id/first_light_linear"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="#EFEFF2"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.4">
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:paddingLeft="8dp">
+
+                    <TextView
+                        android:id="@+id/hand_device_content"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="卧室灯"
+                        android:textSize="14sp" />
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="15dp"
+                        android:layout_marginTop="3dp"
+                        android:layout_toRightOf="@+id/hand_device_content">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="第一路灯控"
+                            android:textSize="10sp" />
+                    </RelativeLayout>
+                </RelativeLayout>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3">
+                <!--<Button-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:id="@+id/hand_scene_btn"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_alignParentRight="true"-->
+                <!--android:layout_centerVertical="true"-->
+                <!--android:text="执行"-->
+                <!--android:textColor="@color/white"-->
+                <!--android:background="@drawable/execute_scene_shape"-->
+                <!--android:textSize="14sp"-->
+                <!--android:src="@mipmap/ic_launcher" />-->
+                <com.Util.view.SlideSwitchButton
+                    android:id="@+id/light_slide_one"
+                    android:layout_width="40dp"
+                    android:layout_height="20dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="5dp"
+                    slideswitch:isOpen="true"
+                    slideswitch:themeColor="#f200aa96" />
+            </RelativeLayout>
+        </LinearLayout>
+
+        <View
+            android:id="@+id/view_light_one"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@drawable/dottedline"
+            android:visibility="gone"></View>
+
+        <LinearLayout
+            android:id="@+id/second_light_linear"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="#EFEFF2"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.4">
+
+                <!--<RelativeLayout-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_centerInParent="true"-->
+                <!--android:paddingLeft="8dp">-->
+
+                <!--<TextView-->
+                <!--android:id="@+id/hand_device_content_two"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="主灯"-->
+                <!--android:textSize="14sp" />-->
+
+                <!--<RelativeLayout-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_below="@+id/hand_device_content_two"-->
+                <!--android:layout_centerVertical="true"-->
+                <!--android:layout_marginTop="3dp">-->
+
+                <!--<TextView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="第二路灯控"-->
+                <!--android:textSize="14sp" />-->
+                <!--</RelativeLayout>-->
+                <!--</RelativeLayout>-->
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:paddingLeft="8dp">
+
+                    <TextView
+                        android:id="@+id/hand_device_content_two"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="卧室灯"
+                        android:textSize="14sp" />
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="15dp"
+                        android:layout_marginTop="3dp"
+                        android:layout_toRightOf="@+id/hand_device_content_two">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="第二路灯控"
+                            android:textSize="10sp" />
+                    </RelativeLayout>
+                </RelativeLayout>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3"
+                android:orientation="vertical">
+
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3">
+                <!--<Button-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:id="@+id/hand_scene_btn"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_alignParentRight="true"-->
+                <!--android:layout_centerVertical="true"-->
+                <!--android:text="执行"-->
+                <!--android:textColor="@color/white"-->
+                <!--android:background="@drawable/execute_scene_shape"-->
+                <!--android:textSize="14sp"-->
+                <!--android:src="@mipmap/ic_launcher" />-->
+                <com.Util.view.SlideSwitchButton
+                    android:id="@+id/light_slide_two"
+                    android:layout_width="40dp"
+                    android:layout_height="20dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="5dp"
+                    slideswitch:isOpen="true"
+                    slideswitch:themeColor="#f200aa96" />
+            </RelativeLayout>
+        </LinearLayout>
+
+        <View
+            android:id="@+id/view_light_two"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@drawable/dottedline"
+            android:visibility="gone"></View>
+
+        <LinearLayout
+            android:id="@+id/third_light_linear"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="#EFEFF2"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.4">
+
+                <!--<RelativeLayout-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_centerInParent="true"-->
+                <!--android:paddingLeft="8dp">-->
+
+                <!--<TextView-->
+                <!--android:id="@+id/hand_device_content_three"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="筒灯"-->
+                <!--android:textSize="14sp" />-->
+
+                <!--<RelativeLayout-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_below="@+id/hand_device_content_three"-->
+                <!--android:layout_centerVertical="true"-->
+                <!--android:layout_marginTop="3dp">-->
+
+                <!--<TextView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="第三路灯控"-->
+                <!--android:textSize="14sp" />-->
+                <!--</RelativeLayout>-->
+                <!--</RelativeLayout>-->
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:paddingLeft="8dp">
+
+                    <TextView
+                        android:id="@+id/hand_device_content_three"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="卧室灯"
+                        android:textSize="14sp" />
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="15dp"
+                        android:layout_marginTop="3dp"
+                        android:layout_toRightOf="@+id/hand_device_content_three">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="第三路灯控"
+                            android:textSize="10sp" />
+                    </RelativeLayout>
+                </RelativeLayout>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3">
+                <!--<Button-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:id="@+id/hand_scene_btn"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_alignParentRight="true"-->
+                <!--android:layout_centerVertical="true"-->
+                <!--android:text="执行"-->
+                <!--android:textColor="@color/white"-->
+                <!--android:background="@drawable/execute_scene_shape"-->
+                <!--android:textSize="14sp"-->
+                <!--android:src="@mipmap/ic_launcher" />-->
+                <com.Util.view.SlideSwitchButton
+                    android:id="@+id/light_slide_three"
+                    android:layout_width="40dp"
+                    android:layout_height="20dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="5dp"
+                    slideswitch:isOpen="true"
+                    slideswitch:themeColor="#f200aa96" />
+            </RelativeLayout>
+        </LinearLayout>
+
+        <View
+            android:id="@+id/view_light_three"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@drawable/dottedline"
+            android:visibility="gone"></View>
+
+        <LinearLayout
+            android:id="@+id/four_light_linear"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="#EFEFF2"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+
+                android:layout_weight="0.4">
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:paddingLeft="8dp">
+
+                    <TextView
+                        android:id="@+id/hand_device_content_four"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="卧室灯"
+                        android:textSize="14sp" />
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="15dp"
+                        android:layout_marginTop="3dp"
+                        android:layout_toRightOf="@+id/hand_device_content_four">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="第四路灯控"
+                            android:textSize="10sp" />
+                    </RelativeLayout>
+                </RelativeLayout>
+                <!--<RelativeLayout-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_centerInParent="true"-->
+                <!--android:paddingLeft="8dp">-->
+
+                <!--<TextView-->
+                <!--android:id="@+id/hand_device_content_four"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="灯带"-->
+                <!--android:textSize="14sp" />-->
+
+                <!--<RelativeLayout-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="50dp"-->
+                <!--android:layout_below="@+id/hand_device_content_four"-->
+                <!--android:layout_centerVertical="true"-->
+                <!--android:layout_marginTop="3dp"-->
+                <!--android:background="#EFEFF2">-->
+
+                <!--<TextView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="第四路灯控"-->
+                <!--android:textSize="14sp" />-->
+                <!--</RelativeLayout>-->
+                <!--</RelativeLayout>-->
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3">
+                <!--<Button-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:id="@+id/hand_scene_btn"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_alignParentRight="true"-->
+                <!--android:layout_centerVertical="true"-->
+                <!--android:text="执行"-->
+                <!--android:textColor="@color/white"-->
+                <!--android:background="@drawable/execute_scene_shape"-->
+                <!--android:textSize="14sp"-->
+                <!--android:src="@mipmap/ic_launcher" />-->
+                <com.Util.view.SlideSwitchButton
+                    android:id="@+id/light_slide_four"
+                    android:layout_width="40dp"
+                    android:layout_height="20dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="5dp"
+                    slideswitch:isOpen="true"
+                    slideswitch:themeColor="#f200aa96" />
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <View
+            android:id="@+id/view_light_four"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@drawable/dottedline"
+            android:visibility="gone"></View>
+
+    </LinearLayout>
+
+</LinearLayout>
