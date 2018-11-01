@@ -31,13 +31,16 @@ import com.data.User;
 import com.massky.sraum.MessageDetailActivity;
 import com.massky.sraum.R;
 import com.xlistview.XListView;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import butterknife.InjectView;
 import okhttp3.Call;
+
 import static com.fragment.MessageFragment.MESSAGE_FRAGMENT;
 
 /**
@@ -302,7 +305,13 @@ public class DeviceMessageFragment extends Basecfragment implements
                     map.put("readStatus", user.messageList.get(i).readStatus);
                     map.put("eventTime", user.messageList.get(i).eventTime);
                     map.put("ischecked", false);
-                    messageLists.add(map);
+                    switch (user.messageList.get(i).messageType) {
+                        case "100":
+                            break;
+                        default:
+                            messageLists.add(map);
+                            break;
+                    }
                 }
                 common_del(doit);
                 page++;
@@ -401,6 +410,7 @@ public class DeviceMessageFragment extends Basecfragment implements
 //        get_message(false, "doit");
 //        if(onDeviceMessageFragListener1 != null)
 //        onDeviceMessageFragListener1.ondevice_message_frag();
+//        ToastUtil.showToast(getActivity(),"DeviceMessageFragment");
     }
 
     @Override

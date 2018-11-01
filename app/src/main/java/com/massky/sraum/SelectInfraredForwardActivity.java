@@ -21,16 +21,11 @@ import android.widget.TextView;
 import com.AddTogenInterface.AddTogglenInterfacer;
 import com.Util.ApiHelper;
 import com.Util.DialogUtil;
-import com.Util.EntityUtils;
 import com.Util.MyOkHttp;
 import com.Util.Mycallback;
-import com.Util.ParceUtil;
-import com.Util.SharedPreferencesUtil;
 import com.Util.ToastUtil;
 import com.Util.TokenUtil;
 import com.adapter.SelectInfraredForwardAdapter;
-import com.adapter.SelectSensorSingleAdapter;
-import com.alibaba.fastjson.JSON;
 import com.base.Basecactivity;
 import com.data.User;
 import com.gizwits.gizwifisdk.api.GizWifiDevice;
@@ -44,7 +39,6 @@ import com.yaokan.sdk.utils.Utility;
 import com.yaokan.sdk.wifi.DeviceManager;
 import com.yaokan.sdk.wifi.GizWifiCallBack;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -201,11 +195,9 @@ public class SelectInfraredForwardActivity extends Basecactivity implements
                 Intent wifiSettingsIntent = new Intent("android.settings.WIFI_SETTINGS");
                 startActivityForResult(wifiSettingsIntent, CONNWIFI);
                 dialog.dismiss();
-
             }
         });
     }
-
 
     private GizWifiCallBack mGizWifiCallBack = new GizWifiCallBack() {
 
@@ -256,13 +248,10 @@ public class SelectInfraredForwardActivity extends Basecactivity implements
                     Logger.e(TAG, "load device  sucess");
                     update(deviceList);
 //                    if(deviceList.get(0).getNetStatus()==GizWifiDeviceNetStatus.GizDeviceOffline)
-
                     break;
                 default:
                     break;
-
             }
-
         }
     };
 
@@ -281,8 +270,8 @@ public class SelectInfraredForwardActivity extends Basecactivity implements
         listintwo.clear();
         list_hand_scene = (List<Map>) getIntent().getSerializableExtra("list_hand_scene");
         for (int i = 0; i < list_hand_scene.size(); i++) {
-            Map<String, String> mapdevice = new HashMap<>();
-            list_hand_scene.add(mapdevice);
+//            Map<String, String> mapdevice = new HashMap<>();
+//            list_hand_scene.add(mapdevice);
             setPicture(list_hand_scene.get(i).get("type").toString());
         }
 
@@ -311,11 +300,25 @@ public class SelectInfraredForwardActivity extends Basecactivity implements
      * @param position
      */
     private void choose_the_brand(int position) {
-        handler.sendEmptyMessage(0);
+//        handler.sendEmptyMessage(0);
         mac = (String) list_hand_scene.get(position).get("controllerId");
         number = list_hand_scene.get(position).get("number").toString();
         //去根据mac去服务器端下载GizWifiDevice
-        get_to_wifi(mac);
+        String apple_name = "";
+        for (int i = 0; i < list_hand_scene.size(); i++) {
+            if (list_hand_scene.get(i).get("controllerId").equals(mac)) {
+                apple_name = list_hand_scene.get(i).get("name").toString();
+
+            }
+        }
+        if (wifiDevices.size() != 0) {
+            get_to_wifi(mac, apple_name);//绑定订阅
+            toControlApplianAct();
+        } else {
+            ToastUtil.showToast(SelectInfraredForwardActivity.this, "请与" + apple_name
+                    +
+                    "在同一网络后再控制");
+        }
     }
 
     private void toControlApplianAct() {
@@ -330,36 +333,42 @@ public class SelectInfraredForwardActivity extends Basecactivity implements
     }
 
     /**
-     * 从服务器端拉小苹果WIFI红外模块
+     * get_to_wifi
+     *
+     * @param mac
+     * @param apple_name
      */
-
-        private void get_to_wifi(String mac) {
-
-            for (int i = 0; i < wifiDevices.size(); i++) {
-                if (wifiDevices.get(i).getMacAddress().equals(mac)) {
-                    mGizWifiDevice = wifiDevices.get(i);
-                }
+    private void get_to_wifi(String mac, String apple_name) {
+        mGizWifiDevice = null;
+        for (int i = 0; i < wifiDevices.size(); i++) {
+            if (wifiDevices.get(i).getMacAddress().equals(mac)) {
+                mGizWifiDevice = wifiDevices.get(i);
             }
-            if (!Utility.isEmpty(mGizWifiDevice)) { //
-                mDeviceManager.bindRemoteDevice(mGizWifiDevice);
-                final GizWifiDevice finalMGizWifiDevice = mGizWifiDevice;
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        mDeviceManager.setSubscribe(finalMGizWifiDevice, true);
-                    }
-                }, 1000);
-            }
-            toControlApplianAct();
         }
-
-
+        if (!Utility.isEmpty(mGizWifiDevice)) { //
+//            Object json = JSON.toJSON(mGizWifiDevice);
+//            String str = new Gson().toJson(json);
+            mDeviceManager.bindRemoteDevice(mGizWifiDevice);
+            final GizWifiDevice finalMGizWifiDevice = mGizWifiDevice;
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mDeviceManager.setSubscribe(finalMGizWifiDevice, true);
+                }
+            }, 1000);
+        } else {
+            ToastUtil.showToast(SelectInfraredForwardActivity.this, "请与" + apple_name
+                    +
+                    "在同一网络后在控制");
+            return;
+        }
+    }
 
     private void setPicture(String type) {
         switch (type) {
             case "AA02":
-                listint.add(R.drawable.icon_zhuwo_60);
-                listintwo.add(R.drawable.icon_zhuwo_60);
+                listint.add(R.drawable.icon_hongwaizfq_40);
+                listintwo.add(R.drawable.icon_hongwaizfq_40);
                 break;
             case "7":
                 listint.add(R.drawable.icon_menci_40);
@@ -617,62 +626,62 @@ public class SelectInfraredForwardActivity extends Basecactivity implements
     }
 
 
-    /**
-     * 获取小苹果列表
-     */
-    private void getWifiApples() {
-        Map<String, String> mapdevice = new HashMap<>();
-        mapdevice.put("token", TokenUtil.getToken(SelectInfraredForwardActivity.this));
-//        mapdevice.put("boxNumber", TokenUtil.getBoxnumber(SelectSensorActivity.this));
-        MyOkHttp.postMapString(ApiHelper.sraum_getWifiAppleInfos
-                , mapdevice, new Mycallback(new AddTogglenInterfacer() {
-                    @Override
-                    public void addTogglenInterfacer() {//刷新togglen数据
-                        getWifiApples();
-                    }
-                }, SelectInfraredForwardActivity.this, dialogUtil) {
-                    @Override
-                    public void onError(Call call, Exception e, int id) {
-                        super.onError(call, e, id);
-                    }
-
-                    @Override
-                    public void pullDataError() {
-                        super.pullDataError();
-                    }
-
-                    @Override
-                    public void emptyResult() {
-                        super.emptyResult();
-                    }
-
-                    @Override
-                    public void wrongToken() {
-                        super.wrongToken();
-                        //重新去获取togglen,这里是因为没有拉到数据所以需要重新获取togglen
-
-                    }
-
-                    @Override
-                    public void wrongBoxnumber() {
-                        super.wrongBoxnumber();
-                    }
-
-                    @Override
-                    public void onSuccess(final User user) {
-                        wifi_apple_list = new ArrayList<>();
-                        for (int i = 0; i < user.controllerList.size(); i++) {
-                            Map<String, String> mapdevice = new HashMap<>();
-                            mapdevice.put("name", user.controllerList.get(i).name);
-                            mapdevice.put("number", user.controllerList.get(i).number);
-                            mapdevice.put("type", user.controllerList.get(i).type);
-                            mapdevice.put("controllerId", user.controllerList.get(i).controllerId);
-                            wifi_apple_list.add(mapdevice);
-                        }
-
-                        if (wifi_apple_list.size() != 0)
-                            get_to_wifi(wifi_apple_list.get(wifi_apple_list.size() - 1).get("controllerId").toString());
-                    }
-                });
-    }
+//    /**
+//     * 获取小苹果列表
+//     */
+//    private void getWifiApples() {
+//        Map<String, String> mapdevice = new HashMap<>();
+//        mapdevice.put("token", TokenUtil.getToken(SelectInfraredForwardActivity.this));
+////        mapdevice.put("boxNumber", TokenUtil.getBoxnumber(SelectSensorActivity.this));
+//        MyOkHttp.postMapString(ApiHelper.sraum_getWifiAppleInfos
+//                , mapdevice, new Mycallback(new AddTogglenInterfacer() {
+//                    @Override
+//                    public void addTogglenInterfacer() {//刷新togglen数据
+//                        getWifiApples();
+//                    }
+//                }, SelectInfraredForwardActivity.this, dialogUtil) {
+//                    @Override
+//                    public void onError(Call call, Exception e, int id) {
+//                        super.onError(call, e, id);
+//                    }
+//
+//                    @Override
+//                    public void pullDataError() {
+//                        super.pullDataError();
+//                    }
+//
+//                    @Override
+//                    public void emptyResult() {
+//                        super.emptyResult();
+//                    }
+//
+//                    @Override
+//                    public void wrongToken() {
+//                        super.wrongToken();
+//                        //重新去获取togglen,这里是因为没有拉到数据所以需要重新获取togglen
+//
+//                    }
+//
+//                    @Override
+//                    public void wrongBoxnumber() {
+//                        super.wrongBoxnumber();
+//                    }
+//
+//                    @Override
+//                    public void onSuccess(final User user) {
+//                        wifi_apple_list = new ArrayList<>();
+//                        for (int i = 0; i < user.controllerList.size(); i++) {
+//                            Map<String, String> mapdevice = new HashMap<>();
+//                            mapdevice.put("name", user.controllerList.get(i).name);
+//                            mapdevice.put("number", user.controllerList.get(i).number);
+//                            mapdevice.put("type", user.controllerList.get(i).type);
+//                            mapdevice.put("controllerId", user.controllerList.get(i).controllerId);
+//                            wifi_apple_list.add(mapdevice);
+//                        }
+//
+//                        if (wifi_apple_list.size() != 0)
+//                            get_to_wifi(wifi_apple_list.get(wifi_apple_list.size() - 1).get("controllerId").toString());
+//                    }
+//                });
+//    }
 }

@@ -132,6 +132,7 @@ public class AssociatedpanelActivity extends Basecactivity implements AdapterVie
     private Bundle bundle;
     private TextView dtext_id, belowtext_id;
     private Button qxbutton_id, checkbutton_id;
+    private int position;
 
     @Override
     protected int viewId() {
@@ -174,7 +175,7 @@ public class AssociatedpanelActivity extends Basecactivity implements AdapterVie
         pathreebtn_sanlu.setOnClickListener(this);
         pafourbtn_sanlu.setOnClickListener(this);
         titlecenId.setText("关联面板");
-        getData();
+        getData(0);
         replacePanel();
     }
 
@@ -202,7 +203,7 @@ public class AssociatedpanelActivity extends Basecactivity implements AdapterVie
         adapter.notifyDataSetChanged();
     }
 
-    private void getData() {
+    private void getData(final int index) {
         dialogUtil.loadDialog();
         Map<String, Object> map = new HashMap<>();
         map.put("token", TokenUtil.getToken(AssociatedpanelActivity.this));
@@ -211,18 +212,22 @@ public class AssociatedpanelActivity extends Basecactivity implements AdapterVie
                 map, new Mycallback(new AddTogglenInterfacer() {
                     @Override
                     public void addTogglenInterfacer() {
-                        getData();
+                        getData(index);
                     }
                 }, AssociatedpanelActivity.this, dialogUtil) {
                     @Override
                     public void onSuccess(User user) {
                         super.onSuccess(user);
                         panelList = user.panelList;
+                        checkList.clear();
                         List<User.panellist> panelListnew = new ArrayList<User.panellist>();
                         for (int i = 0; i < panelList.size(); i++) {
                             User.panellist upanel = panelList.get(i);
                             if (upanel.type.trim().equals("A401") || upanel.type.trim().equals("A501") ||
-                                    upanel.type.trim().equals("A601") || upanel.type.trim().equals("A701")) {
+                                    upanel.type.trim().equals("A601") || upanel.type.trim().equals("A701")
+                                    || upanel.type.trim().equals("A611")
+                                    || upanel.type.trim().equals("A711")
+                                    || upanel.type.trim().equals("A511")) {
                                 panelListnew.add(upanel);
                             }
                         }
@@ -231,15 +236,15 @@ public class AssociatedpanelActivity extends Basecactivity implements AdapterVie
                         User.panellist upone = panelList.get(0);
                         for (int i = 0; i < panelList.size(); i++) {
                             User.panellist up = panelList.get(i);
+                            checkList.add(false);
                             if (panelNumber.equals(up.id)) {//说明该面板已经关联了该场景，置顶该面板
                                 flag = false;
-                                checkList.add(true);
                                 panelid = up.id;
                                 panelList.set(0, up);
                                 panelList.set(i, upone);//替换位置
                                 LogUtil.eLength("改变图片", "数据问题");
-                                panelrela.setVisibility(View.VISIBLE);//主布局显示
-                                setPicture(up.type,up.button5Type, pafivebtn, 5);//pafivebtn为下面第五个relativelayout里面的图片
+//                                panelrela.setVisibility(View.VISIBLE);//主布局显示
+                                setPicture(up.type, up.button5Type, pafivebtn, 5);//pafivebtn为下面第五个relativelayout里面的图片
                                 setPicture(up.type, up.button6Type, pasixbtn, 6);
                                 setPicture(up.type, up.button7Type, pasevenbtn, 7);
                                 setPicture(up.type, up.button8Type, paeightbtn, 8);
@@ -249,23 +254,39 @@ public class AssociatedpanelActivity extends Basecactivity implements AdapterVie
                                 paseventext.setText(up.button7Name);
                                 paeighttext.setText(up.button8Name);
                                 setFlag(up.button5Type, up.button6Type, up.button7Type, up.button8Type);
+                                switch (index) {
+                                    case 1:
+                                        checkList.set(0, true);
+                                        break;
+                                }
+
                             } else {
-                                checkList.add(false);
-                            }
-                        }
-                        for (int i = 0; i < checkList.size(); i++) {
-                            if (flag) {
-                                checkList.set(i, false);
-                            } else {
-                                if (i == 0) {
-                                    checkList.set(0, true);
-                                } else {
-                                    checkList.set(i, false);
+//                                checkList.add(false);
+                                switch (index) {
+                                    case 1:
+                                        checkList.set(i, false);
+                                        break;
                                 }
                             }
                         }
+//                        for (int i = 0; i < checkList.size(); i++) {
+//                            if (flag) {
+//                                checkList.set(i, false);
+//                            } else {
+//                                if (i == 0) {
+////                                    checkList.set(0, true);
+//                                } else {
+//                                    checkList.set(i, false);
+//                                }
+//                            }
+//                        }
                         adapter = new AsccociatedpanelAdapter(AssociatedpanelActivity.this, panelList, checkList);
                         panelistview.setAdapter(adapter);
+                        switch (index) {
+                            case 1:
+                                onitemclick(0);
+                                break;
+                        }
                     }
 
                     @Override
@@ -273,10 +294,11 @@ public class AssociatedpanelActivity extends Basecactivity implements AdapterVie
                         super.wrongToken();
                     }
                 });
-
     }
 
-    /**显示那种布局
+    /**
+     * 显示那种布局
+     *
      * @param linearType
      */
     private void setLinear(String linearType) {
@@ -287,15 +309,21 @@ public class AssociatedpanelActivity extends Basecactivity implements AdapterVie
                 LogUtil.eLength("这是进入A201", "看看操作");
                 break;
             case "A202":
+            case "A311":
                 panelineartwo.setVisibility(View.VISIBLE);
                 LogUtil.eLength("这是进入A202", "进入了");
                 break;
             case "A203":
+            case "A312":
+            case "A321":
                 panelinearthree.setVisibility(View.VISIBLE);
                 LogUtil.eLength("这是进入A203", "看看操作");
 //                paonerela.setVisibility(View.GONE);
                 break;
             case "A204":
+            case "A313":
+            case "A322":
+            case "A331":
                 panelinearfour.setVisibility(View.VISIBLE);
                 break;
             case "A303"://三路调光
@@ -313,22 +341,22 @@ public class AssociatedpanelActivity extends Basecactivity implements AdapterVie
 
     private void setFlag(String fivetype, String sixtype,
                          String sevemtype, String eighttype) {
-        if (fivetype.equals("")) {
+        if (fivetype == null) {
             flagimagefive = "1";
         } else {
             flagimagefive = "3";
         }
-        if (sixtype.equals("")) {
+        if (sixtype == null) {
             flagimagesix = "1";
         } else {
             flagimagesix = "3";
         }
-        if (sevemtype.equals("")) {
+        if (sevemtype == null) {
             flagimageseven = "1";
         } else {
             flagimageseven = "3";
         }
-        if (eighttype.equals("")) {
+        if (eighttype == null) {
             flagimageight = "1";
         } else {
             flagimageight = "3";
@@ -486,7 +514,6 @@ public class AssociatedpanelActivity extends Basecactivity implements AdapterVie
                         default:
                             break;
                     }
-
                 } else {
                     ToastUtil.showToast(AssociatedpanelActivity.this, "不可以设置场景");
                 }
@@ -579,7 +606,7 @@ public class AssociatedpanelActivity extends Basecactivity implements AdapterVie
                     @Override
                     public void onSuccess(User user) {
                         super.onSuccess(user);
-                        getData();
+                        getData(1);
                     }
 
                     @Override
@@ -591,6 +618,11 @@ public class AssociatedpanelActivity extends Basecactivity implements AdapterVie
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        this.position = position;
+        onitemclick(position);
+    }
+
+    private void onitemclick(int position) {
         panelNumber = panelList.get(position).id;
         panelid = panelList.get(position).id;
         type = panelList.get(position).type;
@@ -614,27 +646,33 @@ public class AssociatedpanelActivity extends Basecactivity implements AdapterVie
         checkPosition(position);
         panelrela.setVisibility(View.GONE);
         panelrela.setVisibility(View.VISIBLE);
-        setPicture(type, button5Type, pafivebtn,5);
-        setPicture(type, button6Type, pasixbtn,6);
-        setPicture(type, button7Type, pasevenbtn,7);
-        setPicture(type, button8Type, paeightbtn,8);
-        LogUtil.eLength("查看item", type + "数据" + position);
         clear();
+        setPicture(type, button5Type, pafivebtn, 5);
+        setPicture(type, button6Type, pasixbtn, 6);
+        setPicture(type, button7Type, pasevenbtn, 7);
+        setPicture(type, button8Type, paeightbtn, 8);
+        LogUtil.eLength("查看item", type + "数据" + position);
         switch (type) {
             case "A201":
                 panelinearone.setVisibility(View.VISIBLE);
                 LogUtil.eLength("这是进入A201", "看看操作");
                 break;
             case "A202":
+            case "A311":
                 panelineartwo.setVisibility(View.VISIBLE);
                 LogUtil.eLength("这是进入A202", "进入了");
                 break;
             case "A203":
+            case "A312":
+            case "A321":
                 panelinearthree.setVisibility(View.VISIBLE);
                 LogUtil.eLength("这是进入A203", "看看操作");
 //                paonerela.setVisibility(View.GONE);
                 break;
             case "A204":
+            case "A313":
+            case "A322":
+            case "A331":
                 panelinearfour.setVisibility(View.VISIBLE);
                 break;
             case "A301":
@@ -670,9 +708,27 @@ public class AssociatedpanelActivity extends Basecactivity implements AdapterVie
         panelinearthree.setVisibility(View.GONE);
         panelinearfour.setVisibility(View.GONE);
         paneThreeLuTiaoGuang.setVisibility(View.GONE);
+
+        pafivebtn.setImageBitmap(null);
+        pasixbtn.setImageBitmap(null);
+        pasevenbtn.setImageBitmap(null);
+        paeightbtn.setImageBitmap(null);
     }
 
     private void compareName(String fivename, String sixname, String sevenname, String eightname) {
+        if (fivename == null) {
+            fivename = "";
+        }
+        if (sixname == null) {
+            sixname = "";
+        }
+        if (sevenname == null) {
+            sevenname = "";
+        }
+        if (eightname == null) {
+            eightname = "";
+        }
+
         //1代表为空值或者2非空值代表场景一直3非空值不相等
         if (fivename.equals("")) {
             flagimagefive = "1";

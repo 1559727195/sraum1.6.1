@@ -281,6 +281,7 @@ public class User {
         public List<deviceList> deviceList;
         public String deviceName;
         public String type;
+        public String boxName;
     }
 
     /**

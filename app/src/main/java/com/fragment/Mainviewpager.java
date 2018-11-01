@@ -1,13 +1,19 @@
 package com.fragment;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
@@ -34,12 +40,17 @@ import com.Util.Mycallback;
 import com.Util.SharedPreferencesUtil;
 import com.Util.ToastUtil;
 import com.Util.TokenUtil;
+import com.Util.UpdateManager;
 import com.adapter.FragmentViewPagerAdapter;
 import com.adapter.MygatewayAdapter;
 import com.base.Basecfragment;
 import com.data.Allbox;
 import com.data.User;
+import com.dialog.CommonData;
+import com.dialog.ToastUtils;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
+import com.jpush.ExampleUtil;
+import com.massky.sraum.AddZigbeeDevActivity;
 import com.massky.sraum.LoginActivity;
 import com.massky.sraum.MacdeviceActivity;
 import com.massky.sraum.MainfragmentActivity;
@@ -57,6 +68,8 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 
 import static com.Util.SharedPreferencesUtil.getData;
+import static com.fragment.LeftFragment.MESSAGE_TONGZHI;
+import static com.massky.sraum.MainfragmentActivity.MESSAGE_TONGZHI_DOOR;
 
 
 /**
@@ -64,6 +77,8 @@ import static com.Util.SharedPreferencesUtil.getData;
  */
 //用于主界面首页设置
 public class Mainviewpager extends Basecfragment implements ViewPager.OnPageChangeListener {
+    public static final String MESSAGE_TONGZHI_DOOR_FIRST = "com.fragment.massky.message.tongzhi.door.first";
+    private static String type1 = "";//可视门铃极光推送类型
     @InjectView(R.id.viewpager_id)
     ViewPager viewpager_id;
     @InjectView(R.id.macrelative_id)
@@ -113,6 +128,9 @@ public class Mainviewpager extends Basecfragment implements ViewPager.OnPageChan
     private List<Allbox> allboxList = new ArrayList<Allbox>();
     private DialogUtil dialogUtil;
     private RelativeLayout select_dev_type_id;
+    private MessageReceiver mMessageReceiver;
+    private String type;
+    private String uid;
 //    public static List<RemoteControl> list_remotecontrol_tv = new ArrayList<>();//存储各种遥控器编码列表
 //    public static List<Map> list_remote_others_tv = new ArrayList<>();//存储各种遥控器编码列表对应的rid,mac参数
 
@@ -124,8 +142,49 @@ public class Mainviewpager extends Basecfragment implements ViewPager.OnPageChan
         return R.layout.mainviewpager;
     }
 
+
+    public static Mainviewpager newInstance(String type) {
+        type1 = type;
+        Mainviewpager newFragment = new Mainviewpager();
+        Bundle bundle = new Bundle();
+        newFragment.setArguments(bundle);
+        return newFragment;
+    }
+
+    public void registerMessageReceiver() {
+        mMessageReceiver = new MessageReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
+        filter.addAction(MESSAGE_TONGZHI_DOOR);
+        getActivity().registerReceiver(mMessageReceiver, filter);
+    }
+
+
+    public class MessageReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            try {
+                if (MESSAGE_TONGZHI_DOOR.equals(intent.getAction())) {
+                    type = intent.getStringExtra("type");
+                    uid = intent.getStringExtra("uid");
+                    clear();
+                    Intent mIntent = new Intent(MESSAGE_TONGZHI_DOOR_FIRST);
+                    mIntent.putExtra("type", type);
+                    mIntent.putExtra("uid", uid);
+                    getActivity().sendBroadcast(mIntent);
+                    viewchange(0);
+                }
+            } catch (Exception e) {
+
+            }
+        }
+    }
+
+
     @Override
     protected void onView() {
+        registerMessageReceiver();
         dialogUtil = new DialogUtil(getActivity());
         addPopwinwow();
         LogUtil.i("这是oncreate方法", "onView: ");
@@ -252,6 +311,7 @@ public class Mainviewpager extends Basecfragment implements ViewPager.OnPageChan
     private void startState() {
         clear();
         viewchange(1);
+
     }
 
     @Override
@@ -384,11 +444,12 @@ public class Mainviewpager extends Basecfragment implements ViewPager.OnPageChan
         //在这里先调
         //设置网关模式-sraum-setBox
         Map map = new HashMap();
-        String phoned = getDeviceId(getActivity());
+//        String phoned = getDeviceId(getActivity());
         map.put("token", TokenUtil.getToken(getActivity()));
         String boxnumber = (String) SharedPreferencesUtil.getData(getActivity(), "boxnumber", "");
         map.put("boxNumber", boxnumber);
-        map.put("phoneId", phoned);
+        String regId = (String) SharedPreferencesUtil.getData(getActivity(), "regId", "");
+        map.put("phoneId", regId);
         map.put("status", "1");//进入设置模式
         dialogUtil.loadDialog();
         MyOkHttp.postMapObject(ApiHelper.sraum_setBox, map, new Mycallback(new AddTogglenInterfacer() {
@@ -436,6 +497,9 @@ public class Mainviewpager extends Basecfragment implements ViewPager.OnPageChan
         String id;
         //android.telephony.TelephonyManager
         TelephonyManager mTelephony = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            return "";
+        }
         if (mTelephony.getDeviceId() != null) {
             id = mTelephony.getDeviceId();
         } else {
@@ -534,5 +598,11 @@ public class Mainviewpager extends Basecfragment implements ViewPager.OnPageChan
 //        p.height = (int) (displayHeight * 0.5); //宽度设置为屏幕的0.5
 //        dialog.setCanceledOnTouchOutside(false);// 设置点击屏幕Dialog不消失
         dialog.getWindow().setAttributes(p);  //设置生效
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        getActivity().unregisterReceiver(mMessageReceiver);
     }
 }

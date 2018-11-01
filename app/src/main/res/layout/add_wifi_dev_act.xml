@@ -69,6 +69,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/p17"
         android:layout_marginRight="@dimen/p17"
+        android:id="@+id/txt_title"
         android:text="长按设备reset键，保持5秒左右，至指示灯开始闪烁，即重置成功。"
         android:layout_marginTop="15dp"
         android:textSize="@dimen/p25"

@@ -8,6 +8,8 @@
     <dimen name="p4">4px</dimen>
     <dimen name="p5">5px</dimen>
     <dimen name="p8">8px</dimen>
+    <dimen name="text_normal_size">12.0sp</dimen>
+    <dimen name="text_title_size">15.0sp</dimen>
     <dimen name="p9">9px</dimen>
     <dimen name="p10">10px</dimen>
     <dimen name="p11">11px</dimen>

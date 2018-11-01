@@ -1,7 +1,10 @@
 package com.Util;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Message;
 import android.text.TextUtils;
 
 import com.AddTogenInterface.AddTogglenInterfacer;
@@ -36,6 +39,13 @@ public class Mycallback extends StringCallback implements ApiResult {
     private DialogUtil dialogUtil;
     private AddTogglenInterfacer addTogglenInterfacer;
 
+    Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            remove();
+        }
+    };
+
     public Mycallback(AddTogglenInterfacer addTogglenInterfacer, Context context, DialogUtil dialogUtil) {
         this.context = context;
         this.dialogUtil = dialogUtil;
@@ -45,14 +55,14 @@ public class Mycallback extends StringCallback implements ApiResult {
     @Override
     public void onError(Call call, Exception e, int id) {
         LogUtil.i("这是异常error", e.getMessage() + "");
-        remove();
+        handler.sendEmptyMessage(0);
         ToastUtil.showDelToast(context, "网络连接超时");
     }
 
     @Override
     public void onResponse(String response, int id) {
         LogUtil.eLength("这是返回数据", response + "");
-        remove();
+        handler.sendEmptyMessage(0);
         if (TextUtils.isEmpty(response)) {
             emptyResult();
         } else {
@@ -102,8 +112,16 @@ public class Mycallback extends StringCallback implements ApiResult {
 
     //移除dialog动画加载
     private void remove() {
-        if (dialogUtil != null) {
-            dialogUtil.removeDialog();
+        if (context instanceof Activity) {
+            Activity activity = (Activity) context;
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (dialogUtil != null) {
+                        dialogUtil.removeDialog();
+                    }
+                }
+            });
         }
     }
 

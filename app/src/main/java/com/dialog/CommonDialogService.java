@@ -153,7 +153,8 @@ public class CommonDialogService extends Service implements CommonDialogListener
     private void init_jlogin(String str) {
         String mobilePhone = (String) SharedPreferencesUtil.getData(CommonData.mNowContext, "loginPhone", "");
         TelephonyManager TelephonyMgr = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
-        String szImei = TelephonyMgr.getDeviceId();
+//        String szImei = TelephonyMgr.getDeviceId();
+        String szImei = (String) SharedPreferencesUtil.getData(CommonDialogService.this, "regId", "");
         init_islogin(mobilePhone, szImei,str);
     }
 

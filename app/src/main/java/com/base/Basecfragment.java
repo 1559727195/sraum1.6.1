@@ -82,7 +82,6 @@ public abstract class Basecfragment extends Fragment implements View.OnClickList
         super.onActivityCreated(savedInstanceState);
 //        Log.d("TAG", "fragment->onActivityCreated");
         isPrepared = true;
-        lazyLoad();
     }
 
     @Override
@@ -90,6 +89,7 @@ public abstract class Basecfragment extends Fragment implements View.OnClickList
         super.onCreate(savedInstanceState);
         mContext = getActivity();
         setHasOptionsMenu(true);
+        lazyLoad();
 //        Log.d("TAG", "fragment->onCreate");
     }
 

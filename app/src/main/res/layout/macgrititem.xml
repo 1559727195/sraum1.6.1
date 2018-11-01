@@ -12,32 +12,34 @@
 
         <ImageView
             android:id="@+id/imageitem_id"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="@dimen/p34"
+            android:layout_marginTop="17dp"
             android:src="@drawable/marklamph" />
+
         <TextView
             android:id="@+id/status_txt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/imageitem_id"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="@dimen/p15"
+            android:layout_marginTop="7dp"
             android:text="开"
             android:textColor="@color/e30"
-            android:textSize="@dimen/p20" />
+            android:textSize="10sp" />
+
         <TextView
             android:id="@+id/textitem_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/status_txt"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="@dimen/p15"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="7dp"
             android:text="@string/porchlight"
-            android:layout_marginBottom="@dimen/p40"
             android:textColor="@color/e30"
-            android:textSize="@dimen/p20" />
+            android:textSize="10sp" />
     </RelativeLayout>
 
 </RelativeLayout>

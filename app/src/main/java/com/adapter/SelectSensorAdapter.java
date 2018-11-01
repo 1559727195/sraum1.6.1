@@ -93,7 +93,6 @@ public class SelectSensorAdapter extends BaseAdapter {
         SelectSensorAdapter.isSelected = isSelected;
     }
 
-
     class ViewHolderContentType {
         ImageView img_guan_scene;
         TextView panel_scene_name_txt;

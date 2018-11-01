@@ -594,8 +594,15 @@ public class AddWifiHongWaiScucessActivity extends Basecactivity {
                     @Override
                     public void onError(Call call, Exception e, int id) {
                         super.onError(call, e, id);
-                        AddWifiHongWaiScucessActivity.this.finish();
+//                        AddWifiHongWaiScucessActivity.this.finish();
+                        ToastUtil.showToast(AddWifiHongWaiScucessActivity.this,"修改名字失败");
                     }
+
+                    @Override
+                    public void pullDataError() {
+                        ToastUtil.showToast(AddWifiHongWaiScucessActivity.this,"修改名字失败");
+                    }
+
 
                     @Override
                     public void onSuccess(User user) {
@@ -620,6 +627,11 @@ public class AddWifiHongWaiScucessActivity extends Basecactivity {
                     public void fourCode() {
                         super.fourCode();
                         ToastUtil.showToast(AddWifiHongWaiScucessActivity.this, panelName + ":" + "面板名字已存在");
+                    }
+
+                    @Override
+                    public void wrongBoxnumber() {
+                        ToastUtil.showToast(AddWifiHongWaiScucessActivity.this, "错误");
                     }
                 });
     }

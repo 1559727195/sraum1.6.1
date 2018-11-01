@@ -39,7 +39,6 @@ import static android.R.attr.data;
 import static android.R.attr.fadingEdgeLength;
 import static android.R.attr.label;
 import static android.R.id.list;
-import static cn.jpush.android.d.f;
 import static com.Util.ByteUtils.init_crc_weight_udp;
 import static com.Util.ByteUtils.testCrc;
 import static com.massky.sraum.R.drawable.sh;
@@ -363,6 +362,9 @@ public class SearchgatewayActivity extends Basecactivity {
                     if (null != udpPacket.getAddress()) {
                         //02 1001 0012 62a001ff1008 313030385352677700000000643603
                         String codeString = ByteUtils.bytesToHexString(data, udpPacket.getLength());
+                        if(codeString == null) {
+                            return;
+                        }
                         if (codeString.length() > 22) {
                             String wanggguan_mac = codeString.substring(10, 22);//62a001ff1008
                             Log.e("zhu", "wanggguan_mac:" + wanggguan_mac);

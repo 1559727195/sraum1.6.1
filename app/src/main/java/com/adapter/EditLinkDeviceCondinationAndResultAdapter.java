@@ -81,6 +81,11 @@ public class EditLinkDeviceCondinationAndResultAdapter extends android.widget.Ba
 //        viewHolderContentType.img_guan_scene.setImageResource(element);
         viewHolderContentType.panel_scene_name_txt.setText(listint.get(position).get("name1").toString());
         viewHolderContentType.execute_scene_txt.setText(listint.get(position).get("action").toString());
+        if (listint.get(position).get("boxName").toString().equals("")) {
+            viewHolderContentType.gateway_name_txt.setVisibility(View.GONE);
+        } else {
+            viewHolderContentType.gateway_name_txt.setText(listint.get(position).get("boxName").toString());
+        }
 
         final ViewHolderContentType finalViewHolderContentType = viewHolderContentType;
         viewHolderContentType.delete_btn.setOnClickListener(new View.OnClickListener() {

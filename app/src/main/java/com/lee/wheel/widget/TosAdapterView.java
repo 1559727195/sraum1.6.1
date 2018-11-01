@@ -1026,6 +1026,10 @@ public abstract class TosAdapterView<T extends Adapter> extends ViewGroup {
             selectionChanged();
             mOldSelectedPosition = mSelectedPosition;
             mOldSelectedRowId = mSelectedRowId;
+        } else {
+            selectionChanged();
+            mOldSelectedPosition = mSelectedPosition;
+            mOldSelectedRowId = mSelectedRowId;
         }
     }
 

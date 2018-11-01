@@ -207,7 +207,6 @@ public class RegisterActivity extends Basecactivity {
                 ToastUtil.showDelToast(RegisterActivity.this, "两次密码输入不一致");
             }
         }
-
     }
 
     //验证手机号是否注册，发送验证码

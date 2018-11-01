@@ -2,13 +2,10 @@ package com.Util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-
-import com.massky.sraum.EditLinkDeviceResultActivity;
-
+import com.zlm.libs.preferences.PreferencesProviderUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -30,13 +27,67 @@ public class SharedPreferencesUtil {
      * @param key
      * @param data
      */
-    public static void saveData(Context context, String key, Object data) {
+    public static void saveData_second(Context context, String key, Object data) {
 
         String type = data.getClass().getSimpleName();
-        SharedPreferences sharedPreferences = context
-                .getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
+//        SharedPreferences sharedPreferences = context
+//                .getSharedPreferences(FILE_NAME, Context.MODE_MULTI_PROCESS
+//                );
+//        SharedPreferences.Editor editor = sharedPreferences.edit();
 
+//        if ("Integer".equals(type)) {
+//            editor.putInt(key, (Integer) data);
+//        } else if ("Boolean".equals(type)) {
+//            editor.putBoolean(key, (Boolean) data);
+//        } else if ("String".equals(type)) {
+//            editor.putString(key, (String) data);
+//        } else if ("Float".equals(type)) {
+//            editor.putFloat(key, (Float) data);
+//        } else if ("Long".equals(type)) {
+//            editor.putLong(key, (Long) data);
+//        }
+
+
+        if ("Integer".equals(type)) {
+//            editor.putInt(key, (Integer) data);
+            PreferencesProviderUtils.putInt(context, FILE_NAME, key, (Integer) data);
+        } else if ("Boolean".equals(type)) {
+//            editor.putBoolean(key, (Boolean) data);
+            PreferencesProviderUtils.putBoolean(context, FILE_NAME, key, (Boolean) data);
+        } else if ("String".equals(type)) {
+//            editor.putString(key, (String) data);
+            PreferencesProviderUtils.putString(context, FILE_NAME, key, (String) data);
+        } else if ("Float".equals(type)) {
+//            editor.putFloat(key, (Float) data);
+            PreferencesProviderUtils.putFloat(context, FILE_NAME, key, (Float) data);
+        } else if ("Long".equals(type)) {
+//            editor.putLong(key, (Long) data);
+            PreferencesProviderUtils.putLong(context, FILE_NAME, key, (Long) data);
+        }
+
+//        PreferencesProviderUtils.putBoolean(getApplicationContext(),"def","booleanKey",true);
+//        PreferencesProviderUtils.putFloat(getApplicationContext(),"def","floatKey",0.1f);
+//        PreferencesProviderUtils.putInt(getApplicationContext(),"def","intKey",1);
+//        PreferencesProviderUtils.putLong(getApplicationContext(),"def","longKey",1l);
+//        PreferencesProviderUtils.remove(getApplicationContext(),"def","longKey");
+
+//        editor.commit();
+    }
+
+
+    /**
+     * 保存数据到文件
+     *
+     * @param context
+     * @param key
+     * @param data
+     */
+    public static void saveData(Context context, String key, Object data) {
+        String type = data.getClass().getSimpleName();
+        SharedPreferences sharedPreferences = context
+                .getSharedPreferences(FILE_NAME, Context.MODE_MULTI_PROCESS
+                );
+        SharedPreferences.Editor editor = sharedPreferences.edit();
         if ("Integer".equals(type)) {
             editor.putInt(key, (Integer) data);
         } else if ("Boolean".equals(type)) {
@@ -48,7 +99,6 @@ public class SharedPreferencesUtil {
         } else if ("Long".equals(type)) {
             editor.putLong(key, (Long) data);
         }
-
         editor.commit();
     }
 
@@ -64,7 +114,7 @@ public class SharedPreferencesUtil {
 
         String type = defValue.getClass().getSimpleName();
         SharedPreferences sharedPreferences = context.getSharedPreferences
-                (FILE_NAME, Context.MODE_PRIVATE);
+                (FILE_NAME, Context.MODE_MULTI_PROCESS);
 
         //defValue为为默认值，如果当前获取不到数据就返回它
         if ("Integer".equals(type)) {
@@ -133,6 +183,55 @@ public class SharedPreferencesUtil {
 //        editor.commit();
         saveData(context, key, mJsonArray.toString());
     }
+
+
+    /**
+     * 从文件中读取数据
+     *
+     * @param context
+     * @param key
+     * @param defValue
+     * @return
+     */
+    public static Object getData_second(Context context, String key, Object defValue) {
+
+        String type = defValue.getClass().getSimpleName();
+//        SharedPreferences sharedPreferences = context.getSharedPreferences
+//                (FILE_NAME, Context.MODE_MULTI_PROCESS);
+
+        //defValue为为默认值，如果当前获取不到数据就返回它
+//        if ("Integer".equals(type)) {
+//            return sharedPreferences.getInt(key, (Integer) defValue);
+//        } else if ("Boolean".equals(type)) {
+//            return sharedPreferences.getBoolean(key, (Boolean) defValue);
+//        } else if ("String".equals(type)) {
+//            return sharedPreferences.getString(key, (String) defValue);
+//        } else if ("Float".equals(type)) {
+//            return sharedPreferences.getFloat(key, (Float) defValue);
+//        } else if ("Long".equals(type)) {
+//            return sharedPreferences.getLong(key, (Long) defValue);
+//        }
+
+        if ("Integer".equals(type)) {
+//            return sharedPreferences.getInt(key, (Integer) defValue);
+            return PreferencesProviderUtils.getInt(context, FILE_NAME, key, (Integer) defValue);
+        } else if ("Boolean".equals(type)) {
+//            return sharedPreferences.getBoolean(key, (Boolean) defValue);
+            return PreferencesProviderUtils.getBoolean(context, FILE_NAME, key, (Boolean) defValue);
+        } else if ("String".equals(type)) {
+//            return sharedPreferences.getString(key, (String) defValue);
+            return PreferencesProviderUtils.getString(context, FILE_NAME, key, (String) defValue);
+        } else if ("Float".equals(type)) {
+//            return sharedPreferences.getFloat(key, (Float) defValue);
+            return PreferencesProviderUtils.getFloat(context, FILE_NAME, key, (Float) defValue);
+        } else if ("Long".equals(type)) {
+//            return sharedPreferences.getLong(key, (Long) defValue);
+            return PreferencesProviderUtils.getLong(context, FILE_NAME, key, (Long) defValue);
+        }
+
+        return null;
+    }
+
 
     /**
      * 获取List<Map></>

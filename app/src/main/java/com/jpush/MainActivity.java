@@ -1,6 +1,5 @@
 package com.jpush;
 
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -12,11 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
-
 import com.massky.sraum.R;
-
-
 import cn.jpush.android.api.InstrumentedActivity;
 import cn.jpush.android.api.JPushInterface;
 
@@ -90,8 +85,8 @@ public class MainActivity extends InstrumentedActivity implements OnClickListene
                 init();
                 break;
             case R.id.setting:
-                Intent intent = new Intent(MainActivity.this, PushSetActivity.class);
-                startActivity(intent);
+//                Intent intent = new Intent(MainActivity.this, PushSetActivity.class);
+//                startActivity(intent);
                 break;
             case R.id.stopPush:
                 JPushInterface.stopPush(getApplicationContext());

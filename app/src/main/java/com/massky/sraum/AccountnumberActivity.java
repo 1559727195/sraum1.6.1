@@ -12,6 +12,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -26,6 +27,7 @@ import android.widget.TextView;
 
 import com.AddTogenInterface.AddTogglenInterfacer;
 import com.Util.ApiHelper;
+import com.Util.App;
 import com.Util.AppManager;
 import com.Util.BitmapUtil;
 import com.Util.DialogUtil;
@@ -34,8 +36,8 @@ import com.Util.LogUtil;
 import com.Util.MyOkHttp;
 import com.Util.Mycallback;
 import com.Util.PopwindowUtil;
-
 import com.Util.SharedPreferencesUtil;
+import com.Util.ToastUtil;
 import com.Util.TokenUtil;
 import com.base.Basecactivity;
 import com.data.User;
@@ -98,7 +100,7 @@ public class AccountnumberActivity extends Basecactivity {
     private Button cancelbtn_id, camera_id, photoalbum, cancle_id, save_id, qxbutton_id, checkbutton_id;
     private TextView dtext_id, belowtext_id;
     //请求相机
-    private  final int REQUEST_CAPTURE = 105;
+    private final int REQUEST_CAPTURE = 105;
     //请求相册
     private static final int REQUEST_PICK = 101;
     //请求截图
@@ -138,13 +140,14 @@ public class AccountnumberActivity extends Basecactivity {
         deleteDialog();
         createCameraTempFile(savedInstanceState);
     }
+
     private void init_permissions() {
 
         // 清空图片缓存，包括裁剪、压缩后的图片 注意:必须要在上传完成后调用 必须要获取权限
         RxPermissions permissions = new RxPermissions(this);
-        permissions.request(Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_EXTERNAL_STORAGE
-                ,Manifest.permission.CAMERA
-                ,Manifest.permission.WRITE_SETTINGS).subscribe(new Observer<Boolean>() {
+        permissions.request(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE
+                , Manifest.permission.CAMERA
+                , Manifest.permission.WRITE_SETTINGS).subscribe(new Observer<Boolean>() {
             @Override
             public void onSubscribe(Disposable d) {
 
@@ -179,9 +182,7 @@ public class AccountnumberActivity extends Basecactivity {
         }
     }
 
-
     private String stringBase64;
-
 
 
 //    @Override
@@ -253,11 +254,9 @@ public class AccountnumberActivity extends Basecactivity {
                 dialogBack.removeviewDialog();
                 break;
             case R.id.checkbutton_id:
+
+                logout();
                 dialogBack.removeviewDialog();
-                SharedPreferencesUtil.saveData(AccountnumberActivity.this, "editFlag", false);
-                SharedPreferencesUtil.saveData(AccountnumberActivity.this, "loginflag", false);
-                IntentUtil.startActivityAndFinishFirst(AccountnumberActivity.this, LoginActivity.class);
-                AppManager.getAppManager().finishAllActivity();
                 break;
             case R.id.asevenrelative:
                 Intent mintent = new Intent(AccountnumberActivity.this, MyfamilyActivity.class);
@@ -300,7 +299,9 @@ public class AccountnumberActivity extends Basecactivity {
                 startActivity(intentch);
                 break;
             case R.id.aonerelative:
-                acctext_id.setText("");
+                acctext_id.setText(username.getText().toString() == null ?
+                        "" : username.getText().toString());
+                //                nickNameaaccount.setText(nickName);// username.setText
                 popflag = true;
                 popwindowUtil.loadPopupwindow();
                 break;
@@ -329,14 +330,54 @@ public class AccountnumberActivity extends Basecactivity {
             case R.id.afourrelative:
                 Intent intent1birthday = new Intent(AccountnumberActivity.this, BirthdayActivity.class);
                 intent1birthday.putExtra("type", "birthday");
+                intent1birthday.putExtra("birthday", birthdaytext_id.getText().toString() == null ?
+                        "" : birthdaytext_id.getText().toString());
                 startActivityForResult(intent1birthday, BIRTH);
                 break;
             case R.id.atworelative:
-                acctext_id.setText("");
+//                acctext_id.setText("");
+                acctext_id.setText(nickNameaaccount.getText().toString() == null ?
+                        "" : nickNameaaccount.getText().toString());
+                //                nickNameaaccount.setText(nickName);// username.setText
                 popflag = false;
                 nickPopwindow.loadPopupwindow();
                 break;
         }
+    }
+
+    private void logout() {
+        //在这里先调
+        //设置网关模式-sraum-setBox
+        Map map = new HashMap();
+//        String phoned = getDeviceId(getActivity());
+        map.put("token", TokenUtil.getToken(AccountnumberActivity.this));
+        if (dialogUtil != null)
+            dialogUtil.loadDialog();
+        MyOkHttp.postMapObject(ApiHelper.sraum_logout, map, new Mycallback(new AddTogglenInterfacer() {
+                    @Override
+                    public void addTogglenInterfacer() {
+                        logout();
+                    }
+                }, AccountnumberActivity.this, dialogUtil) {
+                    @Override
+                    public void onSuccess(User user) {
+                        SharedPreferencesUtil.saveData(AccountnumberActivity.this, "editFlag", false);
+                        SharedPreferencesUtil.saveData(AccountnumberActivity.this, "loginflag", false);
+                        IntentUtil.startActivityAndFinishFirst(AccountnumberActivity.this, LoginActivity.class);
+                        AppManager.getAppManager().finishAllActivity();
+                    }
+
+                    @Override
+                    public void wrongToken() {
+                        super.wrongToken();
+                    }
+
+                    @Override
+                    public void wrongBoxnumber() {
+
+                    }
+                }
+        );
     }
 
     /**
@@ -375,7 +416,6 @@ public class AccountnumberActivity extends Basecactivity {
 //
 //        }
     }
-
 
 
     /**
@@ -549,6 +589,21 @@ public class AccountnumberActivity extends Basecactivity {
                 SharedPreferencesUtil.saveData(AccountnumberActivity.this, "avatar",
                         BitmapUtil.bitmaptoString(bitMap));
                 headportrait.setImageBitmap(bitMap);
+                SharedPreferencesUtil.saveData(App.getInstance().getApplicationContext(), "avatar",
+                        BitmapUtil.bitmaptoString(bitMap));
+//                ToastUtil.showToast(AccountnumberActivity.this,"截图成功"+
+//                ",BitmapUtil.bitmaptoString(bitMap):" + BitmapUtil.bitmaptoString(bitMap));
+//                new Handler().postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//
+//                        headportrait.setDrawingCacheEnabled(true);
+//                        Bitmap bitmap_new = headportrait.getDrawingCache();
+//                        String avatar = BitmapUtil.bitmaptoString(bitmap_new);
+//                        headportrait.setDrawingCacheEnabled(false);
+//                        sraum_updateAvatar_second(avatar);
+//                    }
+//                }, 500);
             }
 
             @Override
@@ -557,6 +612,33 @@ public class AccountnumberActivity extends Basecactivity {
             }
         });
     }
+
+
+    private void sraum_updateAvatar_second(final String avatar) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("token", TokenUtil.getToken(AccountnumberActivity.this));
+        map.put("avatar", avatar);
+        MyOkHttp.postMapObject(ApiHelper.sraum_updateAvatar, map, new Mycallback
+                (new AddTogglenInterfacer() {
+                    @Override
+                    public void addTogglenInterfacer() {
+                        sraum_updateAvatar_second(avatar);
+                    }
+                }, AccountnumberActivity.this, dialogUtil) {
+            @Override
+            public void onSuccess(User user) {
+                super.onSuccess(user);
+                SharedPreferencesUtil.saveData(App.getInstance().getApplicationContext(), "avatar",
+                        avatar);
+            }
+
+            @Override
+            public void wrongToken() {
+                super.wrongToken();
+            }
+        });
+    }
+
 
     //更新用户名
     private void updateUserId(final String userId) {
@@ -579,7 +661,7 @@ public class AccountnumberActivity extends Basecactivity {
             public void onSuccess(User user) {
                 super.onSuccess(user);
                 username.setText(userId);
-                android.util.Log.e("peng","AccountnumberActivity->name:" + username.getText().toString());
+                android.util.Log.e("peng", "AccountnumberActivity->name:" + username.getText().toString());
                 SharedPreferencesUtil.saveData(AccountnumberActivity.this, "userName", username.getText().toString());
             }
 
@@ -595,7 +677,7 @@ public class AccountnumberActivity extends Basecactivity {
         account_num_sraum_update(nickName, gender, birthDay, mobilePhone);
     }
 
-    private void account_num_sraum_update(final String nickName, final String gender, final String birthDay,final String mobilePhone) {
+    private void account_num_sraum_update(final String nickName, final String gender, final String birthDay, final String mobilePhone) {
         Map<String, Object> map = new HashMap<>();
         Map<String, Object> mapInfo = new HashMap<String, Object>();
         mapInfo.put("nickName", nickName);
@@ -618,7 +700,7 @@ public class AccountnumberActivity extends Basecactivity {
                 nickNameaaccount.setText(nickName);
                 sextext_id.setText(gender);
                 birthdaytext_id.setText(birthDay);
-                android.util.Log.e("peng","AccountnumberActivity->name:" + username.getText().toString());
+                android.util.Log.e("peng", "AccountnumberActivity->name:" + username.getText().toString());
                 SharedPreferencesUtil.saveData(AccountnumberActivity.this, "userName", username.getText().toString());
             }
 

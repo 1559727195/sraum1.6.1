@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -60,6 +61,23 @@ public class MyscefargmentAdapter extends android.widget.BaseAdapter {
         if (null == convertView) {
             mHolder = new ViewHolder();
             convertView = LayoutInflater.from(context).inflate(R.layout.gritviewitem, null);
+
+            // 根据列数计算项目宽度，以使总宽度尽量填充屏幕
+            int itemWidth = (int) (context.getResources().getDisplayMetrics().widthPixels - 4 * 10) / 4;
+            // Calculate the height by your scale rate, I just use itemWidth here
+            // 下面根据比例计算您的item的高度，此处只是使用itemWidth
+            int itemHeight = itemWidth;
+            AbsListView.LayoutParams params = (AbsListView.LayoutParams) convertView.getLayoutParams();
+            if (params == null) {
+                params = new AbsListView.LayoutParams(
+                        itemWidth / 10 * 9,
+                        itemHeight / 10 * 9 + itemHeight / 10);
+                convertView.setLayoutParams(params);
+            } else {
+                params.height = itemHeight;
+                params.width = itemWidth;
+            }
+
             mHolder.gitemimage = (ImageView) convertView.findViewById(R.id.gitemimage);
             mHolder.imageitem_id = (ImageView) convertView.findViewById(R.id.imageitem_id);
             mHolder.gitemtext = (TextView) convertView.findViewById(R.id.gitemtext);
@@ -78,13 +96,13 @@ public class MyscefargmentAdapter extends android.widget.BaseAdapter {
             mHolder.relativegrit_id.setVisibility(View.VISIBLE);
         }
         if (list.get(position).sceneStatus.equals("1")) {
-            mHolder.gitemtext.setTextColor(Color.parseColor("#e2c896"));
-            mHolder.textitem_id.setTextColor(Color.parseColor("#e2c896"));
-            mHolder.gitemimage.setImageResource(listintwo.get(position));
-            mHolder.imageitem_id.setImageResource(listintwo.get(position));
+//            mHolder.gitemtext.setTextColor(Color.parseColor("#e2c896"));
+//            mHolder.textitem_id.setTextColor(Color.parseColor("#e2c896"));
+            mHolder.gitemimage.setImageResource(listint.get(position));
+            mHolder.imageitem_id.setImageResource(listint.get(position));
         } else {
-            mHolder.gitemtext.setTextColor(Color.parseColor("#303030"));
-            mHolder.textitem_id.setTextColor(Color.parseColor("#303030"));
+//            mHolder.gitemtext.setTextColor(Color.parseColor("#303030"));
+//            mHolder.textitem_id.setTextColor(Color.parseColor("#303030"));
             mHolder.gitemimage.setImageResource(listint.get(position));
             mHolder.imageitem_id.setImageResource(listint.get(position));
         }
@@ -108,5 +126,4 @@ public class MyscefargmentAdapter extends android.widget.BaseAdapter {
         TextView gitemtext, textitem_id;
         RelativeLayout relativegrit_id, itemrela_id;
     }
-
 }

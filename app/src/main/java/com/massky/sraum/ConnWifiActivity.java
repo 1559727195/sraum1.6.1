@@ -90,9 +90,20 @@ public class ConnWifiActivity extends Basecactivity implements IDeviceConfigList
     private String wifi_name = "";
     private GizWifiDevice gizWifiDevice = null;
     private DeviceManager mDeviceManager;
-    private Handler handler = new Handler();
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case 0:
+                    edit_wifi.setEnabled(false);
+                    break;
+                case 1:
+                    edit_wifi.setEnabled(true);
+                    break;
+            }
+        }
+    };
     private String TAG = "robin debug";
-
 
     @Override
     protected int viewId() {
@@ -205,7 +216,6 @@ public class ConnWifiActivity extends Basecactivity implements IDeviceConfigList
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, filter);
     }
 
-
     public class MessageReceiver extends BroadcastReceiver {
 
         @Override
@@ -304,6 +314,7 @@ public class ConnWifiActivity extends Basecactivity implements IDeviceConfigList
             @Override
             public void onClick(View v) {
                 dialog.dismiss();
+                handler.sendEmptyMessage(0);
             }
         });
 
@@ -314,6 +325,7 @@ public class ConnWifiActivity extends Basecactivity implements IDeviceConfigList
                 Intent wifiSettingsIntent = new Intent("android.settings.WIFI_SETTINGS");
                 startActivityForResult(wifiSettingsIntent, CONNWIFI);
                 dialog.dismiss();
+                handler.sendEmptyMessage(1);
 
             }
         });
@@ -342,6 +354,9 @@ public class ConnWifiActivity extends Basecactivity implements IDeviceConfigList
             if (ss.length >= 2) {
                 edit_wifi.setText(ss[1]);
                 wifi_name = ss[1];
+                edit_password_gateway.setFocusable(true);
+                edit_password_gateway.setFocusableInTouchMode(true);
+                edit_password_gateway.requestFocus();
             }
         }
     }
@@ -351,8 +366,6 @@ public class ConnWifiActivity extends Basecactivity implements IDeviceConfigList
      */
     private void initWifiConect() {
         //初始化连接wifi dialog对话框
-
-
         // TODO Auto-generated method stub
         //获取系统服务
         ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);

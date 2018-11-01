@@ -105,7 +105,6 @@ public class AirControlActivity extends Basecactivity implements IDeviceControll
 
     private DeviceController driverControl = null;
 
-
     private Map mapdevice = new HashMap();
     private YkanIRInterfaceImpl ykanInterface;
     private String TAG = "robin debug";

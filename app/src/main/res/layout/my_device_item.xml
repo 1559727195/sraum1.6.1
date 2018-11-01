@@ -52,14 +52,15 @@
 
                 <ImageView
                     android:id="@+id/img_guan_scene"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="10dp"
                     android:src="@mipmap/ic_launcher" />
 
                 <TextView
                     android:id="@+id/panel_scene_name_txt"
+
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"

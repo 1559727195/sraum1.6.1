@@ -32,11 +32,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import butterknife.InjectView;
 import okhttp3.Call;
 
-import static com.massky.sraum.AddZigbeeDevActivity.ACTION_SRAUM_SETBOX;
+import static com.massky.sraum.MainfragmentActivity.ACTION_SRAUM_SETBOX;
 
 /**
  * Created by masskywcy on 2016-11-30.
@@ -153,11 +152,12 @@ public class MacdeviceActivity extends Basecactivity {
         //在这里先调
         //设置网关模式-sraum-setBox
         Map map = new HashMap();
-        String phoned = getDeviceId(this);
+//        String phoned = getDeviceId(this);
         map.put("token", TokenUtil.getToken(this));
         String boxnumber = (String) SharedPreferencesUtil.getData(this, "boxnumber", "");
         map.put("boxNumber", boxnumber);
-        map.put("phoneId", phoned);
+        String regId = (String) SharedPreferencesUtil.getData(MacdeviceActivity.this, "regId", "");
+        map.put("phoneId", regId);
         map.put("status", "0");//进入设置模式
 //        dialogUtil.loadDialog();
         MyOkHttp.postMapObject(ApiHelper.sraum_setBox, map, new Mycallback(new AddTogglenInterfacer() {

@@ -42,6 +42,7 @@ import butterknife.InjectView;
 import okhttp3.Call;
 
 import static com.fragment.Mainviewpager.getDeviceId;
+import static com.massky.sraum.MainfragmentActivity.ACTION_SRAUM_SETBOX;
 
 /**
  * Created by zhu on 2018/5/30.
@@ -66,6 +67,7 @@ public class AddZigbeeDevActivity extends Basecactivity {
             R.drawable.pic_zigbee_kaiguan_2_tiaoguang,
             R.drawable.pic_zigbee_kaiguan_3_tiaoguang,
             R.drawable.pic_zigbee_kaiguan_chuanglian,
+            R.drawable.pic_zigbee_kaiguan_1,
             R.drawable.pic_zigbee_menci,
             R.drawable.pic_zigbee_rentiganying,
             R.drawable.pic_zigbee_jiuzuo,
@@ -73,10 +75,10 @@ public class AddZigbeeDevActivity extends Basecactivity {
             R.drawable.pic_zigbee_tianranqi,
             R.drawable.pic_zigbee_jinjianniu,
             R.drawable.pic_zigbee_zhinengmensuo,
-            R.drawable.pic_zigbee_pm25_big,
+            R.drawable.pic_zigbee_pm250,
             R.drawable.pic_zigbee_shuijin,
-            R.drawable.pic_zigbee_duogongneng
-
+            R.drawable.pic_zigbee_duogongneng,
+            R.drawable.pic_zigbee_chazuo
     };
 
     private int[] iconString = {
@@ -94,7 +96,6 @@ public class AddZigbeeDevActivity extends Basecactivity {
     TextView txt_remain_time;
     private boolean is_index;
     private int position;//灯控，zigbee设备
-    public static String ACTION_SRAUM_SETBOX = "ACTION_SRAUM_SETBOX";//notifactionId = 8 ->设置网关模式，sraum_setBox
     private MessageReceiver mMessageReceiver;
     private DialogUtil dialogUtil;
 
@@ -160,49 +161,56 @@ public class AddZigbeeDevActivity extends Basecactivity {
                 img_show_zigbee.setImageResource(icon[7]);
                 promat_zigbee_txt.setText(iconString[0]);
                 break;
-            case "A801":
+            case "A501":
                 img_show_zigbee.setImageResource(icon[8]);
-                promat_zigbee_txt.setText(iconString[1]);
+                promat_zigbee_txt.setText(iconString[0]);
                 break;
-            case "A901":
+            case "A801":
                 img_show_zigbee.setImageResource(icon[9]);
                 promat_zigbee_txt.setText(iconString[1]);
                 break;
-            case "A902":
+            case "A901":
                 img_show_zigbee.setImageResource(icon[10]);
+                promat_zigbee_txt.setText(iconString[1]);
+                break;
+            case "A902":
+                img_show_zigbee.setImageResource(icon[11]);
                 promat_zigbee_txt.setText(iconString[2]);
                 break;
             case "AB01":
-                img_show_zigbee.setImageResource(icon[11]);
-                promat_zigbee_txt.setText(iconString[1]);
-                break;
-            case "AB04":
                 img_show_zigbee.setImageResource(icon[12]);
                 promat_zigbee_txt.setText(iconString[1]);
                 break;
-            case "B001":
+            case "AB04":
                 img_show_zigbee.setImageResource(icon[13]);
                 promat_zigbee_txt.setText(iconString[1]);
                 break;
-            case "15":
-                //智能门锁
+            case "B001":
                 img_show_zigbee.setImageResource(icon[14]);
+                promat_zigbee_txt.setText(iconString[1]);
+                break;
+            case "B201":
+                //智能门锁
+                img_show_zigbee.setImageResource(icon[15]);
                 promat_zigbee_txt.setText(iconString[2]);
                 break;
             case "AD01":
-                img_show_zigbee.setImageResource(icon[15]);
-                promat_zigbee_txt.setText(iconString[1]);
-                break;
-            case "AC01":
                 img_show_zigbee.setImageResource(icon[16]);
                 promat_zigbee_txt.setText(iconString[1]);
                 break;
-            case "17":
+            case "AC01":
                 img_show_zigbee.setImageResource(icon[17]);
+                promat_zigbee_txt.setText(iconString[1]);
+                break;
+            case "B301":
+                img_show_zigbee.setImageResource(icon[18]);
+                promat_zigbee_txt.setText(iconString[2]);
+                break;
+            case "B101":
+                img_show_zigbee.setImageResource(icon[19]);
                 promat_zigbee_txt.setText(iconString[2]);
                 break;
         }
-
         init_status_bar();
     }
 
@@ -265,6 +273,14 @@ public class AddZigbeeDevActivity extends Basecactivity {
                 is_index = false;
                 AddZigbeeDevActivity.this.finish();
         }
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        sraum_setBox_quit("");
+        is_index = false;
+        AddZigbeeDevActivity.this.finish();
     }
 
     /**
@@ -344,6 +360,12 @@ public class AddZigbeeDevActivity extends Basecactivity {
                                 case "A301"://一键调光，3键灯控  设备4个
                                 case "A302"://两键调光，2键灯控
                                 case "A303"://三键调光，一键灯控
+                                case "A311":
+                                case "A312":
+                                case "A313":
+                                case "A321":
+                                case "A322":
+                                case "A331":
                                 case "A401"://设备2个
                                 case "A501"://设备2个
                                 case "A601"://设备2个
@@ -373,6 +395,8 @@ public class AddZigbeeDevActivity extends Basecactivity {
                                     //PM2.5魔方
                                 case "B001":
                                     //紧急按钮
+                                case "B101":
+                                    //86插座一位
                                 case "B201":
                                 case "B202":
                                     //智能门锁
@@ -411,11 +435,13 @@ public class AddZigbeeDevActivity extends Basecactivity {
     @NonNull
     private Map send_type() {
         Map map = new HashMap();
+        String regId = (String) SharedPreferencesUtil.getData(AddZigbeeDevActivity.this, "regId", "");
+        map.put("phoneId", regId);
         String phoned = getDeviceId(this);
         map.put("token", TokenUtil.getToken(this));
         String boxnumber = (String) SharedPreferencesUtil.getData(this, "boxnumber", "");
         map.put("boxNumber", boxnumber);
-        map.put("phoneId", phoned);
+//        map.put("phoneId", phoned);
         switch (type) {
             case "A201":
             case "A202":
@@ -425,8 +451,9 @@ public class AddZigbeeDevActivity extends Basecactivity {
             case "A302":
             case "A303":
             case "A401":
-            case "15":
-            case "17":
+            case "B101":
+            case "B201":
+            case "B301":
             case "A902":
             case "A501":
             case "AD01":
@@ -511,7 +538,7 @@ public class AddZigbeeDevActivity extends Basecactivity {
                         panelName = user.panelName;
                         panelMAC = user.panelMAC;
 
-                        switch (panelType) {
+                        switch (panelType) {//
                             case "A201"://一灯控
                             case "A202"://二灯控
                             case "A203"://三灯控
@@ -519,6 +546,12 @@ public class AddZigbeeDevActivity extends Basecactivity {
                             case "A301"://一键调光，3键灯控  设备4个
                             case "A302"://两键调光，2键灯控
                             case "A303"://三键调光，一键灯控
+                            case "A311":
+                            case "A312":
+                            case "A313":
+                            case "A321":
+                            case "A322":
+                            case "A331":
                             case "A401"://设备2个
                             case "A511"://空调-设备1个
                             case "A611"://新风
@@ -544,6 +577,7 @@ public class AddZigbeeDevActivity extends Basecactivity {
                                 //PM2.5魔方
                             case "B001":
                                 //紧急按钮
+                            case "B101":
                             case "B201":
                                 //智能门锁
                             case "B301"://直流电阀机械手

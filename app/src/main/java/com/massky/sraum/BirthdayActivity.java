@@ -1,15 +1,23 @@
 package com.massky.sraum;
 
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.drawable.ColorDrawable;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
+import android.widget.LinearLayout;
+import android.widget.NumberPicker;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import com.Util.DatepicketColor;
 import com.Util.LogUtil;
 import com.base.Basecactivity;
+
+import java.lang.reflect.Field;
+
 import butterknife.InjectView;
 
 /**
@@ -32,11 +40,14 @@ public class BirthdayActivity extends Basecactivity {
 
     @Override
     protected void onView() {
+        setDatePickerDividerColor(datePicker);
         backrela_id.setOnClickListener(this);
         String type = (String) getIntent().getSerializableExtra("type");
+        String birthday = (String) getIntent().getSerializableExtra("birthday");
         switch (type) {
             case "birthday":
                 titlecen_id.setText(R.string.birth);
+
                 break;
             case "select_time":
                 titlecen_id.setText("选择时间");
@@ -44,12 +55,22 @@ public class BirthdayActivity extends Basecactivity {
         }
         //Intent intent = getIntent();
         //String birthtime = intent.getStringExtra("birthtime");
-        DatepicketColor.setDatePickerDividerColor(datePicker);
-        Time time = new Time("GMT+8");
-        time.setToNow();
-        yearb = time.year;
-        monthb = time.month;
-        dayb = time.monthDay;
+
+        if (birthday == null) {
+            initTime();
+        } else {
+            switch (birthday.trim()) {
+                case "":
+                    initTime();
+                    break;
+                default:
+                    String[] splits = birthday.split("-");
+                    yearb = Integer.parseInt(splits[0]);
+                    monthb = Integer.parseInt(splits[1]) - 1;
+                    dayb = Integer.parseInt(splits[2]);
+                    break;
+            }
+        }
         /*
         * if (birthtime == null || birthtime.equals("")) {
 
@@ -68,6 +89,51 @@ public class BirthdayActivity extends Basecactivity {
                 dayb = dayOfMonth;
             }
         });
+    }
+
+
+    /**
+     * 设置时间选择器的分割线颜色
+     *
+     * @param datePicker
+     */
+    private void setDatePickerDividerColor(DatePicker datePicker) {
+        // Divider changing:
+
+        // 获取 mSpinners
+        LinearLayout llFirst = (LinearLayout) datePicker.getChildAt(0);
+
+        // 获取 NumberPicker
+        LinearLayout mSpinners = (LinearLayout) llFirst.getChildAt(0);
+        for (int i = 0; i < mSpinners.getChildCount(); i++) {
+            NumberPicker picker = (NumberPicker) mSpinners.getChildAt(i);
+
+            Field[] pickerFields = NumberPicker.class.getDeclaredFields();
+            for (Field pf : pickerFields) {
+                if (pf.getName().equals("mSelectionDivider")) {
+                    pf.setAccessible(true);
+                    try {
+                        pf.set(picker, new ColorDrawable(getResources().getColor(R.color.transparent)));
+                    } catch (IllegalArgumentException e) {
+                        e.printStackTrace();
+                    } catch (Resources.NotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    private void initTime() {
+        DatepicketColor.setDatePickerDividerColor(datePicker);
+        Time time = new Time("GMT+8");
+        time.setToNow();
+        yearb = time.year;
+        monthb = time.month;
+        dayb = time.monthDay;
     }
 
     @Override

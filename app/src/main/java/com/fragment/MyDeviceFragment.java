@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import com.AddTogenInterface.AddTogglenInterfacer;
 import com.Util.ApiHelper;
 import com.Util.DialogUtil;
@@ -41,11 +42,13 @@ import com.massky.sraum.SelectSensorActivity;
 import com.massky.sraum.SelectZigbeeDeviceActivity;
 import com.xlistview.PullToRefreshLayout;
 import com.xlistview.XListView;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import butterknife.InjectView;
 import okhttp3.Call;
 
@@ -143,12 +146,13 @@ public class MyDeviceFragment extends Basecfragment implements AdapterView.OnIte
         switch (accountType) {
             case "1":
                 macdevice_rel.setVisibility(View.VISIBLE);
+                addtxt_text_id.setVisibility(View.VISIBLE);
                 break;//    break;//主机，业主-写死
             case "2":
                 macdevice_rel.setVisibility(View.GONE);
+                addtxt_text_id.setVisibility(View.GONE);
                 break;//从机，成员
         }
-
         onData();
     }
 
@@ -164,7 +168,6 @@ public class MyDeviceFragment extends Basecfragment implements AdapterView.OnIte
     public void initData() {
 
     }
-
 
     @Override
     public void onClick(View v) {
@@ -235,7 +238,6 @@ public class MyDeviceFragment extends Basecfragment implements AdapterView.OnIte
             public void wrongToken() {
                 super.wrongToken();
                 //重新去获取togglen,这里是因为没有拉到数据所以需要重新获取togglen
-
             }
 
             @Override
@@ -271,7 +273,6 @@ public class MyDeviceFragment extends Basecfragment implements AdapterView.OnIte
                     setPicture(user.panelList.get(i).type);
                 }
 
-
                 for (int i = 0; i < user.wifiList.size(); i++) {
                     Map<String, String> mapdevice = new HashMap<>();
                     mapdevice.put("id", user.wifiList.get(i).id);
@@ -281,7 +282,6 @@ public class MyDeviceFragment extends Basecfragment implements AdapterView.OnIte
                     mapdevice.put("status", user.wifiList.get(i).status);
                     mapdevice.put("controllerId", user.wifiList.get(i).controllerId);
                     mapdevice.put("wifi", user.wifiList.get(i).wifi);
-
                     mapdevice.put("buttonStatus", "");
                     mapdevice.put("button5Name", "");
                     mapdevice.put("button5Type", "");
@@ -294,7 +294,6 @@ public class MyDeviceFragment extends Basecfragment implements AdapterView.OnIte
                     mapdevice.put("firmware", "");
                     mapdevice.put("hardware", "");
                     mapdevice.put("gatewayid", "");
-
                     list_hand_scene.add(mapdevice);
                     setPicture(user.wifiList.get(i).type);
                 }
@@ -317,15 +316,30 @@ public class MyDeviceFragment extends Basecfragment implements AdapterView.OnIte
     private void setPicture(String type) {
         switch (type) {
             case "A201":
+                listint.add(R.drawable.icon_yijiandk_40);
+                listintwo.add(R.drawable.icon_yijiandk_40);
+                break;
             case "A202":
+                listint.add(R.drawable.icon_liangjiandki_40);
+                listintwo.add(R.drawable.icon_liangjiandki_40);
+                break;
             case "A203":
+                listint.add(R.drawable.icon_sanjiandk_40);
+                listintwo.add(R.drawable.icon_sanjiandk_40);
+                break;
             case "A204":
-                listint.add(R.drawable.marklamph);
-                listintwo.add(R.drawable.marklamph);
+                listint.add(R.drawable.icon_kaiguan_40);
+                listintwo.add(R.drawable.icon_kaiguan_40_active);
                 break;
             case "A301":
             case "A302":
             case "A303":
+            case "A311":
+            case "A312":
+            case "A313":
+            case "A321":
+            case "A322":
+            case "A331":
                 listint.add(R.drawable.dimminglights);
                 listintwo.add(R.drawable.dimminglights);
                 break;
@@ -335,8 +349,8 @@ public class MyDeviceFragment extends Basecfragment implements AdapterView.OnIte
                 break;
             case "A501":
             case "A511":
-                listint.add(R.drawable.home_26);
-                listintwo.add(R.drawable.home_26);
+                listint.add(R.drawable.icon_kongtiao_40);
+                listintwo.add(R.drawable.icon_kongtiao_40);
                 break;
             case "A801":
                 listint.add(R.drawable.icon_menci_40);
@@ -370,9 +384,46 @@ public class MyDeviceFragment extends Basecfragment implements AdapterView.OnIte
                 listint.add(R.drawable.icon_jinjianniu_40);
                 listintwo.add(R.drawable.icon_jinjianniu_40);
                 break;
+            case "B101"://86插座两位
+                listint.add(R.drawable.icon_kaiguan_socket_40);
+                listintwo.add(R.drawable.icon_kaiguan_socket_40);
+                break;
+            case "B102"://86插座两位
+                listint.add(R.drawable.defaultpic);
+                listintwo.add(R.drawable.defaultpic);
+                //-----
+                break;
+            case "B201":
+                listint.add(R.drawable.icon_zhinengmensuo_40);
+                listintwo.add(R.drawable.icon_zhinengmensuo_40_active);
+                break;
             case "AA02":
-                listint.add(R.drawable.icon_yaokongqi_40);
-                listintwo.add(R.drawable.icon_yaokongqi_40);
+                listint.add(R.drawable.icon_hongwaizfq_40);
+                listintwo.add(R.drawable.icon_hongwaizfq_40);
+                break;
+            case "AA03":
+                listint.add(R.drawable.icon_shexiangtou_40);
+                listintwo.add(R.drawable.icon_shexiangtou_40);
+                break;
+            case "AA04":
+                listint.add(R.drawable.icon_keshimenling_40);
+                listintwo.add(R.drawable.icon_keshimenling_40);
+                break;
+            case "A611":
+                listint.add(R.drawable.freshair);
+                listintwo.add(R.drawable.freshair);
+                break;
+            case "A711":
+                listint.add(R.drawable.floorheating);
+                listintwo.add(R.drawable.floorheating);
+                break;
+            case "B301":
+                listint.add(R.drawable.icon_jixieshou_40);
+                listintwo.add(R.drawable.icon_jixieshou_40);
+                break;
+            default:
+                listint.add(R.drawable.defaultpic);
+                listintwo.add(R.drawable.defaultpic);
                 break;
         }
     }

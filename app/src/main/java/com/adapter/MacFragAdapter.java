@@ -5,6 +5,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -54,6 +55,23 @@ public class MacFragAdapter extends android.widget.BaseAdapter {
         if (null == convertView) {
             mHolder = new ViewHolder();
             convertView = LayoutInflater.from(context).inflate(R.layout.macgrititem, null);
+
+            // 根据列数计算项目宽度，以使总宽度尽量填充屏幕
+            int itemWidth = (int) (context.getResources().getDisplayMetrics().widthPixels - 4 * 10) / 4;
+            // Calculate the height by your scale rate, I just use itemWidth here
+            // 下面根据比例计算您的item的高度，此处只是使用itemWidth
+            int itemHeight = itemWidth;
+            AbsListView.LayoutParams params = (AbsListView.LayoutParams) convertView.getLayoutParams();
+            if (params == null) {
+                params = new AbsListView.LayoutParams(
+                        itemWidth / 10 * 9,
+                        itemHeight / 10 * 9 + itemHeight / 10 * 3);
+                convertView.setLayoutParams(params);
+            } else {
+                params.height = itemHeight;
+                params.width = itemWidth;
+            }
+
             mHolder.imageitem_id = (ImageView) convertView.findViewById(R.id.imageitem_id);
             mHolder.textitem_id = (TextView) convertView.findViewById(R.id.textitem_id);
             mHolder.itemrela_id = (RelativeLayout) convertView.findViewById(R.id.itemrela_id);
@@ -193,11 +211,13 @@ public class MacFragAdapter extends android.widget.BaseAdapter {
 //                    mHolder.itemrela_id.setBackgroundResource(R.drawable.markstarh);
                     mHolder.imageitem_id.setImageResource(R.drawable.icon_pm25_40_active);
                     mHolder.status_txt.setTextColor(context.getResources().getColor(R.color.zongse_color));
-                    mHolder.status_txt.setText("报警");//#E2C891
+//                    mHolder.status_txt.setText("报警");//#E2C891
+                    mHolder.status_txt.setText(list.get(position).get("dimmer").toString());//#E2C891
                 } else {
 //                    mHolder.itemrela_id.setBackgroundResource(R.drawable.markh);
                     mHolder.imageitem_id.setImageResource(R.drawable.icon_pm25_40);
-                    mHolder.status_txt.setText("正常");
+//                    mHolder.status_txt.setText("正常");
+                    mHolder.status_txt.setText(list.get(position).get("dimmer").toString());//#E2C891
                     mHolder.status_txt.setTextColor(context.getResources().getColor(R.color.e30));
                 }
                 break;
@@ -266,6 +286,34 @@ public class MacFragAdapter extends android.widget.BaseAdapter {
                     mHolder.status_txt.setTextColor(context.getResources().getColor(R.color.e30));
                 }
                 break;
+            case "16":
+                if (list.get(position).get("status").toString().equals("1")) {
+//                    mHolder.itemrela_id.setBackgroundResource(R.drawable.markh);
+                    mHolder.imageitem_id.setImageResource(R.drawable.icon_jixieshou_40);
+                    mHolder.status_txt.setText("打开");
+                    mHolder.status_txt.setTextColor(context.getResources().getColor(R.color.e30));
+                } else {
+                    //                    mHolder.itemrela_id.setBackgroundResource(R.drawable.markstarh);
+                    mHolder.imageitem_id.setImageResource(R.drawable.icon_jixieshou_40_active);
+                    mHolder.status_txt.setTextColor(context.getResources().getColor(R.color.zongse_color));
+                    mHolder.status_txt.setText("关闭");//#E2C891
+                }
+                break;
+
+            case "17":
+                if (list.get(position).get("status").toString().equals("1")) {
+//                    mHolder.itemrela_id.setBackgroundResource(R.drawable.markh);
+                    mHolder.imageitem_id.setImageResource(R.drawable.icon_kaiguan_socket_40);
+                    mHolder.status_txt.setText("打开");
+                    mHolder.status_txt.setTextColor(context.getResources().getColor(R.color.e30));
+                } else {
+                    //                    mHolder.itemrela_id.setBackgroundResource(R.drawable.markstarh);
+                    mHolder.imageitem_id.setImageResource(R.drawable.icon_kaiguan_socket_40_active);
+                    mHolder.status_txt.setTextColor(context.getResources().getColor(R.color.zongse_color));
+                    mHolder.status_txt.setText("关闭");//#E2C891
+                }
+                break;
+
 
             case "202":
             case "206":
@@ -281,11 +329,40 @@ public class MacFragAdapter extends android.widget.BaseAdapter {
                     mHolder.status_txt.setTextColor(context.getResources().getColor(R.color.e30));
                 }
                 break;
+            case "101"://wifi摄像头
+                if (list.get(position).get("status").toString().equals("1")) {
+//                    mHolder.itemrela_id.setBackgroundResource(R.drawable.markstarh);
+                    mHolder.imageitem_id.setImageResource(R.drawable.icon_shexiangtou_40);
+//                    mHolder.status_txt.setTextColor(context.getResources().getColor(R.color.zongse_color));
+                    mHolder.status_txt.setTextColor(context.getResources().getColor(R.color.e30));
+                    mHolder.status_txt.setText("正常");//#E2C891
+                } else {
+//                    mHolder.itemrela_id.setBackgroundResource(R.drawable.markh);
+                    mHolder.imageitem_id.setImageResource(R.drawable.icon_shexiangtou_40);
+                    mHolder.status_txt.setText("断线");
+                    mHolder.status_txt.setTextColor(context.getResources().getColor(R.color.e30));
+                }
+                break;
+
+            case "103"://wifi摄像头
+                if (list.get(position).get("status").toString().equals("1")) {
+//                    mHolder.itemrela_id.setBackgroundResource(R.drawable.markstarh);
+                    mHolder.imageitem_id.setImageResource(R.drawable.icon_keshimenling_40);
+//                    mHolder.status_txt.setTextColor(context.getResources().getColor(R.color.zongse_color));
+                    mHolder.status_txt.setTextColor(context.getResources().getColor(R.color.e30));
+                    mHolder.status_txt.setText("正常");//#E2C891
+                } else {
+//                    mHolder.itemrela_id.setBackgroundResource(R.drawable.markh);
+                    mHolder.imageitem_id.setImageResource(R.drawable.icon_keshimenling_40);
+                    mHolder.status_txt.setText("断线");
+                    mHolder.status_txt.setTextColor(context.getResources().getColor(R.color.e30));
+                }
+                break;
+
             default:
                 mHolder.imageitem_id.setImageResource(R.drawable.marklamph);
                 break;
         }
-
         return convertView;
     }
 

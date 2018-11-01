@@ -70,13 +70,12 @@ public class SelectLinkageItemSecondAdapter extends android.widget.BaseAdapter {
             viewHolderContentType = (ViewHolderContentType) convertView.getTag();
         }
 
-
 //        int element = (Integer) list.get(position).get("image");
 //        viewHolderContentType.img_guan_scene.setImageResource(element);
         viewHolderContentType.panel_scene_name_txt.setText(listint.get(position).get("name").toString());
 
-        if(listint.get(position).get("tabname") != null)
-        viewHolderContentType.gateway_name_txt.setText(listint.get(position).get("tabname").toString());
+        if (listint.get(position).get("tabname") != null)
+            viewHolderContentType.gateway_name_txt.setText(listint.get(position).get("tabname").toString());
 //        convertView.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
@@ -95,29 +94,29 @@ public class SelectLinkageItemSecondAdapter extends android.widget.BaseAdapter {
 //                viewHolderContentType.img_guan_scene.setImageResource(listint.get(position));
 //            }
         if (listint.get(position).get("value") != null)
-        switch (listint.get(position).get("value").toString()) {
-            case "":
-                String tiaoguang = (String) listint.get(position).get("tiaoguang");
-                if (tiaoguang != null) {
-                    switch (tiaoguang) {
-                        case "open":
-                            viewHolderContentType.scene_set.setImageResource(R.drawable.backright);
-                            break;
-                        case "close":
-                            viewHolderContentType.scene_set.setImageResource(R.drawable.bg_xia);
-                            break;
+            switch (listint.get(position).get("value").toString()) {
+                case "":
+                    String tiaoguang = (String) listint.get(position).get("tiaoguang");
+                    if (tiaoguang != null) {
+                        switch (tiaoguang) {
+                            case "open":
+                                viewHolderContentType.scene_set.setImageResource(R.drawable.backright);
+                                break;
+                            case "close":
+                                viewHolderContentType.scene_set.setImageResource(R.drawable.bg_xia);
+                                break;
+                        }
                     }
-                }
 //              convertView.setTag(R.id.tiaoguang_open,"close");
-                viewHolderContentType.tiaoguang_value.setText("");//backright
-                break;
-            default:
-                viewHolderContentType.tiaoguang_value.setText("调光灯值" + listint.get(position).get("value").toString());
-                viewHolderContentType.panel_scene_name_txt.setText("");
-                viewHolderContentType.gateway_name_txt.setText("");
-                viewHolderContentType.scene_set.setImageResource(R.drawable.backright);
-                break;
-        }
+                    viewHolderContentType.tiaoguang_value.setText("");//backright
+                    break;
+                default:
+                    viewHolderContentType.tiaoguang_value.setText("调光灯值" + listint.get(position).get("value").toString());
+                    viewHolderContentType.panel_scene_name_txt.setText("");
+                    viewHolderContentType.gateway_name_txt.setText("");
+                    viewHolderContentType.scene_set.setImageResource(R.drawable.backright);
+                    break;
+            }
 
         return convertView;
     }

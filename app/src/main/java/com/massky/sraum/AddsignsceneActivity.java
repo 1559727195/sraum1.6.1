@@ -74,7 +74,7 @@ public class AddsignsceneActivity extends Basecactivity implements
     private List<Map<String, Object>> listob_new = new ArrayList<Map<String, Object>>();
     private List<Map<String, Object>> listobtwo = new ArrayList<Map<String, Object>>();
     private List<Map<String, Object>> listobtwo_new = new ArrayList<Map<String, Object>>();
-    private List<Map> deviceListsce = new ArrayList<>();
+    private List<User.devicesce> deviceListsce = new ArrayList<>();
     private List<Boolean> list = new ArrayList<>();
     public static final int REQUEST_CAPTURE = 100;
     private List<SerializableMap> listmap = new ArrayList<>();
@@ -93,7 +93,7 @@ public class AddsignsceneActivity extends Basecactivity implements
         sceneType = bundle.getString("sceneType");
         actflag = bundle.getBoolean("actflag");
         if (actflag) {
-            deviceListsce = (List<Map>) bundle.getSerializable("deviLceListsce");//actflag是场景和添加智能设备的标志
+            deviceListsce = (List<User.devicesce>) bundle.getSerializable("deviLceListsce");//actflag是场景和添加智能设备的标志
             titlecen_id.setText("编辑场景");
             editorbtn.setVisibility(View.VISIBLE);
             addsilinear.setVisibility(View.GONE);
@@ -203,9 +203,10 @@ public class AddsignsceneActivity extends Basecactivity implements
                     @Override
                     public void onSuccess(User user) {
                         super.onSuccess(user);
-                        AppManager.getAppManager().finishAllActivity();
+//                        AppManager.getAppManager().finishAllActivity();
                         ToastUtil.showDelToast(AddsignsceneActivity.this, "场景添加成功");
-                        IntentUtil.startActivity(AddsignsceneActivity.this, MainfragmentActivity.class, "addflag", "1");
+//                        IntentUtil.startActivity(AddsignsceneActivity.this, MainfragmentActivity.class, "addflag", "1");
+                        AppManager.getAppManager().removeActivity_but_activity_cls(MainfragmentActivity.class);
                     }
 
                     @Override
@@ -337,15 +338,15 @@ public class AddsignsceneActivity extends Basecactivity implements
                         mapseri.put("temperature", ud.temperature);
                         mapseri.put("speed", ud.speed);
                         LogUtil.eLength("添加数据", ud.type + ud.number);
-                        for (Map udsce : deviceListsce) {
-                            if (ud.number.trim().equals(udsce.get("number").toString().trim())) {
-                                mapseri.put("type", udsce.get("type").toString());
-                                mapseri.put("number", udsce.get("number").toString());
-                                mapseri.put("status", udsce.get("status").toString());
-                                mapseri.put("dimmer", udsce.get("dimmer").toString());
-                                mapseri.put("mode", udsce.get("mode").toString());
-                                mapseri.put("temperature", udsce.get("temperature").toString());
-                                mapseri.put("speed", udsce.get("speed").toString());
+                        for (User.devicesce udsce : deviceListsce) {
+                            if (ud.number.trim().equals(udsce.number)) {
+                                mapseri.put("type", udsce.type);
+                                mapseri.put("number", udsce.number);
+                                mapseri.put("status", udsce.status);
+                                mapseri.put("dimmer", udsce.dimmer);
+                                mapseri.put("mode", udsce.mode);
+                                mapseri.put("temperature", udsce.temperature);
+                                mapseri.put("speed", udsce.speed);
                             }
                         }
 
@@ -357,16 +358,16 @@ public class AddsignsceneActivity extends Basecactivity implements
                 mapflag = false;
 //                ToastUtil.showToast(AddsignsceneActivity.this,"只用于第一次刷新添加虚假数据");
                 for (User.device ud : deviceList) {
-                    for (Map udsce : deviceListsce) {
-                        if (ud.number.trim().equals(udsce.get("number").toString().trim())) {//编辑场景设备时，就是原来的场景设备存在
+                    for (User.devicesce udsce : deviceListsce) {
+                        if (ud.number.trim().equals(udsce.number)) {//编辑场景设备时，就是原来的场景设备存在
                             Map<String, Object> map = new HashMap<>();
-                            map.put("type", udsce.get("type").toString());
-                            map.put("number", udsce.get("number").toString());
-                            map.put("status", udsce.get("status").toString());
-                            map.put("dimmer", udsce.get("dimmer").toString());
-                            map.put("mode", udsce.get("mode").toString());
-                            map.put("temperature", udsce.get("temperature").toString());
-                            map.put("speed", udsce.get("speed").toString());
+                            map.put("type", udsce.type);
+                            map.put("number", udsce.number);
+                            map.put("status", udsce.status);
+                            map.put("dimmer", udsce.dimmer);
+                            map.put("mode", udsce.mode);
+                            map.put("temperature", udsce.temperature);
+                            map.put("speed", udsce.speed);
                             listob.add(map);
                             flag = true;//编辑场景设备时，就是原来的场景设备存在flag = true,checkbox出现
                         }
@@ -395,7 +396,6 @@ public class AddsignsceneActivity extends Basecactivity implements
         AddsignAdapter.getIsSelected().put(position, cb.isChecked());
         if (cb.isChecked()) {
             boolean isSelect = list.get(position);//根据有没有被选中，来判断是编辑还是添加
-
 
               /*窗帘所需要的属性值*/
             SerializableMap aserializableMap = new SerializableMap();

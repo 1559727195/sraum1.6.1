@@ -326,6 +326,7 @@ public class EditLinkDeviceResultActivity extends Basecactivity {
                         map.put("startTime", user.deviceLinkInfo.startTime);
                         map.put("endTime", user.deviceLinkInfo.endTime);
                         map.put("type", user.deviceLinkInfo.type);
+                        map.put("boxName", user.deviceLinkInfo.boxName == null ? "" : user.deviceLinkInfo.boxName);
                         Map action_map = new HashMap();
                         switch (user.deviceLinkInfo.type) {
                             case "100"://自动执行条件
@@ -367,6 +368,8 @@ public class EditLinkDeviceResultActivity extends Basecactivity {
                             map_device.put("temperature", user.deviceLinkInfo.deviceList.get(i).temperature);
                             map_device.put("speed", user.deviceLinkInfo.deviceList.get(i).speed);
                             map_device.put("name", user.deviceLinkInfo.deviceList.get(i).name);
+                            map_device.put("boxName", user.deviceLinkInfo.deviceList.get(i).boxName == null ? "" :
+                                    user.deviceLinkInfo.deviceList.get(i).boxName);
                             map_device.put("name1", user.deviceLinkInfo.deviceList.get(i).name);
                             map_device.put("action", get_action(map_device));
                             if (user.deviceLinkInfo.deviceList.get(i).type.equals("100")) {
@@ -418,7 +421,31 @@ public class EditLinkDeviceResultActivity extends Basecactivity {
                 }
                 break;
             case "10":
+                String text_pm = "";
+                String minValue = (String) map_link.get("minValue");
+                String maxValue = (String) map_link.get("maxValue");
+                String temp = "";
+                if (!minValue.equals("")) {
+                    text_pm = minValue;
+                    temp = "小于等于 ";
+                }
 
+                if (!maxValue.equals("")) {
+                    text_pm = maxValue;
+                    temp = "大于等于 ";
+                }
+
+                switch (action) {
+                    case "1":
+                        map_link.put("action", "PM2.5 " + temp + text_pm);
+                        break;
+                    case "2":
+                        map_link.put("action", "温度 " + temp + text_pm + "℃");
+                        break;
+                    case "3":
+                        map_link.put("action", "湿度 " + temp + text_pm + "%");
+                        break;
+                }
                 break;
             case "11":
                 if (action.equals("1")) {
@@ -441,6 +468,7 @@ public class EditLinkDeviceResultActivity extends Basecactivity {
                 }
                 break;
             case "15":
+            case "17":
                 if (action.equals("1")) {
                     map_link.put("action", "打开");
                 } else {
@@ -472,23 +500,27 @@ public class EditLinkDeviceResultActivity extends Basecactivity {
                 action = init_action_tiaoguang((String) map.get("status"), (String) map.get("dimmer"));
                 break;
             case "3":
-                action = init_action_kongtiao((String) map.get("status"), (String) map.get("mode"), (String) map.get("speed"), (String) map.get("temperature"));
+                action = init_action_kongtiao("3", (String) map.get("status"), (String) map.get("mode"), (String) map.get("speed"), (String) map.get("temperature"));
                 break;
             case "4":
                 action = init_action_curtain((String) map.get("status"));
                 break;
             case "5":
-
+                action = init_action_kongtiao("5", (String) map.get("status"), (String) map.get("mode"), (String) map.get("speed"), (String) map.get("temperature"));
                 break;
             case "6":
-
+                action = init_action_kongtiao("6", (String) map.get("status"), (String) map.get("mode"), (String) map.get("speed"), (String) map.get("temperature"));
                 break;
             case "202"://wifi电视
             case "206"://wifi空调
                 action = init_action_wifi_device((String) map.get("status"));
                 break;
+            case "15":
+            case "16":
+            case "17":
+                action = init_action_smart_door_lock((String) map.get("status"));
+                break;
         }
-
         return action;
     }
 
@@ -519,7 +551,6 @@ public class EditLinkDeviceResultActivity extends Basecactivity {
                 action = "外纱打开";
                 break;
         }
-
         return action;
     }
 
@@ -541,18 +572,35 @@ public class EditLinkDeviceResultActivity extends Basecactivity {
     }
 
     /**
-     * 空调
-     *
-     * @param
+     * 智能门锁
      */
-    private String init_action_kongtiao(String status, String model, String speed, String tempature) {
+    private String init_action_smart_door_lock(String status) {
         String action = "";
         switch (status) {
             case "0":
                 action = "关闭";
                 break;
             case "1":
-                action = init_action_air(model, speed, tempature);
+                action = "打开";
+                break;
+        }
+        return action;
+    }
+
+    /**
+     * 空调
+     *
+     * @param
+     * @param type
+     */
+    private String init_action_kongtiao(String type, String status, String model, String speed, String tempature) {
+        String action = "";
+        switch (status) {
+            case "0":
+                action = "关闭";
+                break;
+            case "1":
+                action = init_action_air(type, model, speed, tempature);
                 break;
         }
 
@@ -562,11 +610,12 @@ public class EditLinkDeviceResultActivity extends Basecactivity {
     /**
      * 初始化空调动作
      *
+     * @param type
      * @param model
      * @param speed
      * @param tempature
      */
-    private String init_action_air(String model, String speed, String tempature) {
+    private String init_action_air(String type, String model, String speed, String tempature) {
         StringBuffer temp = new StringBuffer();
 //        String speed = (String) air_control_map.get("speed");
         switch (speed) {
@@ -593,10 +642,16 @@ public class EditLinkDeviceResultActivity extends Basecactivity {
 //        String temperature = (String) air_control_map.get("temperature");
 
         temp.append("  " + tempature + "℃");
+        switch (type) {
+            case "3":
+                init_common_air(model, temp);
+                break;
+        }
+//        common_doit("action", temp.toString());
+        return temp.toString();
+    }
 
-//        String model = (String) air_control_map.get("mode");
-        //
-
+    private void init_common_air(String model, StringBuffer temp) {
         switch (model) {
             case "1":
                 temp.append("  " + "制冷");
@@ -614,8 +669,6 @@ public class EditLinkDeviceResultActivity extends Basecactivity {
                 temp.append("  " + "通风");
                 break;
         }
-//        common_doit("action", temp.toString());
-        return temp.toString();
     }
 
     /**
@@ -633,7 +686,6 @@ public class EditLinkDeviceResultActivity extends Basecactivity {
                 action = "调光值:" + dimmer;
                 break;
         }
-
         return action;
     }
 
@@ -965,7 +1017,7 @@ public class EditLinkDeviceResultActivity extends Basecactivity {
                 .setBgColor(Color.BLACK)//滚轮背景颜色 Night mode
                 .setSubmitColor(Color.WHITE)
                 .setCancelColor(Color.WHITE)*/
-               /*.gravity(Gravity.RIGHT)// default is center*/
+                /*.gravity(Gravity.RIGHT)// default is center*/
                 .setDate(selectedDate)
                 .setRangDate(startDate, endDate)
                 .setLayoutRes(R.layout.pickerview_custom_time, new CustomListener() {

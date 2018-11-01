@@ -3,16 +3,13 @@ package com.Util;
 import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
-
 import com.AddTogenInterface.AddTogglenInterfacer;
 import com.alibaba.fastjson.JSON;
 import com.data.User;
 import com.fragment.MacFragment;
 import com.zhy.http.okhttp.callback.StringCallback;
-
 import java.util.HashMap;
 import java.util.Map;
-
 import okhttp3.Call;
 
 /**

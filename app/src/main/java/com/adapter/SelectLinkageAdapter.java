@@ -9,11 +9,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.base.BaseAdapter;
-import com.data.User;
 import com.massky.sraum.R;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,7 +38,7 @@ public class SelectLinkageAdapter extends android.widget.BaseAdapter {
 
     // 初始化isSelected的数据
     private void initDate() {
-        for (int i = 0; i < listint.size(); i++) {
+        for (int i = 0; i < list.size(); i++) {
             getIsSelected().put(i, false);
         }
     }
@@ -65,6 +61,7 @@ public class SelectLinkageAdapter extends android.widget.BaseAdapter {
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
+
         ViewHolderContentType viewHolderContentType = null;
         if (null == convertView) {
             viewHolderContentType = new ViewHolderContentType();

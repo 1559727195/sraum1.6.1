@@ -71,6 +71,8 @@ public class AirLinkageControlActivity extends Basecactivity implements
     private Map air_control_map = new HashMap();
     private int tempture;
     private Map sensor_map = new HashMap();//传感器map
+    @InjectView(R.id.mode_linear)
+    LinearLayout mode_linear;
 
     /**
      * 空调
@@ -91,6 +93,19 @@ public class AirLinkageControlActivity extends Basecactivity implements
         StatusUtils.setFullToStatusBar(this);  // StatusBar.
 //        String type = (String) getIntent().getSerializableExtra("type");
         air_control_map = (Map) getIntent().getSerializableExtra("air_control_map");
+        String type = air_control_map.get("type").toString();
+        switch (type) {
+            case "3":
+                mode_linear.setVisibility(View.VISIBLE);
+                break;
+            case "5":
+                mode_linear.setVisibility(View.GONE);
+                break;
+            case "6":
+                mode_linear.setVisibility(View.GONE);
+                break;
+        }
+        project_select.setText(air_control_map.get("name").toString());
         air_control_map.put("name1", air_control_map.get("name"));
         //intent.putExtra("sensor_map", (Serializable)  sensor_map);
         sensor_map = (Map) getIntent().getSerializableExtra("sensor_map");
@@ -355,7 +370,16 @@ public class AirLinkageControlActivity extends Basecactivity implements
         String temperature = (String) air_control_map.get("temperature");
 
         temp.append("  " + temperature + "℃");
+        String type = air_control_map.get("type").toString();
+        switch (type) {
+            case "3":
+                common_mode(temp);
+                break;
+        }
+        return temp;
+    }
 
+    private void common_mode(StringBuffer temp) {
         String model = (String) air_control_map.get("mode");
         //
 
@@ -376,10 +400,7 @@ public class AirLinkageControlActivity extends Basecactivity implements
                 temp.append("自动");
                 break;
         }
-
-        return  temp;
     }
-
 
 
     @Override

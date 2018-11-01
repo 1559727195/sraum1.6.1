@@ -9,7 +9,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
+import com.Util.App;
 import com.Util.MusicUtil;
 import com.Util.SharedPreferencesUtil;
 import com.base.Basecfragment;
@@ -19,12 +19,7 @@ import com.massky.sraum.MainfragmentActivity;
 import com.massky.sraum.R;
 import com.suke.widget.SwitchButton;
 import com.wujay.fund.GestureEditActivity;
-
 import butterknife.InjectView;
-
-import static com.massky.sraum.R.id.addimage_id;
-import static com.massky.sraum.R.id.cenimage_id;
-import static com.massky.sraum.R.id.centext_id;
 
 /**
  * Created by masskywcy on 2016-09-20.
@@ -41,7 +36,8 @@ public class MysetFragment extends Basecfragment implements SwitchButton.OnCheck
     SwitchButton swibtntwo;
     @InjectView(R.id.swibtnthree)
     SwitchButton swibtnthree;
-
+    @InjectView(R.id.swibtnthree_set)
+    SwitchButton swibtnthree_set;
     @InjectView(R.id.sideslip_id)
     RelativeLayout sideslip_id;
     @InjectView(R.id.addrelative_id)
@@ -52,7 +48,6 @@ public class MysetFragment extends Basecfragment implements SwitchButton.OnCheck
     ImageView cenimage_id;
     @InjectView(R.id.centext_id)
     TextView centext_id;
-
     private Vibrator vibrator;
     private boolean vibflag, musicflag, editFlag;
     private String loginPhone;
@@ -60,6 +55,7 @@ public class MysetFragment extends Basecfragment implements SwitchButton.OnCheck
     private SharedPreferences.Editor editor;
     private MainfragmentActivity mainfragmentActivity;
     private static SlidingMenu mySlidingMenu;
+    private boolean editFlag_set;
 
     public static MysetFragment newInstance(SlidingMenu mySlidingMenu1) {
         MysetFragment newFragment = new MysetFragment();
@@ -67,12 +63,11 @@ public class MysetFragment extends Basecfragment implements SwitchButton.OnCheck
         mySlidingMenu = mySlidingMenu1;
         newFragment.setArguments(bundle);
         return newFragment;
-
     }
 
-    private void  chageSlideMenu () {
-        if ( mySlidingMenu != null) {
-            if ( mySlidingMenu.isMenuShowing()) {
+    private void chageSlideMenu() {
+        if (mySlidingMenu != null) {
+            if (mySlidingMenu.isMenuShowing()) {
                 mySlidingMenu.showContent();
             } else {
                 mySlidingMenu.showMenu();
@@ -105,6 +100,8 @@ public class MysetFragment extends Basecfragment implements SwitchButton.OnCheck
         swibtnone.setOnCheckedChangeListener(this);
         swibtntwo.setOnCheckedChangeListener(this);
         swibtnthree.setOnCheckedChangeListener(this);
+        swibtnthree_set.setOnCheckedChangeListener(this);
+        //swibtnthree_set
         sideslip_id.setOnClickListener(this);
     }
 
@@ -113,6 +110,10 @@ public class MysetFragment extends Basecfragment implements SwitchButton.OnCheck
         super.onStart();
         editFlag = preferences.getBoolean("editFlag", false);
         swibtnthree.setChecked(editFlag);
+
+        editFlag_set = preferences.getBoolean("editFlag_set", true);
+        swibtnthree_set.setChecked(editFlag_set);
+
     }
 
     @Override
@@ -147,9 +148,9 @@ public class MysetFragment extends Basecfragment implements SwitchButton.OnCheck
                 break;
             case R.id.swibtntwo:
                 if (isChecked) {
-                    MusicUtil.startMusic(getActivity(), 1);
+                    MusicUtil.startMusic(getActivity(), 1, "");
                 } else {
-                    MusicUtil.stopMusic(getActivity());
+                    MusicUtil.stopMusic(getActivity(), "");
                 }
                 editor.putBoolean("musicflag", isChecked);
                 editor.commit();
@@ -162,6 +163,23 @@ public class MysetFragment extends Basecfragment implements SwitchButton.OnCheck
                     editor.putBoolean("editFlag", isChecked);
                     editor.commit();
                 }
+                break;
+
+            case R.id.swibtnthree_set:
+//                if (isChecked) {
+////                    Intent intentges = new Intent(getActivity(), GestureEditActivity.class);
+////                    startActivity(intentges);
+//                } else {
+//                    editor.putBoolean("editFlag_set", isChecked);
+//                    editor.commit();
+//                }
+                editor.putBoolean("editFlag_set", isChecked);
+                editor.commit();
+//                if (isChecked) {
+//                    App.getInstance().registerMessageReceiver_fromAbout("open", 1);
+//                } else {
+//                    App.getInstance().registerMessageReceiver_fromAbout("close", 1);
+//                }
                 break;
         }
     }

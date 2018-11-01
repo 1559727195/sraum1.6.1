@@ -85,9 +85,11 @@ public class MyDeviceItemActivity extends Basecactivity {
 
     private int[] iconName = {R.string.yijianlight, R.string.liangjianlight, R.string.sanjianlight, R.string.sijianlight,
             R.string.yilutiaoguang, R.string.lianglutiaoguang, R.string.sanlutiao, R.string.window_panel, R.string.air_panel,
-            R.string.air_mode
+            R.string.air_mode,R.string.xinfeng_mode,R.string.dinuan_mode
             , R.string.menci, R.string.rentiganying, R.string.jiuzuo, R.string.yanwu, R.string.tianranqi, R.string.jinjin_btn,
-            R.string.zhineng, R.string.pm25, R.string.shuijin, R.string.duogongneng, R.string.wifi_hongwai
+            R.string.zhineng, R.string.pm25, R.string.shuijin, R.string.jixieshou,R.string.cha_zuo_1,R.string.cha_zuo, R.string.wifi_hongwai,
+            R.string.wifi_camera,R.string.one_light_control,R.string.two_light_control,R.string.three_light_control
+            ,R.string.two_dimming_one_control,R.string.two_dimming_two_control,R.string.two_dimming_trhee_control,R.string.keshimenling
     };
 
     @Override
@@ -125,6 +127,18 @@ public class MyDeviceItemActivity extends Basecactivity {
             }
             wangguan_set.setImageResource(imgtype);
             set_type(panelItem_map.get("type").toString());
+            //成员，业主accountType->addrelative_id
+            String accountType = (String) SharedPreferencesUtil.getData(MyDeviceItemActivity.this, "accountType", "");
+            switch (accountType) {
+                case "1":
+                    delete_device_rel.setVisibility(View.VISIBLE);
+                    wangguan_set_rel.setEnabled(true);
+                    break;//业主
+                case "2":
+                    delete_device_rel.setVisibility(View.GONE);
+                    wangguan_set_rel.setEnabled(false);
+                    break;//家庭成员
+            }
         }
 
         onEvent();
@@ -166,38 +180,50 @@ public class MyDeviceItemActivity extends Basecactivity {
             case "A511":
                 gateway_id_txt.setText(iconName[9]);
                 break;
-            case "A801":
+            case "A611":
                 gateway_id_txt.setText(iconName[10]);
                 break;
-            case "A901":
+            case "A711":
                 gateway_id_txt.setText(iconName[11]);
                 break;
-            case "A902":
+            case "A801":
                 gateway_id_txt.setText(iconName[12]);
                 break;
-            case "AB01":
+            case "A901":
                 gateway_id_txt.setText(iconName[13]);
                 break;
-            case "AB04":
+            case "A902":
                 gateway_id_txt.setText(iconName[14]);
                 break;
-            case "B001":
+            case "AB01":
                 gateway_id_txt.setText(iconName[15]);
                 break;
-            case "B201":
+            case "AB04":
                 gateway_id_txt.setText(iconName[16]);
                 break;
-            case "AD01":
+            case "B001":
                 gateway_id_txt.setText(iconName[17]);
                 break;
-            case "AC01":
+            case "B201":
                 gateway_id_txt.setText(iconName[18]);
                 break;
-            case "B301":
+            case "AD01":
                 gateway_id_txt.setText(iconName[19]);
                 break;
-            case "AA02"://WIFI转发模块
+            case "AC01":
                 gateway_id_txt.setText(iconName[20]);
+                break;
+            case "B301":
+                gateway_id_txt.setText(iconName[21]);
+                break;
+            case "B101":
+                gateway_id_txt.setText(iconName[22]);
+                break;
+            case "B102":
+                gateway_id_txt.setText(iconName[23]);
+                break;
+            case "AA02"://WIFI转发模块
+                gateway_id_txt.setText(iconName[24]);
                 rel_yaokongqi.setVisibility(View.VISIBLE);
                 view_yaokongqi.setVisibility(View.VISIBLE);
                 dev_txt.setText("WIFI");
@@ -205,6 +231,40 @@ public class MyDeviceItemActivity extends Basecactivity {
                 //controllerId
                 mac_txt.setText(panelItem_map.get("controllerId").toString());
                 break;
+
+            case "AA03"://WIFI转发模块
+                gateway_id_txt.setText(iconName[25]);
+                dev_txt.setText("WIFI");
+                banben_txt.setText(panelItem_map.get("wifi").toString());
+                //controllerId
+                mac_txt.setText(panelItem_map.get("controllerId").toString());
+                break;
+            case "A311":
+                gateway_id_txt.setText(iconName[26]);
+                break;
+            case "A312":
+                gateway_id_txt.setText(iconName[27]);
+                break;
+            case "A313":
+                gateway_id_txt.setText(iconName[28]);
+                break;
+            case "A321":
+                gateway_id_txt.setText(iconName[29]);
+                break;
+            case "A322":
+                gateway_id_txt.setText(iconName[30]);
+                break;
+            case "A331":
+                gateway_id_txt.setText(iconName[31]);
+                break;
+            case "AA04"://WIFI转发模块
+                gateway_id_txt.setText(iconName[32]);
+                dev_txt.setText("WIFI");
+                banben_txt.setText(panelItem_map.get("wifi").toString());
+                //controllerId
+                mac_txt.setText(panelItem_map.get("controllerId").toString());
+                break;
+
         }
     }
 
@@ -315,6 +375,10 @@ public class MyDeviceItemActivity extends Basecactivity {
             case "AA02":
                 map.put("number", panelNumber);
                 send_method = ApiHelper.sraum_deleteWifiApple;
+                break;//wifi模块
+            case "AA03":
+                map.put("number", panelNumber);
+                send_method = ApiHelper.sraum_deleteWifiCamera;
                 break;//wifi模块
             default:
                 map.put("boxNumber", TokenUtil.getBoxnumber(MyDeviceItemActivity.this));

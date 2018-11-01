@@ -100,7 +100,6 @@ public class MyDeviceAdapter extends android.widget.BaseAdapter {
 //        viewHolderContentType.gateway_name_txt.setText((String) list.get(position).get("boxName"));
         if (position < listint.size())
             viewHolderContentType.img_guan_scene.setImageResource(listint.get(position));
-
         ((SwipeMenuLayout) convertView).setAccountType(accountType);
         ((SwipeMenuLayout) convertView).setPosition(position);
         final View finalConvertView = convertView;
@@ -135,6 +134,105 @@ public class MyDeviceAdapter extends android.widget.BaseAdapter {
         });
 
         return convertView;
+    }
+
+
+    private void setPicture(String type) {
+        switch (type) {
+            case "A201":
+                listint.add(R.drawable.icon_yijiandk_40);
+                listintwo.add(R.drawable.icon_yijiandk_40);
+                break;
+            case "A202":
+                listint.add(R.drawable.icon_liangjiandki_40);
+                listintwo.add(R.drawable.icon_liangjiandki_40);
+                break;
+            case "A203":
+                listint.add(R.drawable.icon_sanjiandk_40);
+                listintwo.add(R.drawable.icon_sanjiandk_40);
+                break;
+            case "A204":
+                listint.add(R.drawable.icon_kaiguan_40);
+                listintwo.add(R.drawable.icon_kaiguan_40_active);
+                break;
+            case "A301":
+            case "A302":
+            case "A303":
+                listint.add(R.drawable.dimminglights);
+                listintwo.add(R.drawable.dimminglights);
+                break;
+            case "A401":
+                listint.add(R.drawable.home_curtain);
+                listintwo.add(R.drawable.home_curtain);
+                break;
+            case "A501":
+            case "A511":
+                listint.add(R.drawable.icon_kongtiao_40);
+                listintwo.add(R.drawable.icon_kongtiao_40);
+                break;
+            case "A801":
+                listint.add(R.drawable.icon_menci_40);
+                listintwo.add(R.drawable.icon_menci_40_active);
+                break;
+            case "A901":
+                listint.add(R.drawable.icon_rentiganying_40);
+                listintwo.add(R.drawable.icon_rentiganying_40);
+                break;
+            case "AB01":
+                listint.add(R.drawable.icon_yanwubjq_40);
+                listintwo.add(R.drawable.icon_yanwubjq_40);
+                break;
+            case "A902":
+                listint.add(R.drawable.icon_rucebjq_40);
+                listintwo.add(R.drawable.icon_rucebjq_40);
+                break;
+            case "AB04":
+                listint.add(R.drawable.icon_ranqibjq_40);
+                listintwo.add(R.drawable.icon_ranqibjq_40);
+                break;
+            case "AC01":
+                listint.add(R.drawable.icon_shuijin_40);
+                listintwo.add(R.drawable.icon_shuijin_40);
+                break;
+            case "AD01":
+                listint.add(R.drawable.icon_pm25_40);
+                listintwo.add(R.drawable.icon_pm25_40);
+                break;
+            case "B001":
+                listint.add(R.drawable.icon_jinjianniu_40);
+                listintwo.add(R.drawable.icon_jinjianniu_40);
+                break;
+            case "B101"://86插座两位
+            case "B102"://86插座两位
+                listint.add(R.drawable.defaultpic);
+                listintwo.add(R.drawable.defaultpic);
+                //-----
+                break;
+            case "B201":
+                listint.add(R.drawable.icon_zhinengmensuo_40);
+                listintwo.add(R.drawable.icon_zhinengmensuo_40_active);
+                break;
+            case "AA02":
+                listint.add(R.drawable.icon_hongwaizfq_40);
+                listintwo.add(R.drawable.icon_hongwaizfq_40);
+                break;
+            case "AA03":
+                listint.add(R.drawable.icon_shexiangtou_40);
+                listintwo.add(R.drawable.icon_shexiangtou_40);
+                break;
+            case "A611":
+                listint.add(R.drawable.freshair);
+                listintwo.add(R.drawable.freshair);
+                break;
+            case "A711":
+                listint.add(R.drawable.floorheating);
+                listintwo.add(R.drawable.floorheating);
+                break;
+            default:
+                listint.add(R.drawable.defaultpic);
+                listintwo.add(R.drawable.defaultpic);
+                break;
+        }
     }
 
     //自定义dialog,centerDialog删除对话框
@@ -217,6 +315,10 @@ public class MyDeviceAdapter extends android.widget.BaseAdapter {
             case "AA02":
                 map.put("number", panelNumber);
                 send_method = ApiHelper.sraum_deleteWifiApple;
+                break;//wifi模块
+            case "AA03":
+                map.put("number", panelNumber);
+                send_method = ApiHelper.sraum_deleteWifiCamera;
                 break;//wifi模块
             default:
                 map.put("boxNumber", TokenUtil.getBoxnumber(activity));

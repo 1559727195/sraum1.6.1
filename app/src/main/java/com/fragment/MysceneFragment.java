@@ -1,5 +1,6 @@
 package com.fragment;
 
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -7,6 +8,7 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -36,7 +38,6 @@ import com.massky.sraum.LinkageListActivity;
 import com.massky.sraum.MainfragmentActivity;
 import com.massky.sraum.MysceneActivity;
 import com.massky.sraum.R;
-import com.massky.sraum.SelectSensorActivity;
 import com.massky.sraum.SexActivity;
 
 import java.io.Serializable;
@@ -48,12 +49,6 @@ import java.util.Map;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import okhttp3.Call;
-
-import static android.R.attr.accountType;
-import static com.massky.sraum.R.id.addimage_id;
-import static com.massky.sraum.R.id.cenimage_id;
-import static com.massky.sraum.R.id.centext_id;
-import static com.massky.sraum.R.id.panel_bottom_add_rel;
 
 /**
  * Created by masskywcy on 2016-09-14.
@@ -474,7 +469,8 @@ public class MysceneFragment extends Basecfragment implements AdapterView.OnItem
                 IntentUtil.startActivity(getActivity(), AddsignsceneActivity.class, bundle);
                 break;
             case R.id.mrelativethree:
-                mrelativethree_();
+//                mrelativethree_();
+                showCenterDeleteDialog(scename);
                 break;
             case R.id.mrelativefour:
                 Bundle bundle1 = new Bundle();
@@ -495,7 +491,7 @@ public class MysceneFragment extends Basecfragment implements AdapterView.OnItem
 
 
     //mrelativethree
-    private void mrelativethree_() {
+    private void mrelativethree_(final Dialog dialog) {
         dialogUtil.removeviewBottomDialog();
         Map<String, Object> map = new HashMap<>();
         map.put("token", TokenUtil.getToken(getActivity()));
@@ -505,7 +501,7 @@ public class MysceneFragment extends Basecfragment implements AdapterView.OnItem
         MyOkHttp.postMapObject(ApiHelper.sraum_deleteScene, map, new Mycallback(new AddTogglenInterfacer() {
             @Override
             public void addTogglenInterfacer() {
-                mrelativethree_();
+                mrelativethree_(dialog);
             }
         }, getActivity(), dialogUtil) {
             @Override
@@ -518,11 +514,68 @@ public class MysceneFragment extends Basecfragment implements AdapterView.OnItem
             public void onSuccess(User user) {
                 super.onSuccess(user);
                 getData(1);
+                dialog.dismiss();
+                ;
             }
 
             @Override
             public void wrongToken() {
                 super.wrongToken();
+            }
+        });
+    }
+
+    //自定义dialog,centerDialog删除对话框
+    public void showCenterDeleteDialog(final String name) {
+//        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+//        // 布局填充器
+//        LayoutInflater inflater = LayoutInflater.from(getActivity());
+//        View view = inflater.inflate(R.layout.user_name_dialog, null);
+//        // 设置自定义的对话框界面
+//        builder.setView(view);
+//
+//        cus_dialog = builder.create();
+//        cus_dialog.show();
+
+        View view = LayoutInflater.from(getActivity()).inflate(R.layout.promat_dialog, null);
+        TextView confirm; //确定按钮
+        TextView cancel; //确定按钮
+        TextView tv_title;
+        TextView name_gloud;
+//        final TextView content; //内容
+        cancel = (TextView) view.findViewById(R.id.call_cancel);
+        confirm = (TextView) view.findViewById(R.id.call_confirm);
+        tv_title = (TextView) view.findViewById(R.id.tv_title);//name_gloud
+        name_gloud = (TextView) view.findViewById(R.id.name_gloud);
+        name_gloud.setText(name);
+//        tv_title.setText("是否拨打119");
+//        content.setText(message);
+        //显示数据
+        final Dialog dialog = new Dialog(getActivity(), R.style.BottomDialog);
+        dialog.setContentView(view);
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
+        DisplayMetrics dm = getActivity().getResources().getDisplayMetrics();
+        int displayWidth = dm.widthPixels;
+        int displayHeight = dm.heightPixels;
+        android.view.WindowManager.LayoutParams p = dialog.getWindow().getAttributes(); //获取对话框当前的参数值
+        p.width = (int) (displayWidth * 0.8); //宽度设置为屏幕的0.5
+//        p.height = (int) (displayHeight * 0.5); //宽度设置为屏幕的0.5
+//        dialog.setCanceledOnTouchOutside(false);// 设置点击屏幕Dialog不消失
+        dialog.getWindow().setAttributes(p);  //设置生效
+        dialog.show();
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        confirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mrelativethree_(dialog);
             }
         });
     }
@@ -602,10 +655,10 @@ public class MysceneFragment extends Basecfragment implements AdapterView.OnItem
                 listtype.set(position, status);
                 String string = listtype.get(position);
                 if (string.equals("1")) {
-                    gitemtext.setTextColor(Color.parseColor("#e2c896"));
-                    gitemimage.setImageResource(listintwo.get(position));
+//                    gitemtext.setTextColor(Color.parseColor("#e2c896"));
+                    gitemimage.setImageResource(listint.get(position));
                 } else {
-                    gitemtext.setTextColor(Color.parseColor("#303030"));
+//                    gitemtext.setTextColor(Color.parseColor("#303030"));
                     gitemimage.setImageResource(listint.get(position));
                 }
                 //adapter.changeState(position);

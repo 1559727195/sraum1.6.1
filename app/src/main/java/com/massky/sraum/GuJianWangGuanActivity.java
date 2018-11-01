@@ -90,6 +90,12 @@ public class GuJianWangGuanActivity extends Basecactivity {
     private DialogUtil dialogUtil;
     public static String UPDATE_GRADE_BOX = "com.massky.sraum.update_grade_box";
 
+    @InjectView(R.id.second)
+    TextView second_txt;
+    @InjectView(R.id.miao)
+    TextView miao;
+    private boolean is_index;
+
 
     @Override
     protected int viewId() {
@@ -105,10 +111,31 @@ public class GuJianWangGuanActivity extends Basecactivity {
         dialogUtil = new DialogUtil(this);
         String newVersion = (String) getIntent().getSerializableExtra("newVersion");
         String currentVersion = (String) getIntent().getSerializableExtra("currentVersion");
+        String doit = (String) getIntent().getSerializableExtra("doit");
 //        intent.putExtra("newVersion",newVersion);
 //        intent.putExtra("currentVersion",currentVersion);
 
         StatusUtils.setFullToStatusBar(this);  // StatusBar.
+        switch (doit) {
+            case "doit":
+                start_upgrade(newVersion, currentVersion);
+                break;
+            case "scuess":
+                update_complete_response();
+                break;
+        }
+
+        onEvent();
+        onData();
+    }
+
+    /**
+     * 开始更新
+     *
+     * @param newVersion
+     * @param currentVersion
+     */
+    private void start_upgrade(String newVersion, String currentVersion) {
         version = "old_version";
         switch (version) {
             case "new_version":
@@ -118,19 +145,16 @@ public class GuJianWangGuanActivity extends Basecactivity {
                 break;
             case "old_version":
                 banbenxin_linear.setVisibility(View.VISIBLE);
+                back.setVisibility(View.GONE);
                 icon_banbengenxin.setImageResource(R.drawable.pic_youshengji);
                 new_gujian_promat_txt.setVisibility(View.VISIBLE);
                 current_gujian_version_linear.setVisibility(View.VISIBLE);
                 upgrade_rel.setVisibility(View.VISIBLE);
-                current_gujian_version_txt.setText(currentVersion);
-                new_gujian_version_txt.setText(newVersion);
+                current_gujian_version_txt.setText("当前固件版本:" + currentVersion);
+                new_gujian_version_txt.setText("最新固件版本:" + newVersion);
 //                new_gujian_promat_txt.setText(newVersion);
-
                 break;
         }
-
-        onEvent();
-        onData();
 
         // 向Handler发送消息
         showTimeTask = new TimerTask() {
@@ -172,36 +196,96 @@ public class GuJianWangGuanActivity extends Basecactivity {
                 GuJianWangGuanActivity.this.finish();
                 break;
             case R.id.back:
-                GuJianWangGuanActivity.this.finish();
-                break;
             case R.id.btn_upgrade://更新固件
-                switch (btn_upgrade.getText().toString()) {
-                    case "取消":
-                        btn_upgrade.setText("升级");
-                        activity_destroy = true;
-                        banben_progress_linear.setVisibility(View.GONE);
-                        banbenxin_linear.setVisibility(View.VISIBLE);
-                        new_gujian_promat_txt.setVisibility(View.VISIBLE);
-                        current_gujian_version_linear.setVisibility(View.VISIBLE);
-                        break;
-                    case "升级":
-                        btn_upgrade.setText("升级中");
-                        banbenxin_linear.setVisibility(View.GONE);
-                        new_gujian_promat_txt.setVisibility(View.GONE);
-//                        current_gujian_version_linear.setVisibility(View.GONE);
-                        banben_progress_linear.setVisibility(View.VISIBLE);
-                        startTimer();
-                        updatebox_version();
-                        break;
-                    case "返回":
-                        GuJianWangGuanActivity.this.finish();
-                        break;
-                }
-
+                back_response();
                 break;
         }
     }
 
+    /**
+     * 按返回键的事件响应
+     */
+    private void back_response() {
+        switch (btn_upgrade.getText().toString()) {
+            case "取消":
+                btn_upgrade.setText("升级");
+                activity_destroy = true;
+                banben_progress_linear.setVisibility(View.GONE);
+                banbenxin_linear.setVisibility(View.VISIBLE);
+                new_gujian_promat_txt.setVisibility(View.VISIBLE);
+                current_gujian_version_linear.setVisibility(View.VISIBLE);
+                break;
+            case "升级":
+                btn_upgrade.setText("升级中");
+                banbenxin_linear.setVisibility(View.GONE);
+                new_gujian_promat_txt.setVisibility(View.GONE);
+//                        current_gujian_version_linear.setVisibility(View.GONE);
+                banben_progress_linear.setVisibility(View.VISIBLE);
+//                startTimer();
+                init_timer();
+                updatebox_version();
+                break;
+            case "返回":
+                GuJianWangGuanActivity.this.finish();
+                break;
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        back_response();
+    }
+
+
+    private void init_timer() {
+        final int[] second = {30};//90秒
+        final int[] minute = {1};//90秒
+        final int[] index = {0};
+        is_index = true;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (is_index) {
+                    try {
+                        Thread.sleep(1000);
+//                        roundProgressBar2.setProgress(i++);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                second[0]--;
+                                if (second[0] > 9) {
+                                    miao.setText(String.valueOf(second[0]));
+                                } else if (second[0] > 0) {
+                                    miao.setText("0" + String.valueOf(second[0]));
+                                } else {
+                                    index[0]++;
+                                    if (index[0] >= 2) {
+                                        GuJianWangGuanActivity.this.finish();
+                                        //停止添加网关
+//                                        is_index = false;
+                                        miao.setText("00");
+                                        second[0] = 0;
+                                        minute[0] = 0;
+                                        miao.setText("00");
+                                        stopTimer();
+                                        GuJianWangGuanActivity.this.finish();
+                                    } else {
+                                        miao.setText("00");
+                                        second[0] = 59;
+                                        minute[0] = 0;
+                                        miao.setText("59");
+                                    }
+                                }
+                                second_txt.setText("0" + String.valueOf(minute[0]));
+                            }
+                        });
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
+    }
 
     // 开始
     private void startTimer() {
@@ -218,15 +302,18 @@ public class GuJianWangGuanActivity extends Basecactivity {
 
     // 结束
     private void stopTimer() {
-        if (timerTask != null) {
-            timerTask.cancel();
-            timerTask = null;
-        }
+//        if (timerTask != null) {
+//            timerTask.cancel();
+//            timerTask = null;
+//        }
+//
+        is_index = false;
     }
 
     // 取消计时
     public void onDestory() {
         timer.cancel();
+        unregisterReceiver(mMessageReceiver);
     }
 
     int second = 0;
@@ -265,6 +352,7 @@ public class GuJianWangGuanActivity extends Basecactivity {
     protected void onDestroy() {
         super.onDestroy();
         activity_destroy = true;
+        is_index = false;
     }
 
 
@@ -276,14 +364,7 @@ public class GuJianWangGuanActivity extends Basecactivity {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case 0:
-                    banben_progress_linear.setVisibility(View.GONE);
-//                    upgrade_rel.setVisibility(View.GONE);
-                    btn_upgrade.setText("返回");
-                    banbenxin_linear.setVisibility(View.VISIBLE);
-                    icon_banbengenxin.setImageResource(R.drawable.icon_edition);
-                    current_gujian_version_linear.setVisibility(View.VISIBLE);
-                    current_gujian_version_txt.setText("当前已经是最新版本");
-                    new_gujian_version_txt.setText(newVersion);
+                    update_complete_response();
                     break;
                 case 1:
 
@@ -291,6 +372,21 @@ public class GuJianWangGuanActivity extends Basecactivity {
             }
         }
     };
+
+    /**
+     * 更新完成的页面跳转
+     */
+    private void update_complete_response() {
+        banben_progress_linear.setVisibility(View.GONE);
+        upgrade_rel.setVisibility(View.VISIBLE);
+        btn_upgrade.setText("返回");
+        banbenxin_linear.setVisibility(View.VISIBLE);
+        new_gujian_promat_txt.setVisibility(View.GONE);
+        icon_banbengenxin.setImageResource(R.drawable.icon_edition);
+        current_gujian_version_linear.setVisibility(View.VISIBLE);
+        current_gujian_version_txt.setText("当前已经是最新版本");
+        new_gujian_version_txt.setText(newVersion);
+    }
 
 
     /**
@@ -301,11 +397,12 @@ public class GuJianWangGuanActivity extends Basecactivity {
         //在这里先调
         //设置网关模式-sraum-setBox
         Map map = new HashMap();
-        String phoned = getDeviceId(this);
+//        String phoned = getDeviceId(this);
+        String regId = (String) SharedPreferencesUtil.getData(GuJianWangGuanActivity.this, "regId", "");
         map.put("token", TokenUtil.getToken(this));
         String boxnumber = (String) SharedPreferencesUtil.getData(this, "boxnumber", "");
         map.put("boxNumber", boxnumber);
-        map.put("regId", phoned);
+        map.put("regId", regId);
 //        map.put("status", "0");//进入设置模式
 //        dialogUtil.loadDialog();
         MyOkHttp.postMapObject(ApiHelper.sraum_updateBox, map, new Mycallback(new AddTogglenInterfacer() {
@@ -391,7 +488,7 @@ public class GuJianWangGuanActivity extends Basecactivity {
                             onDestory();
                             stopTimer();
                             handler_upgrade.sendEmptyMessage(0);
-//                            GuJianWangGuanActivity.this.finish();
+                            GuJianWangGuanActivity.this.finish();
                         } else {
                             ToastUtil.showToast(GuJianWangGuanActivity.this, "网关" +
                                     "升级失败");

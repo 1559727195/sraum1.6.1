@@ -113,7 +113,7 @@ public class FindPwdoneActivity extends Basecactivity {
             MyOkHttp.postMapString(ApiHelper.sraum_checkMobilePhone, map, new Mycallback(new AddTogglenInterfacer() {
                 @Override
                 public void addTogglenInterfacer() {//获取togglen刷新数据
-                    checkNum();
+
                 }
             }, FindPwdoneActivity.this, dialogUtil) {
                 @Override
@@ -124,6 +124,10 @@ public class FindPwdoneActivity extends Basecactivity {
 
                 @Override
                 public void wrongBoxnumber() {
+                }
+
+                @Override
+                public void wrongToken() {
                     getCode();
                 }
             });

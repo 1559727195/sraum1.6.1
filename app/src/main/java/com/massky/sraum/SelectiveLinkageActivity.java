@@ -72,6 +72,7 @@ public class SelectiveLinkageActivity extends Basecactivity implements
     private Map map_link = new HashMap();
     private List<String> listpanelNumber = new ArrayList();
     private List<String> listpanelName = new ArrayList();
+    private List<String> listbox = new ArrayList();
 
     @Override
     protected int viewId() {
@@ -105,54 +106,12 @@ public class SelectiveLinkageActivity extends Basecactivity implements
 //    R.drawable.emergency_button_s
     private void onData() {
         list_hand_scene = new ArrayList<>();
-//        for (String type : ) {
-//            Boolean flag = false;
-//            Map map = new HashMap();
-//            map.put("name", type);
-//            setPicture(type);
-////            switch (type) {
-////                case "7":
-////                    map.put("image",R.drawable.magnetic_door_s);
-////                    break;
-////                case "8":
-////                    map.put("image",R.drawable.human_induction_s);
-////                    break;
-////                case "9":
-////                    map.put("image",R.drawable.water_s);
-////                    break;
-////                case "10":
-////                    map.put("image",R.drawable.pm25_s);
-////                    break;
-////                case "11":
-////                    map.put("image",R.drawable.emergency_button_s);
-////                    break;
-////                case "12":
-////                    map.put("image",R.drawable.icon_rucebjq_40);
-////                    break;
-////                case "13":
-////                    map.put("image",R.drawable.icon_yanwubjq_40);
-////                    break;
-////                case "14":
-////                    map.put("image",R.drawable.icon_ranqibjq_40);
-////                    break;
-////                case "15":
-////                    map.put("image",R.drawable.icon_zhinengmensuo_40);
-////                    break;
-////                case "16":
-////                    map.put("image",R.drawable.ic_launcher);
-////                    break;
-////            }
-//            list_hand_scene.add(map);
-//            list_bool.add(flag);
-//        }
-
         selectexcutesceneresultadapter = new SelectLinkageAdapter(SelectiveLinkageActivity.this,
                 panelList, listint, listintwo);
         maclistview_id.setAdapter(selectexcutesceneresultadapter);
 //        xListView_scan.setPullLoadEnable(false);
 //        xListView_scan.setFootViewHide();
 //        xListView_scan.setXListViewListener(this);
-
 //        uploader_refresh();
         getData(true);
     }
@@ -229,11 +188,11 @@ public class SelectiveLinkageActivity extends Basecactivity implements
                                 panelList.add(map);
                             }
 
-
                         for (Map map : panelList) {
                             listtype.add(map.get("panelType").toString());
                             listpanelNumber.add(map.get("panelNumber").toString());
                             listpanelName.add(map.get("panelName").toString());
+                            listbox.add(map.get("boxName").toString());
                             setPicture(map.get("panelType").toString());
                         }
 
@@ -254,7 +213,6 @@ public class SelectiveLinkageActivity extends Basecactivity implements
                     }
                 });
     }
-
 
 
   /*  */
@@ -391,8 +349,17 @@ public class SelectiveLinkageActivity extends Basecactivity implements
 //                listintwo.add(R.drawable.ic_launcher);
 //                break;
             case "A201":
+                listint.add(R.drawable.icon_yijiandk_40);
+                listintwo.add(R.drawable.icon_yijiandk_40);
+                break;
             case "A202":
+                listint.add(R.drawable.icon_liangjiandki_40);
+                listintwo.add(R.drawable.icon_liangjiandki_40);
+                break;
             case "A203":
+                listint.add(R.drawable.icon_sanjiandk_40);
+                listintwo.add(R.drawable.icon_sanjiandk_40);
+                break;
             case "A204":
                 listint.add(R.drawable.icon_kaiguan_40);
                 listintwo.add(R.drawable.icon_kaiguan_40_active);
@@ -400,6 +367,12 @@ public class SelectiveLinkageActivity extends Basecactivity implements
             case "A301":
             case "A302":
             case "A303":
+            case "A311":
+            case "A312":
+            case "A313":
+            case "A321":
+            case "A322":
+            case "A331":
                 listint.add(R.drawable.icon_tiaoguang_40);
                 listintwo.add(R.drawable.icon_tiaoguang_40_active);
                 break;
@@ -412,12 +385,12 @@ public class SelectiveLinkageActivity extends Basecactivity implements
                 listintwo.add(R.drawable.icon_kongtiao_40_active);
                 break;
             case "A611":
-                listint.add(R.drawable.defaultpic);
-                listintwo.add(R.drawable.defaultpic);
+                listint.add(R.drawable.freshair);
+                listintwo.add(R.drawable.freshair);
                 break;
             case "A711":
-                listint.add(R.drawable.defaultpic);
-                listintwo.add(R.drawable.defaultpic);
+                listint.add(R.drawable.floorheating);
+                listintwo.add(R.drawable.floorheating);
                 break;
             case "A801":
                 listint.add(R.drawable.icon_menci_40);
@@ -455,17 +428,25 @@ public class SelectiveLinkageActivity extends Basecactivity implements
                 listint.add(R.drawable.icon_jinjianniu_40);
                 listintwo.add(R.drawable.icon_jinjianniu_40_active);
                 break;
+            case "B101":
+                listint.add(R.drawable.icon_kaiguan_socket_40);
+                listintwo.add(R.drawable.icon_kaiguan_socket_40);
+                break;
+            case "B102":
+                listint.add(R.drawable.defaultpic);
+                listintwo.add(R.drawable.defaultpic);
+                break;
             case "B201":
                 listint.add(R.drawable.icon_zhinengmensuo_40);
                 listintwo.add(R.drawable.icon_zhinengmensuo_40_active);
                 break;
             case "B301":
-                listint.add(R.drawable.defaultpic);
-                listintwo.add(R.drawable.defaultpic);
+                listint.add(R.drawable.icon_jixieshou_40);
+                listintwo.add(R.drawable.icon_jixieshou_40);
                 break;
             case "AA02":
-                listint.add(R.drawable.icon_yaokongqi_40);
-                listintwo.add(R.drawable.icon_yaokongqi_40_active);
+                listint.add(R.drawable.icon_hongwaizfq_40);
+                listintwo.add(R.drawable.icon_hongwaizfq_40);
                 break;
         }
     }
@@ -538,7 +519,7 @@ public class SelectiveLinkageActivity extends Basecactivity implements
 
         switch (listtype.get(position)) {
             case "A501":
-                getAir501Data(listpanelNumber.get(position));
+                getAir501Data(listpanelNumber.get(position), listbox.get(position));
                 break;
             default:
                 intent = new Intent(SelectiveLinkageActivity.this, SelectiveLinkageDeviceDetailSecondActivity.class);
@@ -546,6 +527,7 @@ public class SelectiveLinkageActivity extends Basecactivity implements
                 intent.putExtra("panelNumber", (Serializable) listpanelNumber.get(position));
                 intent.putExtra("panelType", (Serializable) listtype.get(position));
                 intent.putExtra("panelName", (Serializable) listpanelName.get(position));
+                intent.putExtra("boxName", (Serializable) listbox.get(position) == null ? "" : listbox.get(position));
                 //传感器参数
 //                Map mapdevice = new HashMap();
 //                mapdevice.put("sensorType", map_link.get("deviceType"));
@@ -555,7 +537,6 @@ public class SelectiveLinkageActivity extends Basecactivity implements
 //                mapdevice.put("sensorMinValue", map_link.get("minValue"));
 //                mapdevice.put("sensorMaxValue", map_link.get("maxValue"));
                 intent.putExtra("sensor_map", (Serializable) map_link);
-
                 //
                 startActivityForResult(intent, REQUEST_SENSOR);
                 break;
@@ -574,6 +555,7 @@ public class SelectiveLinkageActivity extends Basecactivity implements
 //                mapdevice.put("sensorMinValue", map_link.get("minValue"));
 //                mapdevice.put("sensorMaxValue", map_link.get("maxValue"));
                 intent.putExtra("sensor_map", (Serializable) map_link);
+                intent.putExtra("boxName", (Serializable) listbox.get(position) == null ? "" : listbox.get(position));
                 startActivity(intent);
 
                 break;
@@ -589,8 +571,9 @@ public class SelectiveLinkageActivity extends Basecactivity implements
      * 空调面板501
      *
      * @param
+     * @param boxName
      */
-    private void getAir501Data(String panelNumber) {
+    private void getAir501Data(String panelNumber, final String boxName) {
         Map<String, Object> map = new HashMap<>();
         map.put("token", TokenUtil.getToken(SelectiveLinkageActivity.this));
         map.put("boxNumber", TokenUtil.getBoxnumber(SelectiveLinkageActivity.this));
@@ -626,6 +609,7 @@ public class SelectiveLinkageActivity extends Basecactivity implements
                             mapdevice.put("speed", user.deviceList.get(position).speed);
                             mapdevice.put("name", user.deviceList.get(position).name);
                             mapdevice.put("panelName", user.deviceList.get(position).panelName);
+                            mapdevice.put("boxName", boxName);
 
 //                            //传感器参数
 //                            mapdevice.put("sensorType", map_link.get("deviceType"));

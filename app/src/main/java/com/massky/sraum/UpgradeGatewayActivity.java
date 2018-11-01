@@ -34,7 +34,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import butterknife.InjectView;
-
 import static com.massky.sraum.GuJianWangGuanActivity.UPDATE_GRADE_BOX;
 
 /**
@@ -138,7 +137,7 @@ public class UpgradeGatewayActivity extends Basecactivity {
         //在这里先调
         //设置网关模式-sraum-setBox
         Map map = new HashMap();
-        String phoned = getDeviceId(this);
+//        String phoned = getDeviceId(this);
         map.put("token", TokenUtil.getToken(this));
         String boxnumber = (String) SharedPreferencesUtil.getData(this, "boxnumber", "");
         map.put("boxNumber", boxnumber);
@@ -198,19 +197,18 @@ public class UpgradeGatewayActivity extends Basecactivity {
         //在这里先调
         //设置网关模式-sraum-setBox
         Map map = new HashMap();
-        String phoned = getDeviceId(this);
+//        String phoned = getDeviceId(this);
+        String regId = (String) SharedPreferencesUtil.getData(UpgradeGatewayActivity.this, "regId", "");
         map.put("token", TokenUtil.getToken(this));
         String boxnumber = (String) SharedPreferencesUtil.getData(this, "boxnumber", "");
         map.put("boxNumber", boxnumber);
-        map.put("regId", phoned);
+        map.put("regId", regId);
 //        map.put("status", "0");//进入设置模式
 //        dialogUtil.loadDialog();
         MyOkHttp.postMapObject(ApiHelper.sraum_updateBox, map, new Mycallback(new AddTogglenInterfacer() {
                     @Override
                     public void addTogglenInterfacer() {//
-//
                         updatebox_version();
-
                     }
                 }, UpgradeGatewayActivity.this, dialogUtil) {
                     @Override

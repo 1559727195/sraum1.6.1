@@ -12,6 +12,7 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import com.AddTogenInterface.AddTogglenInterfacer;
 import com.Util.ApiHelper;
 import com.Util.ClearEditText;
@@ -24,13 +25,16 @@ import com.Util.TokenUtil;
 import com.Util.view.SlideSwitchButton;
 import com.data.User;
 import com.massky.sraum.EditMyDeviceActivity;
+import com.massky.sraum.MyDeviceItemActivity;
 import com.massky.sraum.R;
 import com.mcxtzhang.swipemenulib.SwipeMenuLayout;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import okhttp3.Call;
 
 /**
@@ -109,16 +113,27 @@ public class SelectYaoKongQiAdapter extends android.widget.BaseAdapter {
         viewHolderContentType.img_guan_scene.setImageResource(listint.get(position));
 
         final ViewHolderContentType finalViewHolderContentType = viewHolderContentType;
+        //成员，业主accountType->addrelative_id
+        String accountType = (String) SharedPreferencesUtil.getData(activity, "accountType", "");
+        switch (accountType) {
+            case "1":
+                finalViewHolderContentType.swipemenu_layout.setLeftSwipe(true);
+                viewHolderContentType.swipe_content_linear.setEnabled(true);
+                break;//业主
+            case "2":
+                finalViewHolderContentType.swipemenu_layout.setLeftSwipe(false);
+                viewHolderContentType.swipe_content_linear.setEnabled(false);
+                break;//家庭成员
+        }
         viewHolderContentType.delete_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 finalViewHolderContentType.swipemenu_layout.quickClose();
 //                    delete_item();
-                showCenterDeleteDialog(list.get(position).get("deviceId").toString(),list.get(position).get("number").toString(), list.get(position).get("name").toString());
+                showCenterDeleteDialog(list.get(position).get("deviceId").toString(), list.get(position).get("number").toString(), list.get(position).get("name").toString());
             }
         });
-
 
         viewHolderContentType.edit_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -221,15 +236,22 @@ public class SelectYaoKongQiAdapter extends android.widget.BaseAdapter {
                     ToastUtil.showToast(activity, "云场景名称已存在");
                     return;
                 }
-                sraum_updateWifiAppleName(id, edit_password_gateway.getText().toString() == null ? "" :
-                                edit_password_gateway.getText().toString()
-                        , dialog);
+
+
+                if (!name.equals(edit_password_gateway.getText().toString() == null ? "" :
+                        edit_password_gateway.getText().toString().trim())) {
+                    sraum_updateWifiAppleName(id, edit_password_gateway.getText().toString() == null ? "" :
+                                    edit_password_gateway.getText().toString()
+                            , dialog);
+                } else {
+                    dialog.dismiss();
+                }
             }
         });
     }
 
     //自定义dialog,centerDialog删除对话框
-    public void showCenterDeleteDialog(final String deviceId,final String linkId, final String name) {
+    public void showCenterDeleteDialog(final String deviceId, final String linkId, final String name) {
 //        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 //        // 布局填充器
 //        LayoutInflater inflater = LayoutInflater.from(getActivity());
@@ -278,7 +300,7 @@ public class SelectYaoKongQiAdapter extends android.widget.BaseAdapter {
         confirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sraum_deleteWifiApple(deviceId,linkId, dialog);
+                sraum_deleteWifiApple(deviceId, linkId, dialog);
             }
         });
     }
@@ -345,7 +367,8 @@ public class SelectYaoKongQiAdapter extends android.widget.BaseAdapter {
 
     /**
      * 删除 wifi 遥控器
-     *  @param
+     *
+     * @param
      * @param deviceId
      * @param dialog
      */
@@ -393,7 +416,7 @@ public class SelectYaoKongQiAdapter extends android.widget.BaseAdapter {
 //                refreshLayout.autoRefresh();
                 if (refreshListener != null)
                     refreshListener.refresh();
-                SharedPreferencesUtil.remove_current_values(activity,"remoteairlist",deviceId,
+                SharedPreferencesUtil.remove_current_values(activity, "remoteairlist", deviceId,
                         "rid");
             }
         });

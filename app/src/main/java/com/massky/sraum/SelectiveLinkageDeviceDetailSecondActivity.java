@@ -15,12 +15,10 @@ import com.Util.AppManager;
 import com.Util.DialogUtil;
 import com.Util.MyOkHttp;
 import com.Util.Mycallback;
-import com.Util.ToastUtil;
 import com.Util.TokenUtil;
 import com.adapter.SelectLinkageItemSecondAdapter;
 import com.base.Basecactivity;
 import com.data.User;
-import com.michoi.cloudtalksdk.newsdk.common.POSITION;
 import com.xlistview.PullToRefreshLayout;
 import com.yanzhenjie.statusview.StatusUtils;
 import com.yanzhenjie.statusview.StatusView;
@@ -67,6 +65,7 @@ public class SelectiveLinkageDeviceDetailSecondActivity extends Basecactivity im
     private List<Map> list_map = new ArrayList<>();
     private String panelName;
     private Map sensor_map = new HashMap();//传感器map
+    private String boxName;
 
 
     /**
@@ -92,6 +91,8 @@ public class SelectiveLinkageDeviceDetailSecondActivity extends Basecactivity im
         panelType = (String) getIntent().getSerializableExtra("panelType");
         panelName = (String) getIntent().getSerializableExtra("panelName");
         sensor_map = (Map) getIntent().getSerializableExtra("sensor_map");
+        //  intent.putExtra("boxName", (Serializable) listbox.get(position));
+        boxName = (String) getIntent().getSerializableExtra("boxName");
         if (panelName != null) project_select.setText(panelName);
         getData(true);
         selectexcutesceneresultadapter = new SelectLinkageItemSecondAdapter(SelectiveLinkageDeviceDetailSecondActivity.this,
@@ -101,7 +102,6 @@ public class SelectiveLinkageDeviceDetailSecondActivity extends Basecactivity im
 //        refresh_view.autoRefresh();
         refresh_view.noreleasePull();
     }
-
 
     @Override
     public void onClick(View v) {
@@ -162,6 +162,7 @@ public class SelectiveLinkageDeviceDetailSecondActivity extends Basecactivity im
                             mapdevice.put("temperature", user.deviceList.get(position).temperature);
                             mapdevice.put("speed", user.deviceList.get(position).speed);
                             mapdevice.put("name", user.deviceList.get(position).name);
+                            mapdevice.put("boxName", boxName);
                             mapdevice.put("panelName", user.deviceList.get(position).panelName);
                             type_index.put("type", user.deviceList.get(position).type);
                             type_index.put("index", position);
@@ -184,7 +185,6 @@ public class SelectiveLinkageDeviceDetailSecondActivity extends Basecactivity im
 
     private void setPicture(String type) {
         switch (type) {
-
             case "A201":
             case "A202":
             case "A203":
@@ -195,6 +195,12 @@ public class SelectiveLinkageDeviceDetailSecondActivity extends Basecactivity im
             case "A301":
             case "A302":
             case "A303":
+            case "A311":
+            case "A312":
+            case "A313":
+            case "A321":
+            case "A322":
+            case "A331":
                 tiaoguang_light();
                 panel_txt_promat.setText("执行开关");
                 break;
@@ -208,13 +214,15 @@ public class SelectiveLinkageDeviceDetailSecondActivity extends Basecactivity im
                 break;
             case "A511":
                 panel_txt_promat.setText("选择空调");
-                air_control_list();
+                air_control_list(type);
                 break;
             case "A611":
-
+                panel_txt_promat.setText("选择新风");
+                air_control_list(type);
                 break;
             case "A711":
-
+                panel_txt_promat.setText("选择地暖");
+                air_control_list(type);
                 break;
             case "A801":
 
@@ -242,11 +250,18 @@ public class SelectiveLinkageDeviceDetailSecondActivity extends Basecactivity im
             case "B001":
 
                 break;
-            case "B201":
 
+            case "B101":
+                panel_txt_promat.setText("选择86插座一位");
+                air_control_list(type);
+                break;
+            case "B201":
+                panel_txt_promat.setText("选择智能门锁");
+                air_control_list(type);
                 break;
             case "B301":
-
+                panel_txt_promat.setText("选择机械手");
+                air_control_list(type);
                 break;
 
         }
@@ -255,8 +270,10 @@ public class SelectiveLinkageDeviceDetailSecondActivity extends Basecactivity im
 
     /**
      * 空调控制
+     *
+     * @param type
      */
-    private void air_control_list() {
+    private void air_control_list(String type) {
 
         for (int position = 0; position < deviceActionList.size(); position++) {
             Map map = new HashMap();
@@ -267,7 +284,26 @@ public class SelectiveLinkageDeviceDetailSecondActivity extends Basecactivity im
             map.put("mode", deviceActionList.get(position).get("mode"));
             map.put("temperature", deviceActionList.get(position).get("temperature"));
             map.put("speed", deviceActionList.get(position).get("speed"));
-            map.put("name", deviceActionList.get(position).get("name"));
+            map.put("boxName", deviceActionList.get(position).get("boxName"));
+            switch (type) {
+                case "A511":
+                case "A611":
+                case "A711":
+                    map.put("name", deviceActionList.get(position).get("name"));
+                    break;
+                case "B101":
+                case "B201":
+                    map.put("name", deviceActionList.get(position).get("name") + "打开");
+                    map.put("name1", deviceActionList.get(position).get("name"));
+
+                    break;
+                case "B301":
+                    map.put("name", deviceActionList.get(position).get("name") + "关闭");
+                    map.put("name1", deviceActionList.get(position).get("name"));
+                    break;
+
+            }
+            map.put("boxName", deviceActionList.get(position).get("boxName"));
             list_map.add(map);
         }
 
@@ -299,7 +335,6 @@ public class SelectiveLinkageDeviceDetailSecondActivity extends Basecactivity im
      * 调光灯
      */
     private void tiaoguang_light() {
-        //调光灯
         for (int i = 0; i < deviceActionList.size(); i++) {
 
             switch (deviceActionList.get(i).get("type").toString()) {
@@ -308,10 +343,8 @@ public class SelectiveLinkageDeviceDetailSecondActivity extends Basecactivity im
                     break;
                 case "2":
                     common("第" + (i + 1) + "路调光灯带", deviceActionList.get(i).get("name").toString(), "2", i);
-
                     break;
             }
-
         }
     }
 
@@ -368,7 +401,7 @@ public class SelectiveLinkageDeviceDetailSecondActivity extends Basecactivity im
                     map.put("status", value4);
 //                    map.put("action", "关闭");
                     if (type.equals("4")) {
-                        map.put("action", name + "打开");
+                        map.put("action", name + "关闭");
                     } else {
                         map.put("action", "关闭");
                     }
@@ -391,11 +424,11 @@ public class SelectiveLinkageDeviceDetailSecondActivity extends Basecactivity im
             map.put("mode", deviceActionList.get(position).get("mode"));
             map.put("temperature", deviceActionList.get(position).get("temperature"));
             map.put("speed", deviceActionList.get(position).get("speed"));
+            map.put("boxName", deviceActionList.get(position).get("boxName"));
 //            map.put("name", deviceActionList.get(position).get("name"));
             list_map.add(map);
         }
     }
-
 
     /**
      * 普通灯
@@ -410,9 +443,7 @@ public class SelectiveLinkageDeviceDetailSecondActivity extends Basecactivity im
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-
         switch (panelType) {
-
             case "A201":
             case "A202":
             case "A203":
@@ -420,6 +451,12 @@ public class SelectiveLinkageDeviceDetailSecondActivity extends Basecactivity im
             case "A301":
             case "A302":
             case "A303":
+            case "A311":
+            case "A312":
+            case "A313":
+            case "A321":
+            case "A322":
+            case "A331":
                 back_onclick(position, view);
                 break;
             case "A401"://窗帘的话
@@ -429,10 +466,10 @@ public class SelectiveLinkageDeviceDetailSecondActivity extends Basecactivity im
                 send_map_to_second(list_map.get(position));
                 break;
             case "A611":
-
+                send_map_to_second(list_map.get(position));
                 break;
             case "A711":
-
+                send_map_to_second(list_map.get(position));
                 break;
             case "A801":
 
@@ -461,14 +498,13 @@ public class SelectiveLinkageDeviceDetailSecondActivity extends Basecactivity im
 
                 break;
             case "B201":
-
+            case "B101":
+                send_map_to_second(list_map.get(position));
                 break;
             case "B301":
-
+                send_map_to_second(list_map.get(position));
                 break;
-
         }
-
     }
 
     /**
@@ -526,7 +562,6 @@ public class SelectiveLinkageDeviceDetailSecondActivity extends Basecactivity im
                 break;
             case "4":
 
-
                 break;
             case "5":
 
@@ -534,8 +569,6 @@ public class SelectiveLinkageDeviceDetailSecondActivity extends Basecactivity im
             case "6":
 
                 break;
-
-
         }
     }
 
@@ -596,6 +629,8 @@ public class SelectiveLinkageDeviceDetailSecondActivity extends Basecactivity im
 //        map.put("sensorMaxValue", sensor_map.get("sensorMaxValue"));
         switch (map.get("type").toString()) {
             case "3":
+            case "5":
+            case "6":
                 intent = new Intent(
                         SelectiveLinkageDeviceDetailSecondActivity.this,
                         AirLinkageControlActivity.class
@@ -617,6 +652,50 @@ public class SelectiveLinkageDeviceDetailSecondActivity extends Basecactivity im
                 intent.putExtra("sensor_map", (Serializable) sensor_map);
                 startActivity(intent);
                 SelectiveLinkageDeviceDetailSecondActivity.this.finish();
+                break;
+            case "15":
+            case "16":
+            case "17":
+//                intent = new Intent(
+//                        SelectiveLinkageDeviceDetailSecondActivity.this,
+//                        OpenSmartDoorLockActivity.class
+//                );
+//
+//                intent.putExtra("air_control_map", (Serializable) map);
+//                intent.putExtra("sensor_map", (Serializable) sensor_map);
+//                startActivity(intent);
+                init_intent(map);
+                break;
+        }
+    }
+
+    private void init_intent(Map air_control_map) {
+        init_action(air_control_map);
+        AppManager.getAppManager().finishActivity_current(SelectiveLinkageActivity.class);
+        AppManager.getAppManager().finishActivity_current(SelectiveLinkageDeviceDetailSecondActivity.class);
+        AppManager.getAppManager().finishActivity_current(EditLinkDeviceResultActivity.class);
+        Intent intent = new Intent(
+                SelectiveLinkageDeviceDetailSecondActivity.this,
+                EditLinkDeviceResultActivity.class);
+        intent.putExtra("device_map", (Serializable) air_control_map);
+        intent.putExtra("sensor_map", (Serializable) sensor_map);
+        SelectiveLinkageDeviceDetailSecondActivity.this.finish();
+        startActivity(intent);
+    }
+
+    private void init_action(Map air_control_map) {
+        switch (air_control_map.get("type").toString()) {
+            case "15":
+                air_control_map.put("action", "打开");
+                air_control_map.put("status", "1");
+                break;
+            case "16":
+                air_control_map.put("action", "关闭");
+                air_control_map.put("status", "0");
+                break;
+            case "17":
+                air_control_map.put("action", "打开");
+                air_control_map.put("status", "1");
                 break;
         }
     }
@@ -673,6 +752,7 @@ public class SelectiveLinkageDeviceDetailSecondActivity extends Basecactivity im
             map_value.put("mode", map.get("mode"));
             map_value.put("temperature", map.get("temperature"));
             map_value.put("speed", map.get("speed"));
+            map_value.put("boxName", map.get("boxName"));
 //            map_value.put("name", deviceActionList.get(position).get("name"));
             first.add(map_value);
         }

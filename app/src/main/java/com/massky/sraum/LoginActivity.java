@@ -4,9 +4,11 @@ package com.massky.sraum;
 import android.*;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.TelephonyManager;
 import android.view.MotionEvent;
 import android.view.View;
@@ -36,6 +38,7 @@ import com.base.Basecactivity;
 import com.data.Allbox;
 import com.data.User;
 import com.jpush.Constants;
+import com.jpush.MyReceiver;
 import com.permissions.RxPermissions;
 
 import java.util.ArrayList;
@@ -108,6 +111,19 @@ public class LoginActivity extends Basecactivity {
         });
     }
 
+
+//    public void registerMessageReceiver_tongzhi() {
+//        mMessageReceiver = new MyReceiver();
+//        IntentFilter filter = new IntentFilter();
+//        filter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
+//        filter.addCategory("com.massky.sraum");
+//        filter.addAction("cn.jpush.android.intent.REGISTRATION");
+//        filter.addAction("cn.jpush.android.intent.MESSAGE_RECEIVED");
+//        filter.addAction("cn.jpush.android.intent.NOTIFICATION_RECEIVED");
+//        filter.addAction("cn.jpush.android.intent.NOTIFICATION_OPENED");
+//        filter.addAction("cn.jpush.android.intent.CONNECTION");
+//        registerReceiver(mMessageReceiver, filter);
+//    }
 
     private void intiData() {
         JPushInterface.init(getApplicationContext());
@@ -286,11 +302,12 @@ public class LoginActivity extends Basecactivity {
                         // for ActivityCompat#requestPermissions for more details.
                         return;
                     }
-                    String szImei = TelephonyMgr.getDeviceId();
+//                    String szImei = TelephonyMgr.getDeviceId();
+
                     String regId = (String) SharedPreferencesUtil.getData(LoginActivity.this, "regId", "");
                     map.put("token", user.token);
-                    map.put("regId", regId);
-                    map.put("phoneId", szImei);
+                    map.put("regId", regId);//120c83f7601309b9d2b
+                    map.put("phoneId", regId);
                     LogUtil.eLength("查看数据", JSON.toJSONString(map));
                     MyOkHttp.postMapObjectnest(ApiHelper.sraum_login, map, new MycallbackNest(new AddTogglenInterfacer() {
                         @Override
@@ -323,6 +340,13 @@ public class LoginActivity extends Basecactivity {
                         public void wrongToken() {
                             super.wrongToken();
                             ToastUtil.showDelToast(LoginActivity.this, "登录失败");
+                        }
+
+
+                        @Override
+                        public void pullDataError() {
+                            super.pullDataError();
+                            ToastUtil.showDelToast(LoginActivity.this, "登录失败,数据解析失败");
                         }
                     });
                 }

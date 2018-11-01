@@ -2,28 +2,64 @@ package com.Util;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.multidex.MultiDex;
+import android.support.multidex.MultiDexApplication;
+import android.support.v4.content.LocalBroadcastManager;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.WindowManager;
+
+import com.AddTogenInterface.AddTogglenInterfacer;
+import com.alibaba.fastjson.JSON;
+import com.base.Basecactivity;
+import com.base.Basecfragment;
+import com.base.Basecfragmentactivity;
+import com.data.Allbox;
+import com.data.User;
 import com.dialog.CommonData;
 import com.dialog.CommonDialogService;
 import com.dialog.ToastUtils;
+import com.fragment.MacFragment;
+import com.fragment.MacdeviceFragment;
+import com.fragment.MygatewayFragment;
+import com.fragment.MysceneFragment;
+import com.fragment.RoomFragment;
+import com.fragment.SceneFragment;
+import com.jpush.Constants;
+import com.jpush.ExampleUtil;
+import com.jpush.MainActivity;
+import com.jpush.SystemUtils;
+import com.massky.sraum.FastEditPanelActivity;
+import com.massky.sraum.MainfragmentActivity;
 import com.michoi.cloudtalksdk.util.SystemUtil;
-import com.yaokan.sdk.api.YkanSDKManager;
 import com.zhy.http.okhttp.OkHttpUtils;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
 import cn.jpush.android.api.JPushInterface;
 import okhttp3.OkHttpClient;
+
+import static com.massky.sraum.GuJianWangGuanActivity.UPDATE_GRADE_BOX;
+import static com.massky.sraum.MainfragmentActivity.ACTION_SRAUM_SETBOX;
 
 /**
  * Created by masskywcy on 2017-01-04.
  */
 
-public class App extends Application implements Application.ActivityLifecycleCallbacks{
+public class App extends Application implements Application.ActivityLifecycleCallbacks {
 
     private Context context;
     public String calledAcccout;
@@ -41,13 +77,11 @@ public class App extends Application implements Application.ActivityLifecycleCal
     private boolean isForeground;
     private boolean isDoflag;
 
-
     @Override
     public void onCreate() {
         super.onCreate();
         _instance = this;
-
-        JPushInterface.setDebugMode(true);    // 设置开启日志,发布时请关闭日志
+//        JPushInterface.setDebugMode(true);    // 设置开启日志,发布时请关闭日志
         JPushInterface.init(this);            // 初始化 JPush
         //用于判断log值是否打印
         LogUtil.isDebug = true;
@@ -61,12 +95,11 @@ public class App extends Application implements Application.ActivityLifecycleCal
 
         OkHttpUtils.initClient(okHttpClient);
 
-
         //application生命周期
         this.registerActivityLifecycleCallbacks(this);//注册
         CommonData.applicationContext = this;
         DisplayMetrics metric = new DisplayMetrics();
-        WindowManager mWindowManager  = (WindowManager) this.getSystemService(Context.WINDOW_SERVICE);
+        WindowManager mWindowManager = (WindowManager) this.getSystemService(Context.WINDOW_SERVICE);
         mWindowManager.getDefaultDisplay().getMetrics(metric);
         CommonData.ScreenWidth = metric.widthPixels; // 屏幕宽度（像素）
         Intent dialogservice = new Intent(this, CommonDialogService.class);
@@ -89,55 +122,30 @@ public class App extends Application implements Application.ActivityLifecycleCal
 //        IntentFilter intentFilter = new IntentFilter(); //Intentfilter
 //        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
 //        this.context.registerReceiver(networkConnectionStatusBroadcastReceiver, intentFilter);
-
+//        ToastUtil.showToast(_instance,"你好");
     }
 
-//    private final BroadcastReceiver networkConnectionStatusBroadcastReceiver = new BroadcastReceiver()
-//    {
-//        public void onReceive(Context context, Intent intent)
-//        {
-//            ConnectivityManager connectMgr = (ConnectivityManager) context.getSystemService(context.CONNECTIVITY_SERVICE);
-//            NetworkInfo mobNetInfo = connectMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-//            NetworkInfo wifiNetInfo = connectMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-//            if (!(mobNetInfo != null && mobNetInfo.isConnected())
-//                    && !(wifiNetInfo != null && wifiNetInfo.isConnected()))
-//            {
-//                Log.e("robin debug", "【IMCORE】【本地网络通知】检测本地网络连接断开了!");
-//
-//                CloudTalkManager.getInstance().setNetworkConnected(false);
-//            }
-//            else
-//            {
-//                Log.e("robin debug", "【IMCORE】【本地网络通知】检测本地网络已连接上了!");
-//                CloudTalkManager.getInstance().setNetworkConnected(true);
-//
-//                // Log.e("TEST", "networkConnectionStatusBroadcastReceiver");
-//                //IMUtil.login(); // 登录
-//            }
-//        }
-//    };
-
     /**
-     *
      * @return
      */
-    public static App getInstance(){
+    public static App getInstance() {
         return _instance;
     }
 
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-        if(activity.getParent()!=null){
+        if (activity.getParent() != null) {
             CommonData.mNowContext = activity.getParent();
         } else
             CommonData.mNowContext = activity;
     }
 
+
     @Override
     public void onActivityStarted(Activity activity) {
-        if(activity.getParent()!=null){
+        if (activity.getParent() != null) {
             CommonData.mNowContext = activity.getParent();
-        }else
+        } else
             CommonData.mNowContext = activity;
 
         activityAount++;
@@ -147,7 +155,7 @@ public class App extends Application implements Application.ActivityLifecycleCal
                 isDoflag = true;
                 Log.e("zhu-", "isForeground:" + isForeground);
                 if (CommonData.mNowContext != null) {
-                    boolean loginflag  = (boolean) SharedPreferencesUtil.getData(CommonData.mNowContext, "loginflag", false);
+                    boolean loginflag = (boolean) SharedPreferencesUtil.getData(CommonData.mNowContext, "loginflag", false);
                     if (loginflag)
 //                        ToastUtil.showToast(CommonData.mNowContext,"App-loginflag:" + loginflag);
                         ToastUtils.getInstances().show_fourbackground("账号在其他地方登录，请重新登录。");
@@ -158,9 +166,9 @@ public class App extends Application implements Application.ActivityLifecycleCal
 
     @Override
     public void onActivityResumed(Activity activity) {
-        if(activity.getParent()!=null){
+        if (activity.getParent() != null) {
             CommonData.mNowContext = activity.getParent();
-        }else
+        } else
             CommonData.mNowContext = activity;
     }
 
@@ -176,7 +184,7 @@ public class App extends Application implements Application.ActivityLifecycleCal
         if (activityAount == 0) {
             isForeground = false;
             isDoflag = false;
-            Log.e("zhu-","isForeground:" + isForeground);
+            Log.e("zhu-", "isForeground:" + isForeground);
             //
         }
     }
@@ -194,6 +202,6 @@ public class App extends Application implements Application.ActivityLifecycleCal
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
-        MultiDex.install(this);
+//        MultiDex.install(this);
     }
 }

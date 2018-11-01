@@ -610,9 +610,9 @@ public class MyMacFragment extends Basecfragment implements
                         }
                         if (musicflag) {
                             LogUtil.i("铃声响起");
-                            MusicUtil.startMusic(getActivity(), 1);
+                            MusicUtil.startMusic(getActivity(), 1, "");
                         } else {
-                            MusicUtil.stopMusic(getActivity());
+                            MusicUtil.stopMusic(getActivity(), "");
                         }
                         listtype.set(position, status);
                         String string = listtype.get(position);

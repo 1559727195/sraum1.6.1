@@ -181,6 +181,5 @@ public class ClearDetailEditText extends AppCompatEditText implements
         translateAnimation.setDuration(500);
         return translateAnimation;
     }
-
 }
 

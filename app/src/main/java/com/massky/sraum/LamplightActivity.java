@@ -37,13 +37,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import butterknife.InjectView;
 import okhttp3.Call;
-
 import static com.fragment.MacFragment.ACTION_INTENT_RECEIVER_TO_SECOND_PAGE;
-import static com.massky.sraum.R.id.open_kong_tiao;
-import static okhttp3.Protocol.get;
 
 /**
  * Created by masskywcy on 2016-11-17.
@@ -124,6 +120,18 @@ public class LamplightActivity extends Basecactivity implements SeekBar.OnSeekBa
     RelativeLayout rel_3_pao;
     @InjectView(R.id.openbtn_kong_tiao)
     ImageView openbtn_kong_tiao;
+    @InjectView(R.id.open_btn_lignt_new_cloud_tiao)
+    ImageView open_btn_lignt_new_cloud_tiao;
+    @InjectView(R.id.close_btn_new_cloud_tiao)
+    ImageView close_btn_new_cloud_tiao;
+
+    @InjectView(R.id.open_new_cloud_tiao)
+    LinearLayout open_new_cloud_tiao;
+    @InjectView(R.id.fengsu_new_cloud_tiao)
+    ImageView fengsu_new_cloud_tiao;
+
+
+
     /**
      * 空调
      */
@@ -168,6 +176,7 @@ public class LamplightActivity extends Basecactivity implements SeekBar.OnSeekBa
         dialogUtil = new DialogUtil(LamplightActivity.this);
         backrela_id.setOnClickListener(this);
         windspeedrelative.setOnClickListener(this);
+        fengsu_new_cloud_tiao.setOnClickListener(this);
         patternrelative.setOnClickListener(this);
         id_seekBar.setOnSeekBarChangeListener(this);
         switchrelative.setOnClickListener(this);
@@ -201,6 +210,11 @@ public class LamplightActivity extends Basecactivity implements SeekBar.OnSeekBa
         /**
          * 空调
          */
+        open_btn_lignt_new_cloud_tiao.setOnClickListener(this);
+        close_btn_new_cloud_tiao.setOnClickListener(this);
+
+
+
 
 
         //调光控制
@@ -259,11 +273,16 @@ public class LamplightActivity extends Basecactivity implements SeekBar.OnSeekBa
                 tempimage_id.setText("16");
                 id_seekBar.setMax(14);
                 noairconditioned_id.setVisibility(View.VISIBLE);
+                open_kong_tiao.setVisibility(View.GONE);
+                open_new_cloud_tiao.setVisibility(View.VISIBLE);
+                windspeedrelative.setVisibility(View.GONE);
                 mainairrea_id.setVisibility(View.GONE);
                 patternrelative.setVisibility(View.GONE);
                 tempstate_id.setVisibility(View.GONE);
                 windspeedtwo_id.setVisibility(View.VISIBLE);
                 windspeed_id.setVisibility(View.GONE);
+                open_tiaoguangdeng.setVisibility(View.GONE);
+
                 break;
             //地暖
             case "6":
@@ -271,11 +290,15 @@ public class LamplightActivity extends Basecactivity implements SeekBar.OnSeekBa
                 tempimage_id.setText("16");//最低温度为16度 + 14 =30 度
                 id_seekBar.setMax(14);
                 noairconditioned_id.setVisibility(View.VISIBLE);
+                open_kong_tiao.setVisibility(View.GONE);
+                open_new_cloud_tiao.setVisibility(View.VISIBLE);
+                windspeedrelative.setVisibility(View.GONE);
                 mainairrea_id.setVisibility(View.GONE);
                 patternrelative.setVisibility(View.GONE);
                 tempstate_id.setVisibility(View.GONE);
                 windspeedtwo_id.setVisibility(View.VISIBLE);
                 windspeed_id.setVisibility(View.GONE);
+                open_tiaoguangdeng.setVisibility(View.GONE);
                 break;
         }
         id_seekBar.setOnTouchListener(new View.OnTouchListener() {//这个是根据网关状态在线情况，不在线的话，seekBar就不能滑动了，
@@ -371,6 +394,47 @@ public class LamplightActivity extends Basecactivity implements SeekBar.OnSeekBa
                     getMapdevice();
                 }
                 break;
+            case R.id.fengsu_new_cloud_tiao:
+                mapflag = false;
+                if (statusbo) {
+                    //风速状态
+                    switch (windflag) {
+                        case "1":
+                            windspeedtwo_id.setText("中风");
+                            windspeed_id.setText("中风");
+                            windflag = "2";
+                            break;
+                        case "2":
+                            windspeedtwo_id.setText("高风");
+                            windspeed_id.setText("高风");
+                            windflag = "3";
+                            break;
+                        case "3":
+                            windspeedtwo_id.setText("强力");
+                            windspeed_id.setText("强力");
+                            windflag = "4";
+                            break;
+                        case "4":
+                            windspeedtwo_id.setText("送风");
+                            windspeed_id.setText("送风");
+                            windflag = "5";
+                            break;
+                        case "5":
+                            windspeedtwo_id.setText("自动");
+                            windspeed_id.setText("自动");
+                            windflag = "6";
+                            break;
+                        case "6":
+                            windspeedtwo_id.setText("低风");
+                            windspeed_id.setText("低风");
+                            windflag = "1";
+                            break;
+                        default:
+                            break;
+                    }
+                    getMapdevice();
+                }
+                break;
             case R.id.patternrelative:
                 mapflag = false;
                 if (statusbo) {
@@ -404,6 +468,18 @@ public class LamplightActivity extends Basecactivity implements SeekBar.OnSeekBa
                 mapflag = true;
                 getMapdevice();
                 break;//关灯
+            case R.id.close_btn_new_cloud_tiao://close
+//                close_btn_light_kong_tiao.setImageResource(R.drawable
+//                        .guan_white_word);
+//                change_btn_kong_tiao.setImageResource(R.drawable
+//                        .change_black_word);
+//                openbtn_kong_tiao.setImageResource(R.drawable
+//                        .open_black_word);
+//                open();
+                statusflag = "0";
+                mapflag = true;
+                getMapdevice();
+                break;//关灯
             case R.id.change_btn_kong_tiao:
 //                change_btn_kong_tiao.setImageResource(R.drawable
 //                        .change_white_word);
@@ -417,6 +493,18 @@ public class LamplightActivity extends Basecactivity implements SeekBar.OnSeekBa
                 getMapdevice();
                 break;//切换灯的状态
             case R.id.openbtn_kong_tiao://打开灯
+//                openbtn_kong_tiao.setImageResource(R.drawable
+//                        .open_white_word);
+//                change_btn_kong_tiao.setImageResource(R.drawable
+//                        .change_black_word);
+//                close_btn_light_kong_tiao.setImageResource(R.drawable
+//                        .guan_black_word);
+                statusflag = "1";
+                mapflag = true;
+                getMapdevice();
+                break;
+
+            case R.id.open_btn_lignt_new_cloud_tiao://打开灯
 //                openbtn_kong_tiao.setImageResource(R.drawable
 //                        .open_white_word);
 //                change_btn_kong_tiao.setImageResource(R.drawable
@@ -742,9 +830,9 @@ public class LamplightActivity extends Basecactivity implements SeekBar.OnSeekBa
                             vibrator.vibrate(200);
                         }
                         if (musicflag) {
-                            MusicUtil.startMusic(LamplightActivity.this, 1);
+                            MusicUtil.startMusic(LamplightActivity.this, 1, "");
                         } else {
-                            MusicUtil.stopMusic(LamplightActivity.this);
+                            MusicUtil.stopMusic(LamplightActivity.this, "");
                         }
                     }
                 });
@@ -983,6 +1071,11 @@ public class LamplightActivity extends Basecactivity implements SeekBar.OnSeekBa
         close_btn_light_kong_tiao.setImageResource(R.drawable
                 .guan_white_word);
 
+        open_btn_lignt_new_cloud_tiao.setImageResource(R.drawable
+                .open_black_word);
+        close_btn_new_cloud_tiao.setImageResource(R.drawable
+                .guan_white_word);
+
     }
 
     /*非窗帘全开状态设置*/
@@ -1000,6 +1093,11 @@ public class LamplightActivity extends Basecactivity implements SeekBar.OnSeekBa
         close_btn_light_kong_tiao.setImageResource(R.drawable
                 .guan_black_word);
         openbtn_kong_tiao.setImageResource(R.drawable
+                .open_white_word);
+
+        close_btn_new_cloud_tiao.setImageResource(R.drawable
+                .guan_black_word);
+        open_btn_lignt_new_cloud_tiao.setImageResource(R.drawable
                 .open_white_word);
     }
 

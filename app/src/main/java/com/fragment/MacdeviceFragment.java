@@ -27,6 +27,7 @@ import com.base.Basecfragment;
 import com.data.Allbox;
 import com.data.User;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
+import com.massky.sraum.AddZigbeeDevActivity;
 import com.massky.sraum.MacdetailActivity;
 import com.massky.sraum.MacdeviceActivity;
 import com.massky.sraum.MainfragmentActivity;
@@ -173,11 +174,12 @@ public class MacdeviceFragment extends Basecfragment implements AdapterView.OnIt
         //在这里先调
         //设置网关模式-sraum-setBox
         Map map = new HashMap();
-        String phoned = getDeviceId(getActivity());
+//        String phoned = getDeviceId(getActivity());
         map.put("token", TokenUtil.getToken(getActivity()));
         String boxnumber = (String) SharedPreferencesUtil.getData(getActivity(), "boxnumber", "");
         map.put("boxNumber", boxnumber);
-        map.put("phoneId", phoned);
+        String regId = (String) SharedPreferencesUtil.getData(getActivity(), "regId", "");
+        map.put("phoneId", regId);
         map.put("status", "1");//进入设置模式
         dialogUtil.loadDialog();
         MyOkHttp.postMapObject(ApiHelper.sraum_setBox, map, new Mycallback(new AddTogglenInterfacer() {

@@ -14,7 +14,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/title"
-        android:visibility="gone"
 
         android:layout_marginTop="@dimen/p90">
 
@@ -116,8 +115,8 @@
             android:layout_width="match_parent"
             android:layout_height="70dp"
             android:layout_below="@+id/id_seekBar"
-            android:orientation="horizontal"
-            android:layout_marginTop="50dp">
+            android:layout_marginTop="50dp"
+            android:orientation="horizontal">
 
             <RelativeLayout
                 android:id="@+id/rel_1_pao"
@@ -128,8 +127,8 @@
 
                 <ImageView
                     android:id="@+id/openbtn_kong_tiao"
-                    android:layout_width="81dp"
-                    android:layout_height="81dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
                     android:layout_centerHorizontal="true"
                     android:src="@drawable/open_black_word" />
@@ -163,6 +162,71 @@
                     android:layout_height="81dp"
                     android:layout_centerInParent="true"
                     android:src="@drawable/change_black_word" />
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/open_new_cloud_tiao"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:layout_below="@+id/id_seekBar"
+            android:layout_marginTop="50dp"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <RelativeLayout
+                android:id="@+id/rel_1_new_cloud_pao"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_weight="1">
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/hsmall_circle">
+
+                    <ImageView
+                        android:id="@+id/fengsu_new_cloud_tiao"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:background="@drawable/hwind_speed" />
+                </RelativeLayout>
+
+            </RelativeLayout>
+
+
+            <RelativeLayout
+                android:id="@+id/rel_2_new_cloud_pao"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_weight="1">
+
+                <ImageView
+                    android:id="@+id/open_btn_lignt_new_cloud_tiao"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_centerHorizontal="true"
+                    android:src="@drawable/open_black_word" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/rel_3_new_cloud_pao"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <ImageView
+                    android:id="@+id/close_btn_new_cloud_tiao"
+                    android:layout_width="81dp"
+                    android:layout_height="81dp"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/guan_black_word" />
             </RelativeLayout>
 
         </LinearLayout>
@@ -377,12 +441,36 @@
         </RelativeLayout>
 
     </android.support.percent.PercentRelativeLayout>
+    <android.support.percent.PercentRelativeLayout
+        android:id="@+id/open_smart_door_lock"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:visibility="gone">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            app:layout_widthPercent="33%">
+
+            <ImageView
+                android:layout_width="81dp"
+                android:id="@+id/img_door_lock"
+                android:layout_height="81dp"
+                android:layout_centerInParent="true"
+                android:src="@drawable/open_black_word" />
+        </RelativeLayout>
+
+
+    </android.support.percent.PercentRelativeLayout>
 
     <RelativeLayout
         android:id="@+id/mainairrea_id"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-      >
+        android:visibility="gone">
 
         <RelativeLayout
             android:id="@+id/cuereaone_id"

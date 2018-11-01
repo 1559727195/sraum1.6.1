@@ -9,12 +9,14 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.AddTogenInterface.AddTogglenInterfacer;
 import com.Util.ApiHelper;
 import com.Util.DialogUtil;
 import com.Util.IntentUtil;
 import com.Util.MyOkHttp;
 import com.Util.Mycallback;
+import com.Util.SharedPreferencesUtil;
 import com.Util.ToastUtil;
 import com.Util.TokenUtil;
 import com.Util.UpdateManager;
@@ -28,12 +30,15 @@ import com.massky.sraum.ProductActivity;
 import com.massky.sraum.R;
 import com.massky.sraum.YinSiActivity;
 import com.permissions.RxPermissions;
+
 import java.util.HashMap;
 import java.util.Map;
+
 import butterknife.InjectView;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 
+import static com.massky.sraum.MainfragmentActivity.MESSAGE_RECEIVED_FROM_ABOUT_FRAGMENT;
 
 /**
  * Created by masskywcy on 2016-09-23.
@@ -50,7 +55,6 @@ public class AboutFragment extends Basecfragment {
     RelativeLayout atworelative;
     @InjectView(R.id.afourrelative)
     RelativeLayout afourrelative;
-
     @InjectView(R.id.sideslip_id)
     RelativeLayout sideslip_id;
     @InjectView(R.id.addrelative_id)
@@ -74,12 +78,11 @@ public class AboutFragment extends Basecfragment {
         mySlidingMenu = mySlidingMenu1;
         newFragment.setArguments(bundle);
         return newFragment;
-
     }
 
-    private void  chageSlideMenu () {
-        if ( mySlidingMenu != null) {
-            if ( mySlidingMenu.isMenuShowing()) {
+    private void chageSlideMenu() {
+        if (mySlidingMenu != null) {
+            if (mySlidingMenu.isMenuShowing()) {
                 mySlidingMenu.showContent();
             } else {
                 mySlidingMenu.showMenu();
@@ -112,7 +115,6 @@ public class AboutFragment extends Basecfragment {
 
             @Override
             public void onNext(Boolean aBoolean) {
-
             }
 
             @Override
@@ -121,11 +123,11 @@ public class AboutFragment extends Basecfragment {
 
             @Override
             public void onComplete() {
-
             }
         });
         sideslip_id.setOnClickListener(this);
     }
+
 
     @Override
     public void initData() {
@@ -157,9 +159,11 @@ public class AboutFragment extends Basecfragment {
                 break;
             case R.id.checkbutton_id:
                 viewDialog.removeviewDialog();
-                String UpApkUrl = ApiHelper.UpdateApkUrl + "sraum" + Version + ".apk";
-                UpdateManager manager = new UpdateManager(getActivity(), UpApkUrl);
-                manager.showDownloadDialog();
+//                String UpApkUrl = ApiHelper.UpdateApkUrl + "sraum" + Version + ".apk";
+//                UpdateManager manager = new UpdateManager(getActivity(), UpApkUrl);
+//                manager.showDownloadDialog();
+                Intent broadcast = new Intent(MESSAGE_RECEIVED_FROM_ABOUT_FRAGMENT);
+                getActivity().sendBroadcast(broadcast);
                 break;
             case R.id.qxbutton_id:
                 viewDialog.removeviewDialog();
@@ -168,17 +172,22 @@ public class AboutFragment extends Basecfragment {
                 IntentUtil.startActivity(getActivity(), DeveloperActivity.class);
                 break;
             case R.id.asixrelative:
-                IntentUtil.startActivity(getActivity(),ProductActivity.class);
+                IntentUtil.startActivity(getActivity(), ProductActivity.class);
                 break;
             case R.id.atworelative:
-                IntentUtil.startActivity(getActivity(),HelpYouActivity.class);
+                IntentUtil.startActivity(getActivity(), HelpYouActivity.class);
                 break;
             case R.id.afourrelative:
-                IntentUtil.startActivity(getActivity(),YinSiActivity.class);
+                IntentUtil.startActivity(getActivity(), YinSiActivity.class);
                 break;
             case R.id.asixrelative_upgrate:
-                viewDialog.loadDialog();
-                about_togglen();
+                boolean loadapk = (boolean) SharedPreferencesUtil.getData(getActivity(), "loadapk", false);
+                if (loadapk) {
+                    ToastUtil.showToast(getActivity(), "正在更新中");
+                } else {
+                    viewDialog.loadDialog();
+                    about_togglen();
+                }
                 break;
         }
     }

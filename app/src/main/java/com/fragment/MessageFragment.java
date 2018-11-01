@@ -169,7 +169,13 @@ public class MessageFragment extends Basecfragment implements ViewPager.OnPageCh
             }
         });
 //        roomFragment = new RoomFragment();
-        systemmessagefragment = new SystemMessageFragment();
+        systemmessagefragment = SystemMessageFragment.newInstance(new SystemMessageFragment.OnDeviceMessageFragListener() {
+            @Override
+            public void ondevice_message_frag() {
+                addtxt_text_id.setText("编辑");
+                sendBroad("取消");
+            }
+        });
         list.add(devicemessagefragment);
         list.add(systemmessagefragment);
 //        list.add(roomFragment);

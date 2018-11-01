@@ -78,6 +78,16 @@ public class LinkageListActivity extends Basecactivity implements
             }
         });
         maclistview_id.setAdapter(linkageListAdapter);
+        //成员，业主accountType->addrelative_id
+        String accountType = (String) SharedPreferencesUtil.getData(LinkageListActivity.this, "accountType", "");
+        switch (accountType) {
+            case "1":
+                next_step_txt.setVisibility(View.VISIBLE);
+                break;//业主
+            case "2":
+              next_step_txt.setVisibility(View.GONE);
+                break;//家庭成员
+        }
     }
 
     @Override

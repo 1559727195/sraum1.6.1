@@ -6,25 +6,21 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
-import android.os.Message;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.Util.App;
 import com.Util.AppManager;
 import com.Util.BitmapUtil;
 import com.Util.DialogUtil;
 import com.Util.IntentUtil;
 import com.Util.SharedPreferencesUtil;
-import com.Util.ToastUtil;
 import com.base.Basecfragment;
-import com.j256.ormlite.logger.Log;
 import com.massky.sraum.LoginActivity;
 import com.massky.sraum.MainfragmentActivity;
 import com.massky.sraum.R;
-
-import java.util.Map;
 
 import butterknife.InjectView;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -114,10 +110,11 @@ public class LeftFragment extends Basecfragment {
                         break;
                 }
                 if (dialogFlag) {
-                    switchFragment(newContent);
+                    switchFragment(newContent, type, "");
                 }
             } else if (MESSAGE_TONGZHI.equals(intent.getAction())) {
                 String type = intent.getStringExtra("type");
+                String uid = intent.getStringExtra("uid");
                 switch (type) {
                     case "1"://首页
                         clear();
@@ -137,10 +134,17 @@ public class LeftFragment extends Basecfragment {
                         relative_message_id.setBackgroundColor(BLACK);
                         newContent = 1;
                         break;
+                    case "52"://可视门铃报警
+                        clear();
+                        dialogFlag = true;
+                        relative_message_id.setBackgroundColor(BLACK);
+                        newContent = 0;
+                        break;
                 }
                 if (dialogFlag) {
-                    switchFragment(newContent);
+                    switchFragment(newContent,type,uid);
                 }
+//                AppManager.getAppManager().removeActivity_but_activity_cls(MainfragmentActivity.class);
             }
         }
     }
@@ -165,8 +169,9 @@ public class LeftFragment extends Basecfragment {
     @Override
     public void onResume() {
         super.onResume();
-        headportrait_id.setImageBitmap(BitmapUtil.stringtoBitmap((String) SharedPreferencesUtil.
-                getData(getActivity(), "avatar", "")));
+        String  avatar = (String) SharedPreferencesUtil.
+                getData(App.getInstance().getApplicationContext(), "avatar", "");
+        headportrait_id.setImageBitmap(BitmapUtil.stringtoBitmap(avatar));
         String name = (String) SharedPreferencesUtil.getData(getActivity(), "userName", "");
         String loginPhone = (String) SharedPreferencesUtil.getData(getActivity(), "loginPhone", "");
         if (name.trim().equals("")) {
@@ -272,7 +277,7 @@ public class LeftFragment extends Basecfragment {
                 break;
         }
         if (dialogFlag) {
-            switchFragment(newContent);
+            switchFragment(newContent, "", "");
         }
     }
 
@@ -306,16 +311,17 @@ public class LeftFragment extends Basecfragment {
 
     /**
      * 切换fragment
-     *
-     * @param index
+     *  @param index
+     * @param type
+     * @param uid
      */
-    private void switchFragment(int index) {
+    private void switchFragment(int index, String type, String uid) {
         if (getActivity() == null) {
             return;
         }
         if (getActivity() instanceof MainfragmentActivity) {
             MainfragmentActivity fca = (MainfragmentActivity) getActivity();
-            fca.setTabSelection(index);
+            fca.setTabSelection(index,type,uid);
         }
     }
 

@@ -13,7 +13,6 @@ import android.text.Spannable;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import com.AddTogenInterface.AddTogglenInterfacer;
 import com.Util.ApiHelper;
 import com.Util.ClearDetailEditText;
@@ -28,10 +27,8 @@ import com.Util.ToastUtil;
 import com.Util.TokenUtil;
 import com.base.Basecactivity;
 import com.data.User;
-
 import java.util.HashMap;
 import java.util.Map;
-
 import butterknife.InjectView;
 import okhttp3.Call;
 
@@ -175,15 +172,15 @@ public class DetailActivity extends Basecactivity {
                         newVersion = user.newVersion;
 
                         if (newVersion != null) {
-                            if (Integer.parseInt(newVersion) >= 56) {
 
+                            if (Integer.valueOf(newVersion, 16) >= Integer.valueOf("56", 16)) {
                                 //int d = Integer.valueOf("ff",16);   //d=255
                                 if (Integer.valueOf(newVersion, 16) > Integer.valueOf(currentVersion, 16)) {
-                                    updatebox_version(newVersion,currentVersion);
+                                    updatebox_version(newVersion, currentVersion,"doit");
                                 } else {
-                                    ToastUtil.showToast(DetailActivity.this, "网关版本已最新");
+//                                    ToastUtil.showToast(DetailActivity.this, "网关版本已最新");
 //                                    is_index = false;
-
+                                    updatebox_version(newVersion, currentVersion,"scuess");
                                     //停止添加网关
                                 }
                             } else {
@@ -208,14 +205,16 @@ public class DetailActivity extends Basecactivity {
 
     /**
      * 网关版本更新
-     * @param newVersion
+     *  @param newVersion
      * @param currentVersion
+     * @param doit
      */
-    private void updatebox_version(String newVersion, String currentVersion) {
+    private void updatebox_version(String newVersion, String currentVersion, String doit) {
         Intent intent = new Intent(DetailActivity.this,
                 GuJianWangGuanActivity.class);
-        intent.putExtra("newVersion",newVersion);
-        intent.putExtra("currentVersion",currentVersion);
+        intent.putExtra("newVersion", newVersion);
+        intent.putExtra("currentVersion", currentVersion);
+        intent.putExtra("doit", doit);
         startActivity(intent);
     }
 
@@ -350,13 +349,20 @@ public class DetailActivity extends Basecactivity {
         } else {//网关在线
             editextdetail.setEnabled(true);
 //            editextdetail.drawdelete(false);//让差号不可见
-              if (editextdetail.getText().toString().equals("")) {
-                  editextdetail.setClearDetailShow(false);
-              } else {
-                  editextdetail.setClearDetailShow(true);
-              }
+            if (editextdetail.getText().toString().equals("")) {
+                editextdetail.setClearDetailShow(false);
+            } else {
+                editextdetail.setClearDetailShow(true);
+            }
         }
         editextdetail.setCursorVisible(false);
+//        getBoxInfo();
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         getBoxInfo();
     }
 }

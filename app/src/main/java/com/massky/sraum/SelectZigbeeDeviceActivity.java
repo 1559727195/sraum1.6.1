@@ -34,14 +34,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import butterknife.InjectView;
 import okhttp3.Call;
-
-import static com.fragment.Mainviewpager.getDeviceId;
 
 /**
  * Created by zhu on 2018/1/3.
@@ -57,19 +54,20 @@ public class SelectZigbeeDeviceActivity extends Basecactivity {
     GridView mac_wifi_dev_id;
     @InjectView(R.id.back)
     ImageView back;
-    private int[] icon = {R.drawable.icon_type_yijiandk_90, R.drawable.icon_type_liangjiandk_90,
+    private int[] icon = {
+            R.drawable.icon_type_yijiandk_90, R.drawable.icon_type_liangjiandk_90,
             R.drawable.icon_type_sanjiandk_90, R.drawable.icon_type_sijiandk_90, R.drawable.icon_type_yilutiaoguang_90,
             R.drawable.icon_type_lianglutiaoguang_90, R.drawable.icon_type_sanlutiaoguang_90, R.drawable.icon_type_chuanglianmb_90,
-            R.drawable.icon_type_kongtiaomb_90,
             R.drawable.icon_type_menci_90, R.drawable.icon_type_rentiganying_90,
             R.drawable.icon_type_toa_90, R.drawable.icon_type_yanwucgq_90, R.drawable.icon_type_tianranqibjq_90,
             R.drawable.icon_type_jinjianniu_90, R.drawable.icon_type_zhinengmensuo_90, R.drawable.icon_type_pm25,
-            R.drawable.icon_type_shuijin, R.drawable.icon_type_duogongneng
+            R.drawable.icon_type_shuijin, R.drawable.icon_type_duogongneng,R.drawable.icon_kaiguan_socket_90
     };
+
     //"B301"暂时为多功能模块
     private String[] types = {
-            "A201", "A202", "A203", "A204", "A301", "A302", "A303", "A401", "A501",
-            "A801", "A901", "A902", "AB01", "AB04", "B001", "15", "AD01", "AC01", "17",
+            "A201", "A202", "A203", "A204", "A301", "A302", "A303", "A401",
+            "A801", "A901", "A902", "AB01", "AB04", "B001", "B201", "AD01", "AC01", "B301", "B101"
     };
 
     //        //type：设备类型，1-灯，2-调光，3-空调，4-窗帘，5-新风，6-地暖,7-门磁，8-人体感应，9-水浸检测器，10-入墙PM2.5
@@ -77,22 +75,22 @@ public class SelectZigbeeDeviceActivity extends Basecactivity {
 
     //wifi类型
     private String[] types_wifi = { //红外转发器类型暂定为hongwai,遥控器类型暂定为yaokong
-            "hongwai", "yaokong", "101", "102"
+            "hongwai", "yaokong", "101", "103"
     };
 
     private int[] icon_wifi = {
             R.drawable.hongwai_s,
             R.drawable.icon_type_yaokongqi,
             R.drawable.icon_type_shexiangtou_90,
-            R.drawable.icon_type_pmmofang_90,
-
+            // R.drawable.icon_type_pmmofang_90,
+            R.drawable.icon_keshimenling
 
     };
-    private int[] iconNam_wifi = {R.string.hongwai, R.string.yaokongqi, R.string.shexiangtou, R.string.pm_mofang};
+    private int[] iconNam_wifi = {R.string.hongwai, R.string.yaokongqi, R.string.shexiangtou, R.string.keshimenling};//, R.string.pm_mofang
     private int[] iconName = {R.string.yijianlight, R.string.liangjianlight, R.string.sanjianlight, R.string.sijianlight,
-            R.string.yilutiaoguang1, R.string.lianglutiaoguang1, R.string.sanlutiao1, R.string.window_panel1, R.string.kongtiao_panel
+            R.string.yilutiaoguang1, R.string.lianglutiaoguang1, R.string.sanlutiao1, R.string.window_panel1
             , R.string.menci, R.string.rentiganying, R.string.jiuzuo, R.string.yanwu, R.string.tianranqi, R.string.jinjin_btn,
-            R.string.zhineng, R.string.pm25, R.string.shuijin, R.string.duogongneng
+            R.string.zhineng, R.string.pm25, R.string.shuijin, R.string.duogongneng,R.string.cha_zuo_1
     };
     private SelectWifiDevAdapter adapter_wifi;
     private DialogUtil dialogUtil;
@@ -106,7 +104,6 @@ public class SelectZigbeeDeviceActivity extends Basecactivity {
     private List<String> deviceNames = new ArrayList<String>();
     private GizWifiDevice mGizWifiDevice = null;
     private List<Map> wifi_apple_list = new ArrayList<>();
-
 
     private String TAG = "robin debug";
     private String mac;
@@ -163,10 +160,11 @@ public class SelectZigbeeDeviceActivity extends Basecactivity {
                     case "A302":
                     case "A303":
                     case "A401":
-                    case "15":
-                    case "17":
+                    case "B101":
+                    case "B301":
                     case "A902":
                     case "AD01":
+                    case "A501":
 //                    case "A511":
                         sraum_setBox_accent(types[position], "normal");
                         break;
@@ -177,6 +175,11 @@ public class SelectZigbeeDeviceActivity extends Basecactivity {
                     case "B001":
                     case "AC01":
                         sraum_setBox_accent(types[position], "zigbee");
+                        break;
+                    case "B201":
+                        Intent intent_position = new Intent(SelectZigbeeDeviceActivity.this, SelectSmartDoorLockActivity.class);
+                        intent_position.putExtra("type", types[position]);
+                        startActivity(intent_position);
                         break;
                 }
             }
@@ -190,6 +193,11 @@ public class SelectZigbeeDeviceActivity extends Basecactivity {
                 Intent intent_wifi = null;
                 switch (types_wifi[position]) {
                     case "101":
+                    case "103":
+                        intent_wifi = new Intent(SelectZigbeeDeviceActivity.this, AddWifiDevActivity.class);
+                        intent_wifi.putExtra("type", types_wifi[position]);
+                        startActivity(intent_wifi);
+                        break;
                     case "102":
                         break;
                     case "hongwai":
@@ -201,7 +209,6 @@ public class SelectZigbeeDeviceActivity extends Basecactivity {
                         getOtherDevices();
                         break;
                 }
-
             }
         });
     }
@@ -267,9 +274,7 @@ public class SelectZigbeeDeviceActivity extends Basecactivity {
                     break;
                 default:
                     break;
-
             }
-
         }
     };
 
@@ -336,7 +341,7 @@ public class SelectZigbeeDeviceActivity extends Basecactivity {
                                 ToastUtil.showToast(SelectZigbeeDeviceActivity.this, "请与" + list_hand_scene.get(0)
                                         .get("name").toString()
                                         +
-                                        "在同一网络后在添加");
+                                        "在同一网络后再添加");
                             }
                         } else {
                             Intent intent_wifi =
@@ -358,10 +363,17 @@ public class SelectZigbeeDeviceActivity extends Basecactivity {
         mac = (String) list_hand_scene.get(position).get("controllerId");
         number = list_hand_scene.get(position).get("number").toString();
         //去根据mac去服务器端下载GizWifiDevice
-        get_to_wifi(mac);
+        String apple_name = "";
+        for (int i = 0; i < list_hand_scene.size(); i++) {
+            if (list_hand_scene.get(i).get("controllerId").equals(mac)) {
+                apple_name = list_hand_scene.get(i).get("name").toString();
+
+            }
+        }
+        get_to_wifi(mac, apple_name);
     }
 
-    private void get_to_wifi(String mac) {
+    private void get_to_wifi(String mac, String apple_name) {
 
         for (int i = 0; i < wifiDevices.size(); i++) {
             if (wifiDevices.get(i).getMacAddress().equals(mac)) {
@@ -377,6 +389,11 @@ public class SelectZigbeeDeviceActivity extends Basecactivity {
                     mDeviceManager.setSubscribe(finalMGizWifiDevice, true);
                 }
             }, 1000);
+        } else {
+            ToastUtil.showToast(SelectZigbeeDeviceActivity.this, "请与" + apple_name
+                    +
+                    "在同一网络后再控制");
+            return;
         }
         toControlApplianAct();
     }
@@ -436,8 +453,6 @@ public class SelectZigbeeDeviceActivity extends Basecactivity {
 //                    }, 1000);
 //                }
 //            }
-
-
             //去绑定和订阅
         }
 //        adapter.notifyDataSetChanged();
@@ -447,12 +462,13 @@ public class SelectZigbeeDeviceActivity extends Basecactivity {
         //在这里先调
         //设置网关模式-sraum-setBox
         Map map = new HashMap();
-        String phoned = getDeviceId(SelectZigbeeDeviceActivity.this);
+//        String phoned = getDeviceId(SelectZigbeeDeviceActivity.this);
         map.put("token", TokenUtil.getToken(SelectZigbeeDeviceActivity.this));
         String boxnumber = (String) SharedPreferencesUtil.getData(SelectZigbeeDeviceActivity.this,
                 "boxnumber", "");
         map.put("boxNumber", boxnumber);
-        map.put("phoneId", phoned);
+        String regId = (String) SharedPreferencesUtil.getData(SelectZigbeeDeviceActivity.this, "regId", "");
+        map.put("phoneId", regId);
         switch (yangshi) {
             case "normal":
                 map.put("status", "1");//普通进入设置模式
@@ -474,7 +490,14 @@ public class SelectZigbeeDeviceActivity extends Basecactivity {
                         switch (yangshi) {
                             case "normal":
                             case "zigbee":
-                                intent_position = new Intent(SelectZigbeeDeviceActivity.this, AddZigbeeDevActivity.class);
+                                switch (type) {
+//                                    case "B201":
+//                                        intent_position = new Intent(SelectZigbeeDeviceActivity.this, SelectSmartDoorLockActivity.class);
+//                                        break;
+                                    default:
+                                        intent_position = new Intent(SelectZigbeeDeviceActivity.this, AddZigbeeDevActivity.class);
+                                        break;
+                                }
                                 intent_position.putExtra("type", type);
                                 startActivity(intent_position);
                                 break;

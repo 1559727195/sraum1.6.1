@@ -1,10 +1,16 @@
 package com.fragment;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.media.MediaPlayer;
+import android.net.NetworkRequest;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -18,8 +24,11 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.AddTogenInterface.AddTogglenInterfacer;
 import com.Util.ApiHelper;
+import com.Util.AppManager;
 import com.Util.DbDevice;
 import com.Util.DialogUtil;
 import com.Util.EntityUtils;
@@ -42,12 +51,20 @@ import com.gizwits.gizwifisdk.api.GizWifiDevice;
 import com.gizwits.gizwifisdk.enumration.GizWifiDeviceNetStatus;
 import com.gizwits.gizwifisdk.enumration.GizWifiErrorCode;
 import com.google.gson.Gson;
+import com.ipcamera.demo.AddCameraActivity;
+import com.ipcamera.demo.BridgeService;
+import com.ipcamera.demo.PlayActivity;
+import com.ipcamera.demo.utils.ContentCommon;
+import com.ipcamera.demo.utils.SystemValue;
+import com.massky.sraum.AddWifiCameraScucessActivity;
 import com.massky.sraum.AirControlActivity;
+import com.massky.sraum.ConnWifiCameraActivity;
 import com.massky.sraum.LamplightActivity;
 import com.massky.sraum.MacdetailActivity;
 import com.massky.sraum.MacdeviceActivity;
 import com.massky.sraum.MainfragmentActivity;
 import com.massky.sraum.Pm25Activity;
+import com.massky.sraum.Pm25SecondActivity;
 import com.massky.sraum.R;
 import com.massky.sraum.SelectInfraredForwardActivity;
 import com.massky.sraum.SelectZigbeeDeviceActivity;
@@ -63,6 +80,7 @@ import com.yaokan.sdk.utils.Logger;
 import com.yaokan.sdk.utils.Utility;
 import com.yaokan.sdk.wifi.DeviceManager;
 import com.yaokan.sdk.wifi.GizWifiCallBack;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -70,7 +88,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
+
 import butterknife.InjectView;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
@@ -80,13 +100,17 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.Call;
+import vstc2.nativecaller.NativeCaller;
+
+import static com.fragment.Mainviewpager.MESSAGE_TONGZHI_DOOR_FIRST;
 
 /**
  * Created by masskywcy on 2016-09-05.
  */
 /*用于第一个fragment主界面*/
 public class MacFragment extends Basecfragment implements
-        AdapterView.OnItemClickListener {
+        AdapterView.OnItemClickListener
+        , BridgeService.IpcamClientInterface, BridgeService.CallBackMessageInterface {
     @InjectView(R.id.bottomimage_id)
     ImageView bottomimage_id;
     @InjectView(R.id.addmacbtn_id)
@@ -118,6 +142,19 @@ public class MacFragment extends Basecfragment implements
     private List<Map<String, Object>> listob;
     private boolean isjpush;
     private String TAG = MainfragmentActivity.class.getSimpleName();
+    private boolean isSearched;
+    private MyBroadCast receiver;
+    private WifiManager manager = null;
+    private MyWifiThread myWifiThread = null;
+    private static final int SEARCH_TIME = 3000;
+    private int option = ContentCommon.INVALID_OPTION;
+    private int CameraType = ContentCommon.CAMERA_TYPE_MJPEG;
+    private static final String STR_DID = "did";
+    private static final String STR_MSG_PARAM = "msgparam";
+    List<Map> list_wifi_camera = new ArrayList<>();
+    private boolean playactivityfinsh = true;
+
+    public static String MACFRAGMENT_PM25 = "com.fragment.pm25";
 
     /**
      * 小苹果绑定列表
@@ -127,9 +164,8 @@ public class MacFragment extends Basecfragment implements
     private List<String> deviceNames = new ArrayList<String>();
     private YkanIRInterfaceImpl ykanInterface;
     private int index;
+    private boolean again_connection;
     private Handler handler = new Handler() {
-
-
         @Override
         public void handleMessage(Message msg) {
 //            ToastUtil.showToast(getActivity(), "mggiz在线");
@@ -161,7 +197,6 @@ public class MacFragment extends Basecfragment implements
                             break;
                     }
                     break;
-
                 case 3:
                     if (dialogUtil != null) dialogUtil.removeDialog();
                     break;
@@ -196,6 +231,28 @@ public class MacFragment extends Basecfragment implements
                             break;
                     }
                     break;
+                case 10://wifi摄像头已经在线了
+                    String content = stringbuffer.toString();
+                    String[] splits = content.split(",");
+                    if (splits.length == 3) {
+                        if (splits[0].equals("未知状态") && splits[1].equals("正在连接") && splits[2].equals("在线")) {
+                            stringbuffer = new StringBuffer();
+//                            AppManager.getAppManager().finishActivity_current(PlayActivity.class);
+                            Intent intent = new Intent("play_finish");
+                            getActivity().sendBroadcast(intent);
+                            again_connection = true;
+                        }
+                    } else {
+                        if (!playactivityfinsh) {
+//                        AppManager.getAppManager().finishActivity_current(PlayActivity.class);
+                            Intent intent = new Intent(getActivity(), PlayActivity.class);
+                            startActivity(intent);
+                        }
+                    }
+                    break;
+                case 11://连接失败，在去连
+                    onitem_wifi_shexiangtou(mapdevice);
+                    break;
             }
         }
     };
@@ -213,6 +270,11 @@ public class MacFragment extends Basecfragment implements
     private int index_click;
     private String deviceInfo = "";
     private List<Map> list_hand_scene = new ArrayList<>();
+
+    private boolean blagg = false;
+    private Intent intentbrod = null;
+    private WifiInfo info = null;
+    private String type = "";
 
     public static MacFragment newInstance() {
         MacFragment newFragment = new MacFragment();
@@ -276,6 +338,7 @@ public class MacFragment extends Basecfragment implements
 //        SharedPreferencesUtil.saveData(getActivity(), "nihao", "nihao");
 //        String str = (String) SharedPreferencesUtil.getData(getActivity(), "nihao", "");
 
+        init_wifi_camera();
         registerMessageReceiver();
         // 遥控云数据接口分装对象对象
         ykanInterface = new YkanIRInterfaceImpl(getActivity().getApplicationContext());
@@ -287,8 +350,6 @@ public class MacFragment extends Basecfragment implements
         mDeviceManager = DeviceManager
                 .instanceDeviceManager(getActivity().getApplicationContext());
 //        get_wifidevice(0);
-
-
         dbDevice = new DbDevice(getActivity());
         loginPhone = (String) SharedPreferencesUtil.getData(getActivity(), "loginPhone", "");
         SharedPreferences preferences = getActivity().getSharedPreferences("sraum" + loginPhone,
@@ -347,6 +408,160 @@ public class MacFragment extends Basecfragment implements
             }
         });
         macfragritview_id.setOnItemClickListener(this);
+    }
+
+    Runnable updateThread = new Runnable() {
+
+        public void run() {
+            NativeCaller.StopSearch();
+            Message msg = updateListHandler.obtainMessage();
+            msg.what = 1;
+            updateListHandler.sendMessage(msg);
+        }
+    };
+
+    Handler updateListHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg.what == 1) {
+
+            } else {
+
+            }
+        }
+
+    };
+
+    public static String int2ip(long ipInt) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(ipInt & 0xFF).append(".");
+        sb.append((ipInt >> 8) & 0xFF).append(".");
+        sb.append((ipInt >> 16) & 0xFF).append(".");
+        sb.append((ipInt >> 24) & 0xFF);
+        return sb.toString();
+    }
+
+    private void startSearch() {
+//        listAdapter.ClearAll();
+//        progressdlg.setMessage(getString(R.string.searching_tip));
+//        progressdlg.show();
+        new Thread(new SearchThread()).start();
+        updateListHandler.postDelayed(updateThread, SEARCH_TIME);
+    }
+
+    private class SearchThread implements Runnable {
+        @Override
+        public void run() {
+            Log.d("tag", "startSearch");
+            NativeCaller.StartSearch();
+        }
+    }
+
+    class MyTimerTask extends TimerTask {
+
+        public void run() {
+            updateListHandler.sendEmptyMessage(100000);
+        }
+    }
+
+    ;
+
+    class MyWifiThread extends Thread {
+        @Override
+        public void run() {
+            while (blagg == true) {
+                super.run();
+
+                updateListHandler.sendEmptyMessage(100000);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+
+    class StartPPPPThread implements Runnable {
+        @Override
+        public void run() {
+            try {
+                Thread.sleep(100);
+                startCameraPPPP();
+            } catch (Exception e) {
+
+            }
+        }
+    }
+
+    private class MyBroadCast extends BroadcastReceiver {
+
+
+        @Override
+        public void onReceive(Context arg0, Intent arg1) {
+
+//            AddCameraActivity.this.finish();
+            Log.d("ip", "AddCameraActivity.this.finish()");
+            if (arg1.getAction().equals("finish")) {
+                playactivityfinsh = true;
+                if (again_connection) {
+                    Intent intent_new = new Intent(getActivity(), PlayActivity.class);
+                    startActivity(intent_new);
+                    again_connection = false;
+                }
+            }
+        }
+    }
+
+
+    private void startCameraPPPP() {
+        try {
+            Thread.sleep(100);
+        } catch (Exception e) {
+
+        }
+
+        if (SystemValue.deviceId.toLowerCase().startsWith("vsta")) {
+            NativeCaller.StartPPPPExt(SystemValue.deviceId, SystemValue.deviceName,
+                    SystemValue.devicePass, 1, "", "EFGFFBBOKAIEGHJAEDHJFEEOHMNGDCNJCDFKAKHLEBJHKEKMCAFCDLLLHAOCJPPMBHMNOMCJKGJEBGGHJHIOMFBDNPKNFEGCEGCBGCALMFOHBCGMFK", 0);
+        } else if (SystemValue.deviceId.toLowerCase().startsWith("vstd")) {
+            NativeCaller.StartPPPPExt(SystemValue.deviceId, SystemValue.deviceName,
+                    SystemValue.devicePass, 1, "", "HZLXSXIALKHYEIEJHUASLMHWEESUEKAUIHPHSWAOSTEMENSQPDLRLNPAPEPGEPERIBLQLKHXELEHHULOEGIAEEHYEIEK-$$", 1);
+        } else if (SystemValue.deviceId.toLowerCase().startsWith("vstf")) {
+            NativeCaller.StartPPPPExt(SystemValue.deviceId, SystemValue.deviceName,
+                    SystemValue.devicePass, 1, "", "HZLXEJIALKHYATPCHULNSVLMEELSHWIHPFIBAOHXIDICSQEHENEKPAARSTELERPDLNEPLKEILPHUHXHZEJEEEHEGEM-$$", 1);
+        } else if (SystemValue.deviceId.toLowerCase().startsWith("vste")) {
+            NativeCaller.StartPPPPExt(SystemValue.deviceId, SystemValue.deviceName,
+                    SystemValue.devicePass, 1, "", "EEGDFHBAKKIOGNJHEGHMFEEDGLNOHJMPHAFPBEDLADILKEKPDLBDDNPOHKKCIFKJBNNNKLCPPPNDBFDL", 0);
+        } else if (SystemValue.deviceId.toLowerCase().startsWith("vstg")) {
+            NativeCaller.StartPPPPExt(SystemValue.deviceId, SystemValue.deviceName,
+                    SystemValue.devicePass, 1, "", "EEGDFHBOKCIGGFJPECHIFNEBGJNLHOMIHEFJBADPAGJELNKJDKANCBPJGHLAIALAADMDKPDGOENEBECCIK:vstarcam2018", 0);
+        } else if (SystemValue.deviceId.toLowerCase().startsWith("vstb") || SystemValue.deviceId.toLowerCase().startsWith("vstc")) {
+            NativeCaller.StartPPPPExt(SystemValue.deviceId, SystemValue.deviceName,
+                    SystemValue.devicePass, 1, "", "ADCBBFAOPPJAHGJGBBGLFLAGDBJJHNJGGMBFBKHIBBNKOKLDHOBHCBOEHOKJJJKJBPMFLGCPPJMJAPDOIPNL", 0);
+        } else {
+            NativeCaller.StartPPPPExt(SystemValue.deviceId, SystemValue.deviceName,
+                    SystemValue.devicePass, 1, "", "", 0);
+        }
+        //int result = NativeCaller.StartPPPP(SystemValue.deviceId, SystemValue.deviceName,
+        //		SystemValue.devicePass,1,"");
+        //Log.i("ip", "result:"+result);
+    }
+
+    private void stopCameraPPPP() {
+        NativeCaller.StopPPPP(SystemValue.deviceId);
+    }
+
+    private void init_wifi_camera() {
+//        BridgeService.setAddCameraInterface(this);
+        BridgeService.setCallBackMessage(this);
+        receiver = new MyBroadCast();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("finish");
+        getActivity().registerReceiver(receiver, filter);
+        intentbrod = new Intent("drop");
     }
 
 
@@ -420,7 +635,6 @@ public class MacFragment extends Basecfragment implements
     void update(List<GizWifiDevice> gizWifiDevices) {
         GizWifiDevice mGizWifiDevice = null;
 
-
         if (gizWifiDevices == null) {
             deviceNames.clear();
         } else if (gizWifiDevices != null && gizWifiDevices.size() >= 1) {
@@ -451,7 +665,6 @@ public class MacFragment extends Basecfragment implements
 //                    }, 1000);
 //                }
 //            }
-
 
 
             //去绑定和订阅
@@ -712,22 +925,24 @@ public class MacFragment extends Basecfragment implements
 
                 //保持本地WIFI设备与服务器端同步，服务端没有，本地有则把本地的删掉；
 
-                list_remotecontrol_air = SharedPreferencesUtil.getInfo_List(getActivity(), "remoteairlist");
-                for (int i = 0; i < list_remotecontrol_air.size(); i++) {
-                    int index = 0;
-                    String rid = list_remotecontrol_air.get(i).get("rid").toString();
-                    for (Map map : list) {
-                        if (!list_remotecontrol_air.get(i).get("rid").toString()
-                                .equals(map.get("deviceId").toString())) {
-                            index++;
-                            if (index == list.size()) {//说明服务端没有该rid，删除本地保存的rid
-                                //SharedPreferencesUtil.remove_current_index(getActivity(), "remoteairlist", i);
-                                SharedPreferencesUtil.remove_current_values(getActivity(), "remoteairlist", rid,
-                                        "rid");
-                            }
-                        }
-                    }
-                }
+//                list_remotecontrol_air = SharedPreferencesUtil.getInfo_List(getActivity(), "remoteairlist");
+//                for (int i = 0; i < list_remotecontrol_air.size(); i++) {
+//                    int index = 0;
+//                    String rid = list_remotecontrol_air.get(i).get("rid").toString();
+//                    for (Map map : list) {
+//                        if (!list_remotecontrol_air.get(i).get("rid").toString()
+//                                .equals(map.get("deviceId").toString())) {
+//                            index++;
+//                            if (index == list.size()) {//说明服务端没有该rid，删除本地保存的rid
+//                                //SharedPreferencesUtil.remove_current_index(getActivity(), "remoteairlist", i);
+//                                SharedPreferencesUtil.remove_current_values(getActivity(), "remoteairlist", rid,
+//                                        "rid");
+//                            }
+//                        }
+//                    }
+//                }
+
+                send_broad_topm25();
                 LogUtil.i("这是设备长度2", "" + list.size());
                 macstatus.setVisibility(View.GONE);
                 boxStatus(TokenUtil.getBoxflag(getActivity()), list.size());
@@ -737,6 +952,31 @@ public class MacFragment extends Basecfragment implements
                 adapter.notifyDataSetChanged();
             }
         });
+    }
+
+    private void send_broad_topm25() {
+        for (Map map : list) {
+            if (map.get("type").toString().equals("10")) {
+                Map<String, Object> mapdevice = new HashMap<String, Object>();
+                mapdevice.put("type", map.get("type").toString());
+                mapdevice.put("number", map.get("number").toString());
+                mapdevice.put("status", map.get("status").toString());
+                mapdevice.put("dimmer", map.get("dimmer").toString());
+                mapdevice.put("mode", map.get("mode").toString());
+                mapdevice.put("temperature", map.get("temperature").toString());
+                mapdevice.put("speed", map.get("speed").toString());
+                mapdevice.put("mac", map.get("mac") == null ? "" :
+                        map.get("mac").toString());
+                mapdevice.put("deviceId", map.get("deviceId") == null ? "" :
+                        map.get("deviceId").toString());
+                mapdevice.put("name", map.get("name").toString());
+                mapdevice.put("panelName", map.get("panelName") == null ? "" :
+                        map.get("panelName").toString());
+
+                sendBroad_pm25(mapdevice);
+                break;
+            }
+        }
     }
 
     @Override
@@ -754,7 +994,19 @@ public class MacFragment extends Basecfragment implements
         Map<String, Object> mapdevice = new HashMap<String, Object>();
         mapdevice.put("type", list.get(position).get("type").toString());
         mapdevice.put("number", list.get(position).get("number").toString());
-        mapdevice.put("status", status);
+        switch (list.get(position).get("type").toString()) {
+            case "11":
+                mapdevice.put("status", "0");
+                break;
+            case "15":
+            case "17":
+                mapdevice.put("status", "1");
+                break;
+            default:
+                mapdevice.put("status", status);
+                break;
+        }
+
         mapdevice.put("dimmer", list.get(position).get("dimmer").toString());
         mapdevice.put("mode", list.get(position).get("mode").toString());
         mapdevice.put("temperature", list.get(position).get("temperature").toString());
@@ -791,14 +1043,14 @@ public class MacFragment extends Basecfragment implements
                 break;
             case "10":
                 name = "PM2.5";
-                ToastUtil.showToast(getActivity(),
-                        name + "无控制功能");
+//                ToastUtil.showToast(getActivity(),
+//                        name + "无控制功能");
                 break;
-            case "11":
-                name = "紧急按钮";
-                ToastUtil.showToast(getActivity(),
-                        name + "无控制功能");
-                break;
+//            case "11":
+//                name = "紧急按钮";
+//                ToastUtil.showToast(getActivity(),
+//                        name + "无控制功能");
+//                break;
             case "12":
                 name = "久坐报警器";
                 ToastUtil.showToast(getActivity(),
@@ -814,17 +1066,21 @@ public class MacFragment extends Basecfragment implements
                 ToastUtil.showToast(getActivity(),
                         name + "无控制功能");
                 break;
-            case "15":
-                name = "智能门锁";
-                ToastUtil.showToast(getActivity(),
-                        name + "无控制功能");
-                break;
-            case "16":
-                name = "直流电阀机械手";
-                ToastUtil.showToast(getActivity(),
-                        name + "无控制功能");
-                break;
+//            case "15":
+//                name = "智能门锁";
+//                ToastUtil.showToast(getActivity(),
+//                        name + "无控制功能");
+//                break;
+//            case "16":
+//                name = "直流电阀机械手";
+//                ToastUtil.showToast(getActivity(),
+//                        name + "无控制功能");
+//                break;
 
+//            case "17":
+//                name = "86插座一位";
+//                ToastUtil.showToast(getActivity(),name + "无控制功能");
+//                break;
             //special_type_device(mapdevice);
 //                test_pm25();
             // test_tv();
@@ -836,17 +1092,21 @@ public class MacFragment extends Basecfragment implements
             case "7":
             case "8":
             case "9":
-            case "10":
-            case "11":
+//            case "10":
+//            case "11":
             case "12":
             case "13":
             case "14":
-            case "15":
-            case "16":
+//            case "15":
+//            case "16":
                 break;
             case "202"://电视机
                 this.mapdevice = mapdevice;
                 test_tv(mapdevice.get("mac").toString());
+                break;
+            case "10":
+                this.mapdevice = mapdevice;
+                test_pm25();
                 break;
             case "206"://WIFI空调
                 this.mapdevice = mapdevice;
@@ -857,11 +1117,92 @@ public class MacFragment extends Basecfragment implements
                 //test_air_control();
 //                water_sensor();
                 break;
+            case "101"://wifi摄像头
+            case "103":
+//                map.put("token", TokenUtil.getToken(AddWifiCameraScucessActivity.this));
+//                map.put("type", "AA03");
+//                map.put("name", name);
+//                map.put("mac", wificamera.get("strMac"));
+//                map.put("controllerId", wificamera.get("strDeviceID"));
+//                map.put("user", wificamera.get("strName"));
+//                map.put("password", "888888");
+//                map.put("wifi", wificamera.get("wifi"));
+                this.mapdevice = mapdevice;
+                onitem_wifi_shexiangtou(mapdevice);
+                break;
             default:
                 curtains_and_light(position, mapalldevice);
                 break;
         }
     }
+
+    /**
+     * 摄像头click
+     *
+     * @param mapdevice
+     */
+    private void onitem_wifi_shexiangtou(Map<String, Object> mapdevice) {
+        playactivityfinsh = false;
+        again_connection = false;
+        this.mapdevice = mapdevice;
+        List<Map> list = SharedPreferencesUtil.getInfo_List(getActivity(), "list_wifi_camera_first");
+        int tag = 0;
+        for (int i = 0; i < list.size(); i++) {
+            if (mapdevice.get("mode").toString().toString()
+                    .equals(list.get(i).get("did"))) {
+                tag = (int) list.get(i).get("tag");
+            }
+        }
+        if (tag == 1) {
+            handler.sendEmptyMessage(10);//设备已经在线了
+//            Toast.makeText(getActivity(), "设备已经是在线状态了", Toast.LENGTH_SHORT).show();
+        } else if (tag == 2) {
+            Toast.makeText(getActivity(), "设备不在线", Toast.LENGTH_SHORT).show();
+        } else {
+            done(mapdevice.get("dimmer").toString()
+                    , mapdevice.get("temperature").toString()
+                    , mapdevice.get("mode").toString());//String strUser,String strPwd,String strDID
+        }
+    }
+
+    private void done(String strUser, String strPwd, String strDID) {
+        Intent in = new Intent();
+//        String strUser = userEdit.getText().toString();
+//        String strPwd = pwdEdit.getText().toString();
+//        String strDID = didEdit.getText().toString();
+
+        if (strDID.length() == 0) {
+            Toast.makeText(getActivity(),
+                    getResources().getString(R.string.input_camera_id), Toast.LENGTH_SHORT).show();
+            return;
+        } //
+
+        if (strUser.length() == 0) {
+            Toast.makeText(getActivity(),
+                    getResources().getString(R.string.input_camera_user), Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (option == ContentCommon.INVALID_OPTION) {
+            option = ContentCommon.ADD_CAMERA;
+        }
+
+        in.putExtra(ContentCommon.CAMERA_OPTION, option);
+        in.putExtra(ContentCommon.STR_CAMERA_ID, strDID);
+        in.putExtra(ContentCommon.STR_CAMERA_USER, strUser);
+        in.putExtra(ContentCommon.STR_CAMERA_PWD, strPwd);
+        in.putExtra(ContentCommon.STR_CAMERA_TYPE, CameraType);
+//        progressBar.setVisibility(View.VISIBLE);
+        if (dialogUtil != null)
+            dialogUtil.loadDialog();
+        SystemValue.deviceName = strUser;
+        SystemValue.deviceId = strDID;
+        SystemValue.devicePass = strPwd;
+        BridgeService.setIpcamClientInterface(this);
+        NativeCaller.Init();
+        new Thread(new StartPPPPThread()).start();
+    }
+
 
     /**
      * 测试水浸传感器
@@ -915,7 +1256,7 @@ public class MacFragment extends Basecfragment implements
         } else {
             ToastUtil.showToast(getActivity(), "请与" + apple_name
                     +
-                    "在同一网络后在控制");
+                    "在同一网络后再控制");
         }
     }
 
@@ -978,129 +1319,6 @@ public class MacFragment extends Basecfragment implements
     }
 
 
-//    /**
-//     * 从服务器端拉小苹果WIFI红外模块
-//     */
-//    private void get_to_wifi1(final String deviceInfo, final String onclick) {
-//        Map map = new HashMap();
-//        map.put("mac", deviceInfo);
-//        map.put("token", TokenUtil.getToken(getActivity()));
-//        MyOkHttp.postMapObject_WIFI(ApiHelper.sraum_getWifiApple_WIFI, map,
-//                new Mycallback(new AddTogglenInterfacer() {//刷新togglen获取新数据
-//                    @Override
-//                    public void addTogglenInterfacer() {
-//
-//                    }
-//                }, getActivity(), null) {
-//                    @Override
-//                    public void onError(Call call, Exception e, int id) { //-----
-//                        super.onError(call, e, id);
-//
-//                    }
-//
-//                    @Override
-//                    public void onSuccess(User user) {
-//                        final String code = user.deviceInfo;
-//                        final GizWifiDevice[] gizWifiDevice = {null};
-////                        ToastUtil.showToast(getActivity(), "WIFI红外下载成功:" + code);
-//                        new Thread(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                if (code == null) {
-//                                    return;
-//                                }
-//
-////                                SharedPreferencesUtil.saveData(getActivity(), "mGizWifiDevice", code);
-////                                gizWifiDevice[0] = ParceUtil.unmarshall(code, GizWifiDevice.CREATOR);
-////                                test();
-//                                Map map = JSON.parseObject(code);
-//                                mGizWifiDevice = EntityUtils.mapToEntity(map, GizWifiDevice.CREATOR);
-//                                if (mGizWifiDevice != null) {
-////                                    mGizWifiDevice = gizWifiDevice[0];
-////                                    ToastUtil.showToast(getActivity(),"mGizWifiDevice:" + mGizWifiDevice.getMacAddress()
-//                                    Log.e("robin debug", "mGizWifiDevice:" + mGizWifiDevice.getMacAddress());
-//                                    isok = true;
-//                                    switch (onclick) {
-//                                        case "onResume":
-//                                            handler.sendEmptyMessage(1);
-//                                            break;
-//                                        case "onclick":
-//                                            handler.sendEmptyMessage(2);
-//                                            break;
-//                                    }
-//
-//                                } else {
-//                                    isok = false;
-//                                    index_click++;
-//                                    if (index_click >= 24) {
-//                                        isok = false;
-//                                        index_click = 0;
-//                                        switch (onclick) {
-//                                            case "onclick":
-//                                                if (mGizWifiDevice == null) {
-//                                                    getActivity().runOnUiThread(new Runnable() {
-//                                                        @Override
-//                                                        public void run() {
-////                                                            ToastUtil.showToast(getActivity(), "设备，null");
-//                                                        }
-//                                                    });
-//                                                }
-//                                                break;
-//                                        }
-//                                        handler.sendEmptyMessage(3);
-//                                    } else {
-//                                        try {
-//                                            Thread.sleep(100);
-//                                        } catch (InterruptedException e) {
-//                                            e.printStackTrace();
-//                                        }
-//                                        mDeviceManager.setGizWifiCallBack(mGizWifiCallBack);
-////                                        add_from_net(onclick);
-//                                        getWifiApples(onclick, deviceInfo);
-//                                    }
-//                                }
-//                            }
-//                        }).start();
-//                    }
-//
-//                    @Override
-//                    public void wrongToken() {
-//                        super.wrongToken();
-//                    }
-//
-//                    @Override
-//                    public void threeCode() {
-//                        super.threeCode();
-//                    }
-//
-//                    @Override
-//                    public void fourCode() {
-//                        super.fourCode();
-//                    }
-//                });
-//    }
-
-//    /**
-//     * 获取小苹果列表
-//     *
-//     * @param onclick
-//     */
-//    private void getWifiApples(final String onclick, final String mac) {
-//
-//        if (!mac.equals("")) {
-//            get_to_wifi1(mac, onclick);
-//        } else {//服务器端没有小苹果wifgizdevice,所以清除本地
-//            mGizWifiDevice = null;
-////            SharedPreferencesUtil.saveData(getActivity(), "mGizWifiDevice", "");
-//            getActivity().runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    if (dialogUtil != null) dialogUtil.removeDialog();
-//                }
-//            });
-//        }
-//    }
-
     /**
      * get_to_wifi
      *
@@ -1108,7 +1326,7 @@ public class MacFragment extends Basecfragment implements
      * @param apple_name
      */
     private void get_to_wifi(String mac, String apple_name) {
-
+        mGizWifiDevice = null;
         for (int i = 0; i < wifiDevices.size(); i++) {
             if (wifiDevices.get(i).getMacAddress().equals(mac)) {
                 mGizWifiDevice = wifiDevices.get(i);
@@ -1128,7 +1346,7 @@ public class MacFragment extends Basecfragment implements
         } else {
             ToastUtil.showToast(getActivity(), "请与" + apple_name
                     +
-                    "在同一网络后在控制");
+                    "在同一网络后再控制");
             return;
         }
     }
@@ -1137,8 +1355,6 @@ public class MacFragment extends Basecfragment implements
      * 跳转到空调控制界面
      */
     private void to_control(String doit) {
-
-
         String mac = mapdevice.get("mac").toString();
         String rid = mapdevice.get("deviceId").toString();
         boolean issame = false;
@@ -1452,7 +1668,9 @@ public class MacFragment extends Basecfragment implements
      * 测试pm2.5
      */
     private void test_pm25() {
-        startActivity(new Intent(getActivity(), Pm25Activity.class));
+        Intent intent = new Intent(getActivity(), Pm25SecondActivity.class);
+        intent.putExtra("mapdevice", (Serializable) this.mapdevice);
+        startActivity(intent);
     }
 
     /**
@@ -1481,7 +1699,10 @@ public class MacFragment extends Basecfragment implements
      * @param mapalldevice
      */
     private void curtains_and_light(int position, Map<String, Object> mapalldevice) {
-        if (list.get(position).get("type").toString().equals("1")) {
+        if (list.get(position).get("type").toString().equals("1") || list.get(position).get("type").toString().equals("11")
+                || list.get(position).get("type").toString().equals("16")
+                || list.get(position).get("type").toString().equals("15")
+                || list.get(position).get("type").toString().equals("17")) {
             String boxstatus = TokenUtil.getBoxstatus(getActivity());
             if (!boxstatus.equals("0")) {
                 getBoxStatus(mapalldevice, position);
@@ -1542,6 +1763,7 @@ public class MacFragment extends Basecfragment implements
                         Map<String, Object> mapalldevice = new HashMap<String, Object>();
                         mapalldevice.put("token", TokenUtil.getToken(getActivity()));
                         mapalldevice.put("boxNumber", TokenUtil.getBoxnumber(getActivity()));
+
                         mapalldevice.put("deviceInfo", listob);
                         sraum_device_control(mapalldevice);
                     }
@@ -1549,22 +1771,39 @@ public class MacFragment extends Basecfragment implements
                     @Override
                     public void fourCode() {
                         super.fourCode();
-                        ToastUtil.showToast(getActivity(), "操作失败");
+                        switch (listob.get(0).get("type").toString()) {
+                            case "11":
+                                ToastUtil.showToast(getActivity(), "恢复失败");
+                                break;
+                            default:
+                                ToastUtil.showToast(getActivity(), "操作失败");
+                                break;
+                        }
                     }
 
                     @Override
                     public void onSuccess(User user) {
                         super.onSuccess(user);
-                        ToastUtil.showToast(getActivity(), "操作成功");
+
+                        switch (listob.get(0).get("type").toString()) {
+                            case "11":
+                                ToastUtil.showToast(getActivity(), "恢复成功");
+                                break;
+                            default:
+                                ToastUtil.showToast(getActivity(), "操作成功");
+                                break;
+                        }
+
                         if (vibflag) {
                             Vibrator vibrator = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
                             vibrator.vibrate(200);
                         }
+
                         if (musicflag) {
                             LogUtil.i("铃声响起");
-                            MusicUtil.startMusic(getActivity(), 1);
+                            MusicUtil.startMusic(getActivity(), 1, "");
                         } else {
-                            MusicUtil.stopMusic(getActivity());
+                            MusicUtil.stopMusic(getActivity(), "");
                         }
                         listtype.set(position, status);
                         String string = listtype.get(position);
@@ -1590,11 +1829,21 @@ public class MacFragment extends Basecfragment implements
         });
     }
 
+    private int tag = 0;
+
     @Override
-    public void onDestroy() {
+    public void onDestroy() { // ----
         getActivity().unregisterReceiver(mMessageReceiver);
+        getActivity().unregisterReceiver(receiver);
+        NativeCaller.Free();
+        Intent intent = new Intent();
+        intent.setClass(getActivity(), BridgeService.class);
+        getActivity().stopService(intent);
+        tag = 0;
+//        over_camera_list();
         super.onDestroy();
     }
+
 
     public MessageReceiver mMessageReceiver;
     public static String ACTION_INTENT_RECEIVER = "com.massky.jr.treceiver";
@@ -1607,6 +1856,7 @@ public class MacFragment extends Basecfragment implements
         mMessageReceiver = new MessageReceiver();
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_INTENT_RECEIVER);
+        filter.addAction(MESSAGE_TONGZHI_DOOR_FIRST);
         getActivity().registerReceiver(mMessageReceiver, filter);
     }
 
@@ -1625,6 +1875,25 @@ public class MacFragment extends Basecfragment implements
                     //推送过来的
 //                    ToastUtil.showToast(getActivity(), "我控制的设备时推送过来的" + ",messflag:" + messflag);
                 }
+            } else if (intent.getAction().equals(MESSAGE_TONGZHI_DOOR_FIRST)) {//门铃视频预览
+                type = (String) intent.getSerializableExtra("type");
+
+                Map mapdevice = new HashMap();
+                mapdevice.put("dimmer", "admin");
+                mapdevice.put("temperature", "888888");
+                mapdevice.put("mode", (String) intent.getSerializableExtra("uid"));//
+                //VSTD128380HDAFD
+
+//                mapdevice.put("mode", "VSTD128380HDAFD");//
+//                done(mapdevice.get("dimmer").toString()
+//                        , mapdevice.get("temperature").toString()
+//                        , mapdevice.get("mode").toString());//String strUser,String strPwd,String strDID
+                int index = (int) SharedPreferencesUtil.getData(context, "tongzhi_time", 1);
+                index--;
+                SharedPreferencesUtil.saveData(context, "tongzhi_time", index);
+                if (index == 0) {
+                    onitem_wifi_shexiangtou(mapdevice);
+                }
             }
         }
     }
@@ -1632,12 +1901,23 @@ public class MacFragment extends Basecfragment implements
     private void sendBroad() {
         Intent mIntent = new Intent(ACTION_INTENT_RECEIVER_TO_SECOND_PAGE);
         getActivity().sendBroadcast(mIntent);
+
+
+//        //MACFRAGMENT_PM25
+    }
+
+
+    private void sendBroad_pm25(Map map) {
+        Intent mIntent_pm25 = new Intent(MACFRAGMENT_PM25);
+        mIntent_pm25.putExtra("mapdevice", (Serializable) mapdevice);
+        getActivity().sendBroadcast(mIntent_pm25);
     }
 
     @Override
     public void onResume() {
         super.onResume();
 //        init_giz_wifi_dev("onResume");
+        blagg = true;
         mDeviceManager.setGizWifiCallBack(mGizWifiCallBack);
         update(mDeviceManager.getCanUseGizWifiDevice());
         getOtherDevices();
@@ -1648,6 +1928,219 @@ public class MacFragment extends Basecfragment implements
 //        add_from_net("onclick");
 //        Log.e("robin debug","gizWifiDevice->mac:" + gizWifiDevice.getMacAddress());
     }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (myWifiThread != null) {
+            blagg = false;
+        }
+        NativeCaller.StopSearch();
+    }
+
+    StringBuffer stringbuffer = new StringBuffer();
+    private int connection_wifi_camera_index;
+    private Handler PPPPMsgHandler = new Handler() {
+        public void handleMessage(Message msg) {
+
+            Bundle bd = msg.getData();
+            int msgParam = bd.getInt(STR_MSG_PARAM);
+            //        bd.putString(STR_DID, did);
+//            String  did = bd.getString(STR_DID);
+            int msgType = msg.what;
+            Log.i("aaa", "====" + msgType + "--msgParam:" + msgParam);
+            String did = bd.getString(STR_DID);
+            switch (msgType) {
+                case ContentCommon.PPPP_MSG_TYPE_PPPP_STATUS:
+                    int resid;
+                    switch (msgParam) {
+                        case ContentCommon.PPPP_STATUS_CONNECTING://0
+                            resid = R.string.pppp_status_connecting;
+                            Log.e("fei->", "resid:" + "正在连接");
+                            if (stringbuffer.toString().contains("未知状态,"))
+                                stringbuffer.append("正在连接");
+                            tag = 2;
+                            if (dialogUtil != null) dialogUtil.removeDialog();
+                            break;
+                        case ContentCommon.PPPP_STATUS_CONNECT_FAILED://3
+                            resid = R.string.pppp_status_connect_failed;
+                            Log.e("fei->", "resid:" + "连接失败");
+                            tag = 0;
+                            if (dialogUtil != null) dialogUtil.removeDialog();
+                            connection_wifi_camera_index++;
+                            if (connection_wifi_camera_index <= 10)
+                                handler.sendEmptyMessage(11);
+                            break;
+                        case ContentCommon.PPPP_STATUS_DISCONNECT://4
+                            resid = R.string.pppp_status_disconnect;
+                            Log.e("fei->", "resid:" + "断线");
+                            tag = 0;
+                            if (dialogUtil != null) dialogUtil.removeDialog();
+                            break;
+                        case ContentCommon.PPPP_STATUS_INITIALING://1
+                            resid = R.string.pppp_status_initialing;
+                            Log.e("fei->", "resid:" + "已连接吗，正在初始化");
+                            tag = 2;
+                            if (dialogUtil != null) dialogUtil.removeDialog();
+                            break;
+                        case ContentCommon.PPPP_STATUS_INVALID_ID://5
+                            resid = R.string.pppp_status_invalid_id;
+                            Log.e("fei->", "resid:" + "ID号无效");
+//                            progressBar.setVisibility(View.GONE);
+                            tag = 0;
+                            if (dialogUtil != null) dialogUtil.removeDialog();
+                            break;
+                        case ContentCommon.PPPP_STATUS_ON_LINE://2 在线状态
+                            resid = R.string.pppp_status_online;
+                            Log.e("fei->", "resid:" + "在线");
+                            connection_wifi_camera_index = 0;
+                            if (stringbuffer.toString().contains("未知状态,正在连接"))
+                                stringbuffer.append(",在线");
+                            //摄像机在线之后读取摄像机类型
+                            String cmd = "get_status.cgi?loginuse=admin&loginpas=" + SystemValue.devicePass
+                                    + "&user=admin&pwd=" + SystemValue.devicePass;
+                            NativeCaller.TransferMessage(did, cmd, 1);
+                            tag = 1;
+                            if (dialogUtil != null) dialogUtil.removeDialog();
+                            handler.sendEmptyMessage(10);//设备已经在线了
+                            break;
+                        case ContentCommon.PPPP_STATUS_DEVICE_NOT_ON_LINE://6
+                            resid = R.string.device_not_on_line;
+                            Log.e("fei->", "resid:" + "摄像机不在线");
+                            tag = 0;
+                            if (dialogUtil != null) dialogUtil.removeDialog();
+                            break;
+                        case ContentCommon.PPPP_STATUS_CONNECT_TIMEOUT://7
+                            resid = R.string.pppp_status_connect_timeout;
+                            Log.e("fei->", "resid:" + "连接超时");
+                            tag = 0;
+                            if (dialogUtil != null) dialogUtil.removeDialog();
+                            break;
+                        case ContentCommon.PPPP_STATUS_CONNECT_ERRER://8
+                            resid = R.string.pppp_status_pwd_error;
+                            Log.e("fei->", "resid:" + "错误密码");
+                            tag = 0;
+                            if (dialogUtil != null) dialogUtil.removeDialog();
+                            break;
+                        default:
+                            resid = R.string.pppp_status_unknown;
+                            Log.e("fei->", "resid:" + "未知状态");
+                            stringbuffer = new StringBuffer();
+                            stringbuffer.append("未知状态,");
+                            if (dialogUtil != null) dialogUtil.removeDialog();
+                    }
+
+                    init_Camera(did);
+
+              /*      textView_top_show.setText(getResources().getString(resid));*/
+                    if (msgParam == ContentCommon.PPPP_STATUS_ON_LINE) {
+                        NativeCaller.PPPPGetSystemParams(did, ContentCommon.MSG_TYPE_GET_PARAMS);
+                    }
+                    if (msgParam == ContentCommon.PPPP_STATUS_INVALID_ID
+                            || msgParam == ContentCommon.PPPP_STATUS_CONNECT_FAILED
+                            || msgParam == ContentCommon.PPPP_STATUS_DEVICE_NOT_ON_LINE
+                            || msgParam == ContentCommon.PPPP_STATUS_CONNECT_TIMEOUT
+                            || msgParam == ContentCommon.PPPP_STATUS_CONNECT_ERRER) {
+                        NativeCaller.StopPPPP(did);
+                    }
+                    break;
+                case ContentCommon.PPPP_MSG_TYPE_PPPP_MODE:
+                    break;
+            }
+        }
+    };
+
+    /**
+     * 初始化摄像头列表
+     *
+     * @param did
+     */
+    private void init_Camera(String did) {
+        int index = 0;
+        Map map = new HashMap();
+        map.put("did", did);
+        map.put("tag", tag);
+        for (int i = 0; i < list_wifi_camera.size(); i++) {
+            if (list_wifi_camera.get(i).get("did").equals(did)) {
+                list_wifi_camera.get(i).put("tag", tag);
+                index--;
+            } else {
+                index++;
+            }
+        }
+        if (index == list_wifi_camera.size()) {
+            list_wifi_camera.add(map);
+        }
+        SharedPreferencesUtil.saveInfo_List(getActivity(), "list_wifi_camera_first", list_wifi_camera);
+    }
+
+    @Override
+    public void BSMsgNotifyData(String did, int type, int param) {
+        Log.d("ip", "type:" + type + " param:" + param);
+        Bundle bd = new Bundle();
+        Message msg = PPPPMsgHandler.obtainMessage();
+        msg.what = type;
+        bd.putInt(STR_MSG_PARAM, param);
+        bd.putString(STR_DID, did);
+        msg.setData(bd);
+        PPPPMsgHandler.sendMessage(msg);
+        if (type == ContentCommon.PPPP_MSG_TYPE_PPPP_STATUS) {
+            intentbrod.putExtra("ifdrop", param);
+            getActivity().sendBroadcast(intentbrod);
+        }
+    }
+
+    @Override
+    public void BSSnapshotNotify(String did, byte[] bImage, int len) {
+        // TODO Auto-generated method stub
+        Log.i("ip", "BSSnapshotNotify---len" + len);
+    }
+
+    @Override
+    public void callBackUserParams(String did, String user1, String pwd1,
+                                   String user2, String pwd2, String user3, String pwd3) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void CameraStatus(String did, int status) {
+
+    }
+
+
+    @Override
+    public void CallBackGetStatus(String did, String resultPbuf, int cmd) {
+        // TODO Auto-generated method stub
+        if (cmd == ContentCommon.CGI_IEGET_STATUS) {
+            String cameraType = spitValue(resultPbuf, "upnp_status=");
+            int intType = Integer.parseInt(cameraType);
+            int type14 = (int) (intType >> 16) & 1;// 14位 来判断是否报警联动摄像机
+            if (intType == 2147483647) {// 特殊值
+                type14 = 0;
+            }
+
+            if (type14 == 1) {
+                updateListHandler.sendEmptyMessage(2);
+            }
+        }
+    }
+
+    private String spitValue(String name, String tag) {
+        String[] strs = name.split(";");
+        for (int i = 0; i < strs.length; i++) {
+            String str1 = strs[i].trim();
+            if (str1.startsWith("var")) {
+                str1 = str1.substring(4, str1.length());
+            }
+            if (str1.startsWith(tag)) {
+                String result = str1.substring(str1.indexOf("=") + 1);
+                return result;
+            }
+        }
+        return -1 + "";
+    }
+
 
     private void test() {
         Map map1 = JSON.parseObject("{\"CREATOR\":{},\"MSG_RECV\":5,\"XPGWifiDeviceHardwareFirmwareIdKey\":\"firmwareId\",\"XPGWifiDeviceHardwareFirmwareVerKey\":\"firmwareVer\",\"XPGWifiDeviceHardwareMCUHardVerKey\":\"mcuHardVer\",\"XPGWifiDeviceHardwareMCUSoftVerKey\":\"mcuSoftVer\",\"XPGWifiDeviceHardwareProductKey\":\"productKey\",\"XPGWifiDeviceHardwareWifiHardVerKey\":\"wifiHardVer\",\"XPGWifiDeviceHardwareWifiSoftVerKey\":\"wifiSoftVer\",\"alias\":\"\",\"app_sn_queue\":[],\"dest\":{\"blobAshmemSize\":0},\"deviceMcuFirmwareVer\":\"\",\"deviceModuleFirmwareVer\":\"\",\"did\":\"KSgszGjyN9cNyVfUuAYRLo\",\"flags\":0,\"han\":{\"looper\":{\"currentThread\":false,\"queue\":{\"idle\":true,\"polling\":true},\"thread\":{\"alive\":true,\"daemon\":false,\"id\":1,\"interrupted\":false,\"name\":\"main\",\"priority\":5,\"stackTrace\":[{\"className\":\"android.os.MessageQueue\",\"fileName\":\"MessageQueue.java\",\"lineNumber\":-2,\"methodName\":\"nativePollOnce\",\"nativeMethod\":true},{\"className\":\"android.os.MessageQueue\",\"fileName\":\"MessageQueue.java\",\"lineNumber\":356,\"methodName\":\"next\",\"nativeMethod\":false},{\"className\":\"android.os.Looper\",\"fileName\":\"Looper.java\",\"lineNumber\":138,\"methodName\":\"loop\",\"nativeMethod\":false},{\"className\":\"android.app.ActivityThread\",\"fileName\":\"ActivityThread.java\",\"lineNumber\":6523,\"methodName\":\"main\",\"nativeMethod\":false},{\"className\":\"java.lang.reflect.Method\",\"fileName\":\"Method.java\",\"lineNumber\":-2,\"methodName\":\"invoke\",\"nativeMethod\":true},{\"className\":\"com.android.internal.os.ZygoteInit$MethodAndArgsCaller\",\"fileName\":\"ZygoteInit.java\",\"lineNumber\":942,\"methodName\":\"run\",\"nativeMethod\":false},{\"className\":\"com.android.internal.os.ZygoteInit\",\"fileName\":\"ZygoteInit.java\",\"lineNumber\":832,\"methodName\":\"main\",\"nativeMethod\":false}],\"state\":\"RUNNABLE\",\"threadGroup\":{\"daemon\":false,\"destroyed\":false,\"maxPriority\":10,\"name\":\"main\",\"parent\":{\"daemon\":false,\"destroyed\":false,\"maxPriority\":10,\"name\":\"system\"}},\"uncaughtExceptionHandler\":{\"$ref\":\"$.han.looper.thread.threadGroup\"}}}},\"hand\":{\"looper\":{\"$ref\":\"$.han.looper\"}},\"handler\":{\"looper\":{\"$ref\":\"$.han.looper\"}},\"hasProductDefine\":true,\"ipAddress\":\"192.168.169.219\",\"isBind\":false,\"isDisabled\":false,\"isLAN\":true,\"loginning\":false,\"logintimeout\":0,\"mListener\":{},\"macAddress\":\"5CCF7FB6C07C\",\"netStatus\":\"GizDeviceOnline\",\"notify_status_sn\":0,\"oldIsConnected\":false,\"oldIsOnline\":true,\"productKey\":\"0f998d408465430ea435b48f58a7ac3b\",\"productName\":\"小苹果\",\"productType\":\"GizDeviceNormal\",\"productUI\":\"{\\\"object\\\":{\\\"version\\\":4,\\\"showEditButton\\\":false},\\\"sections\\\":[{\\\"elements\\\":[{\\\"boolValue\\\":false,\\\"object\\\":{\\\"action\\\":\\\"entity0\\\",\\\"bind\\\":[\\\"entity0.switch\\\"],\\\"perm\\\":\\\"W\\\"},\\\"type\\\":\\\"QBooleanElement\\\",\\\"key\\\":\\\"entity0.switch\\\",\\\"title\\\":\\\"开关（未使用）\\\"},{\\\"items\\\":[\\\"低风\\\",\\\"中风\\\",\\\"高风\\\"],\\\"object\\\":{\\\"action\\\":\\\"entity0\\\",\\\"bind\\\":[\\\"entity0.fan_speed\\\"],\\\"perm\\\":\\\"W\\\"},\\\"type\\\":\\\"QRadioElement\\\",\\\"key\\\":\\\"entity0.fan_speed\\\",\\\"title\\\":\\\"风速（未使用）\\\"},{\\\"keyboardType\\\":\\\"NumbersAndPunctuation\\\",\\\"title\\\":\\\"遥控码\\\",\\\"object\\\":{\\\"action\\\":\\\"entity0\\\",\\\"bind\\\":[\\\"entity0.cmd_key\\\"],\\\"perm\\\":\\\"W\\\"},\\\"value\\\":0,\\\"key\\\":\\\"entity0.cmd_key\\\",\\\"maxLength\\\":1800,\\\"type\\\":\\\"QMultilineElement\\\"},{\\\"object\\\":{\\\"action\\\":\\\"entity0\\\",\\\"bind\\\":[\\\"entity0.room_temp\\\"],\\\"uint_spec\\\":{\\\"max\\\":35,\\\"step\\\":1,\\\"min\\\":-10},\\\"perm\\\":\\\"N\\\"},\\\"type\\\":\\\"QLabelElement\\\",\\\"key\\\":\\\"entity0.room_temp\\\",\\\"title\\\":\\\"室内温度（未使用）\\\"}]}]}\",\"remark\":\"\",\"sharingRole\":\"GizDeviceSharingNormal\",\"subscribed\":true}");
@@ -1683,6 +2176,12 @@ public class MacFragment extends Basecfragment implements
      * @param onclick
      */
     boolean isok;
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+    }
 
     private void add_from_net(final String onclick) {
         final GizWifiDevice[] gizWifiDevice = {null};
@@ -1753,4 +2252,5 @@ public class MacFragment extends Basecfragment implements
 //
 //        void deleteRemoteControl();
 //    }
+
 

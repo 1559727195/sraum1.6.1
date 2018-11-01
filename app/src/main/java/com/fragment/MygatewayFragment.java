@@ -17,7 +17,6 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import com.AddTogenInterface.AddTogglenInterfacer;
 import com.Util.ApiHelper;
 import com.Util.DialogUtil;
@@ -40,15 +39,12 @@ import com.massky.sraum.ChangeWangGuanpassActivity;
 import com.massky.sraum.DetailActivity;
 import com.massky.sraum.MainfragmentActivity;
 import com.massky.sraum.R;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import butterknife.InjectView;
 import okhttp3.Call;
-
 import static com.Util.TokenUtil.getBoxnumber;
 
 /**
@@ -72,7 +68,6 @@ public class MygatewayFragment extends Basecfragment implements
     ImageView cenimage_id;
     @InjectView(R.id.centext_id)
     TextView centext_id;
-
     PopupWindow popupWindow;
     private RelativeLayout rightrelative_id, leftrelative_id;
     private DialogUtil dialogUtil;

@@ -3,6 +3,9 @@ package com.jpush;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
@@ -10,7 +13,9 @@ import android.util.Log;
 
 import com.AddTogenInterface.AddTogglenInterfacer;
 import com.Util.ApiHelper;
+import com.Util.AppManager;
 import com.Util.LogUtil;
+import com.Util.MusicUtil;
 import com.Util.MyOkHttp;
 import com.Util.Mycallback;
 import com.Util.SharedPreferencesUtil;
@@ -31,10 +36,13 @@ import com.massky.sraum.FastEditPanelActivity;
 import com.massky.sraum.LoginActivity;
 import com.massky.sraum.MacdeviceActivity;
 import com.massky.sraum.MainfragmentActivity;
+import com.massky.sraum.MyServcie;
+import com.massky.sraum.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -43,8 +51,8 @@ import java.util.Map;
 
 import cn.jpush.android.api.JPushInterface;
 
-import static com.massky.sraum.AddZigbeeDevActivity.ACTION_SRAUM_SETBOX;
 import static com.massky.sraum.GuJianWangGuanActivity.UPDATE_GRADE_BOX;
+import static com.massky.sraum.MainfragmentActivity.ACTION_SRAUM_SETBOX;
 
 /**
  * 自定义接收器
@@ -58,9 +66,11 @@ public class MyReceiver extends BroadcastReceiver {
     private Context context;
     private List<Allbox> allboxList = new ArrayList<Allbox>();
     private String action = "";
+    private MediaPlayer player;
 
     @Override
     public void onReceive(Context context, Intent intent) {
+
         this.context = context;
         Bundle bundle = intent.getExtras();
         LogUtil.i(TAG, "[MyReceiver] onReceive - " + intent.getAction() + ", extras: " + printBundle(bundle));
@@ -70,7 +80,6 @@ public class MyReceiver extends BroadcastReceiver {
             LogUtil.i(TAG, "[MyReceiver] 接收Registration Id : " + regId);
             SharedPreferencesUtil.saveData(context, "regId", regId);
             //send the Registration Id to your server...
-
         } else if (JPushInterface.ACTION_MESSAGE_RECEIVED.equals(intent.getAction())) {
             LogUtil.i(TAG, "[MyReceiver] 接收到推送下来的自定义消息: " + bundle.getString(JPushInterface.EXTRA_MESSAGE));
 //            ToastUtil.showToast(context,"接收到推送下来的自定义消息");
@@ -116,22 +125,22 @@ public class MyReceiver extends BroadcastReceiver {
                 e.printStackTrace();
             }
 
-
             //判断app进程是否存活
             if (SystemUtils.isAppAlive(context, "com.massky.sraum")) {
                 switch (type) {
                     case "1":
                     case "2":
                     case "51":
+                        break;
+                    case "52":
                         //processCustomMessage_charge(context, bundle);
                         //打开自定义的Activity
-                        Intent i_charge = new Intent(context, MainfragmentActivity.class);
-                        i_charge.putExtra(Constants.EXTRA_BUNDLE, bundle);//    launchIntent.putExtra(Constants.EXTRA_BUNDLE, args);
-                        //i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        i_charge.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        context.startActivity(i_charge);
+                        SharedPreferencesUtil.saveData(context, "tongzhi_time", 1);
+//                        if (soundPool != null) soundPool.pause(sampleId1);
+                        MusicUtil.stopMusic(context, "doorbell");
                         break;
                 }
+                common_tongzhi(context, bundle);
 
             } else {
                 Log.i("NotificationReceiver", "the app process is dead");
@@ -141,9 +150,14 @@ public class MyReceiver extends BroadcastReceiver {
                     case "1":
                     case "2":
                     case "51":
-                        launchIntent.putExtra(Constants.EXTRA_BUNDLE, bundle);
+                        break;
+                    case "52":
+                        SharedPreferencesUtil.saveData(context, "tongzhi_time", 1);//门铃报警通知次数
+//                        if (soundPool != null) soundPool.pause(sampleId1);
+                        MusicUtil.stopMusic(context, "doorbell");
                         break;
                 }
+                launchIntent.putExtra(Constants.EXTRA_BUNDLE, bundle);
                 launchIntent.setFlags(
                         Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
                 context.startActivity(launchIntent);
@@ -183,6 +197,14 @@ public class MyReceiver extends BroadcastReceiver {
         }
     }
 
+    private void common_tongzhi(Context context, Bundle bundle) {
+        Intent i_charge = new Intent(context, MainfragmentActivity.class);
+        i_charge.putExtra(Constants.EXTRA_BUNDLE, bundle);//    launchIntent.putExtra(Constants.EXTRA_BUNDLE, args);
+        //i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        i_charge.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        context.startActivity(i_charge);
+    }
+
     private void processCustomMessage_toMainActivity(Context context, Bundle bundle) {
         String message = bundle.getString(JPushInterface.EXTRA_MESSAGE);//账号已在别处登录！
         String extras = bundle.getString(JPushInterface.EXTRA_EXTRA);////{"type":"2"}
@@ -199,6 +221,7 @@ public class MyReceiver extends BroadcastReceiver {
                         msgIntent.putExtra(MainfragmentActivity.KEY_EXTRAS, extras);
                     }
                 } catch (JSONException e) {
+
                 }
             }
 
@@ -246,6 +269,7 @@ public class MyReceiver extends BroadcastReceiver {
 
     //进行广播通知是否刷新设备和场景
     private void processCustomMessage(int notifactionId, Bundle bundle) {
+        Log.e("MyReceiver", "MyReceiver.notifactionId:" + notifactionId);
         action = "";
         String extras = bundle.getString(JPushInterface.EXTRA_EXTRA);////{"type":"2"}
         if (notifactionId == 2) {
@@ -316,7 +340,18 @@ public class MyReceiver extends BroadcastReceiver {
 
                 }
             }
+        } else if (notifactionId == 52) {//notifactionId = 50 ->升级网关
+            //构建对象
+            init_soundPool();
+
         }
+    }
+
+    /**
+     * 门铃报警
+     */
+    private void init_soundPool() {
+        MusicUtil.startMusic(context, 1, "doorbell");
     }
 
     private void sendBroad(int notifactionId, String second) {

@@ -2,6 +2,7 @@ package com.massky.sraum;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.percent.PercentRelativeLayout;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
@@ -94,7 +95,7 @@ public class AddlamplightActivity extends Basecactivity implements SeekBar.OnSee
     TextView windspeedtwo_id;
     @InjectView(R.id.open)
     RelativeLayout open;
-//    @InjectView(R.id.openbtn)
+    //    @InjectView(R.id.openbtn)
 //    ImageView openbtn;
     @InjectView(R.id.close_btn_lignt)
     ImageView close_btn_light;
@@ -102,6 +103,11 @@ public class AddlamplightActivity extends Basecactivity implements SeekBar.OnSee
     ImageView change_btn;
     @InjectView(R.id.openbtn)
     ImageView open_btn_light;
+    @InjectView(R.id.open_smart_door_lock)
+    PercentRelativeLayout open_smart_door_lock;
+    @InjectView(R.id.img_door_lock)
+    ImageView img_door_lock;
+
 
     /**
      * 空调
@@ -116,6 +122,20 @@ public class AddlamplightActivity extends Basecactivity implements SeekBar.OnSee
     ImageView change_btn_kong_tiao;
     @InjectView(R.id.openbtn_kong_tiao)
     ImageView open_btn_light_kong_tiao;
+
+    @InjectView(R.id.open_btn_lignt_new_cloud_tiao)
+    ImageView open_btn_lignt_new_cloud_tiao;
+    @InjectView(R.id.close_btn_new_cloud_tiao)
+    ImageView close_btn_new_cloud_tiao;
+
+    @InjectView(R.id.open_new_cloud_tiao)
+    LinearLayout open_new_cloud_tiao;
+    @InjectView(R.id.fengsu_new_cloud_tiao)
+    ImageView fengsu_new_cloud_tiao;
+    @InjectView(R.id.openbtn_tiao_guang)
+    ImageView openbtn_tiao_guang;
+
+
     /**
      * 空调-----
      */
@@ -154,6 +174,7 @@ public class AddlamplightActivity extends Basecactivity implements SeekBar.OnSee
     private boolean actflag;
     private boolean isStatus_back;////说明是历史按钮记录，
 
+
     @Override
     protected int viewId() {
         return R.layout.mainpageitemone;
@@ -161,7 +182,7 @@ public class AddlamplightActivity extends Basecactivity implements SeekBar.OnSee
 
     @Override
     protected void onView() {
-       //关灯
+        //关灯
 
         close_btn_light.setOnClickListener(this);
         //切换灯的状态
@@ -169,10 +190,13 @@ public class AddlamplightActivity extends Basecactivity implements SeekBar.OnSee
 
         //开灯
         open_btn_light.setOnClickListener(this);
+        img_door_lock.setOnClickListener(this);
 
         /**
          * 空调
          */
+        open_btn_lignt_new_cloud_tiao.setOnClickListener(this);
+        close_btn_new_cloud_tiao.setOnClickListener(this);
 
         close_btn_light_kong_tiao.setOnClickListener(this);
         //切换灯的状态
@@ -228,6 +252,7 @@ public class AddlamplightActivity extends Basecactivity implements SeekBar.OnSee
         curopenrelativetwo_id.setOnClickListener(this);
         //点击窗帘1关闭
         curoffrelativetwo_id.setOnClickListener(this);
+        fengsu_new_cloud_tiao.setOnClickListener(this);
         //暂停
         sucrela.setOnClickListener(this);
         Intent intent = getIntent();
@@ -282,11 +307,16 @@ public class AddlamplightActivity extends Basecactivity implements SeekBar.OnSee
          * 空调
          */
 
-
         switch (type) {
             //普通灯
             case "1":
                 open.setVisibility(View.VISIBLE);
+                noairconditioned_id.setVisibility(View.GONE);//空调
+                mainairrea_id.setVisibility(View.GONE);
+                break;
+            case "15":
+            case "16":
+                open_smart_door_lock.setVisibility(View.VISIBLE);
                 noairconditioned_id.setVisibility(View.GONE);//空调
                 mainairrea_id.setVisibility(View.GONE);
                 break;
@@ -315,6 +345,7 @@ public class AddlamplightActivity extends Basecactivity implements SeekBar.OnSee
                 open_xin_feng.setVisibility(View.GONE);//空调来了-新风消失
                 windspeedrelative.setVisibility(View.VISIBLE);//空调调风的风速控制
                 windspeedrelative_xin_feng.setVisibility(View.GONE);//新风的风速控制
+                openbtn_tiao_guang.setVisibility(View.GONE);
                 break;
             //窗帘
             case "4":
@@ -331,16 +362,20 @@ public class AddlamplightActivity extends Basecactivity implements SeekBar.OnSee
                 addflag = false;
                 tempimage_id.setText("16");
                 id_seekBar.setMax(14);
+                open_new_cloud_tiao.setVisibility(View.VISIBLE);
                 noairconditioned_id.setVisibility(View.VISIBLE);
                 mainairrea_id.setVisibility(View.GONE);
                 patternrelative.setVisibility(View.GONE);
                 tempstate_id.setVisibility(View.GONE);
                 windspeedtwo_id.setVisibility(View.VISIBLE);
                 windspeed_id.setVisibility(View.GONE);
-                open_xin_feng.setVisibility(View.VISIBLE);//新风来了-空调消失
                 open_kong_tiao.setVisibility(View.GONE);//新风来了-空调消失
                 windspeedrelative.setVisibility(View.GONE);//空调调风的风速控制
-                windspeedrelative_xin_feng.setVisibility(View.VISIBLE);//新风的风速控制
+                windspeedrelative_xin_feng.setVisibility(View.GONE);//新风的风速控制
+                open_xin_feng.setVisibility(View.GONE);//新风来了-空调消失
+
+                openbtn_tiao_guang.setVisibility(View.GONE);
+
                 break;
             //地暖
             case "6"://地暖和新风是一样的
@@ -348,16 +383,19 @@ public class AddlamplightActivity extends Basecactivity implements SeekBar.OnSee
                 tempimage_id.setText("16");
                 id_seekBar.setMax(14);
                 noairconditioned_id.setVisibility(View.VISIBLE);
+                open_new_cloud_tiao.setVisibility(View.VISIBLE);
                 mainairrea_id.setVisibility(View.GONE);
                 patternrelative.setVisibility(View.GONE);
                 tempstate_id.setVisibility(View.GONE);
                 windspeedtwo_id.setVisibility(View.VISIBLE);
                 windspeed_id.setVisibility(View.GONE);
 
-                open_xin_feng.setVisibility(View.VISIBLE);//新风来了-空调消失
                 open_kong_tiao.setVisibility(View.GONE);//新风来了-空调消失
                 windspeedrelative.setVisibility(View.GONE);//空调调风的风速控制
-                windspeedrelative_xin_feng.setVisibility(View.VISIBLE);//新风的风速控制
+                windspeedrelative_xin_feng.setVisibility(View.GONE);//新风的风速控制
+                open_xin_feng.setVisibility(View.GONE);//新风来了-空调消失
+                openbtn_tiao_guang.setVisibility(View.GONE);
+
                 break;
         }
         initState();//初始化状态
@@ -452,6 +490,16 @@ public class AddlamplightActivity extends Basecactivity implements SeekBar.OnSee
                                 open_btn_light_xin_feng.setImageResource(R.drawable
                                         .open_white_word);
                                 break;//地暖
+                            case "15":
+                                statusflag = "1";
+                                img_door_lock.setImageResource(R.drawable
+                                        .open_white_word);
+                                break;
+                            case "16":
+                                statusflag = "0";
+                                img_door_lock.setImageResource(R.drawable
+                                        .guan_white_word);
+                                break;
                         }
                     }
                 }
@@ -492,7 +540,7 @@ public class AddlamplightActivity extends Basecactivity implements SeekBar.OnSee
     }
 
     /**
-     *场景按钮状态选择
+     * 场景按钮状态选择
      */
     private void init_add_secene() {
         switch (type) {
@@ -546,11 +594,36 @@ public class AddlamplightActivity extends Basecactivity implements SeekBar.OnSee
                         break;//状态-切换
                 }
                 break;//地暖
+            case "15":
+                switch (statusflag) {
+                    case "0":
+                        img_door_lock.setImageResource(R.drawable
+                                .open_black_word);
+                        break;//状态-开
+                    case "1":
+                        img_door_lock.setImageResource(R.drawable
+                                .open_white_word);
+                        break;
+                }
+                break;
+            case "16":
+                switch (statusflag) {
+                    case "0":
+                        img_door_lock.setImageResource(R.drawable
+                                .guan_white_word);
+                        break;//状态-开
+                    case "1":
+                        img_door_lock.setImageResource(R.drawable
+                                .guan_white_word);
+                        break;
+                }
+                break;
         }
     }
 
     private void setModetwo() {
         String strmode = "";
+        modeflag = modeflag == null ? "" : modeflag;
         switch (modeflag) {
             case "1":
                 strmode = "制冷";
@@ -575,6 +648,7 @@ public class AddlamplightActivity extends Basecactivity implements SeekBar.OnSee
 
     private void setSpeed() {
         String strwind = "";
+        windflag = windflag == null ? "" : windflag;
         switch (windflag) {
             case "1":
                 strwind = "低风";
@@ -612,6 +686,10 @@ public class AddlamplightActivity extends Basecactivity implements SeekBar.OnSee
         //空调开关状态
         switchrelative.setBackgroundResource(R.drawable.hsmall_circle);
         statusopen.setImageResource(R.drawable.hopen);
+        open_btn_lignt_new_cloud_tiao.setImageResource(R.drawable
+                .open_black_word);
+        close_btn_new_cloud_tiao.setImageResource(R.drawable
+                .guan_white_word);
     }
 
     /*非窗帘全开状态设置*/
@@ -625,12 +703,17 @@ public class AddlamplightActivity extends Basecactivity implements SeekBar.OnSee
         //空调开关状态
         switchrelative.setBackgroundResource(R.drawable.hsmall_black);
         statusopen.setImageResource(R.drawable.hairclose_word);
+
+        close_btn_new_cloud_tiao.setImageResource(R.drawable
+                .guan_black_word);
+        open_btn_lignt_new_cloud_tiao.setImageResource(R.drawable
+                .open_white_word);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-           /**
+            /**
              * 新风-和地暖是一样的
              */
             case R.id.close_btn_lignt_xin_feng://close
@@ -640,6 +723,22 @@ public class AddlamplightActivity extends Basecactivity implements SeekBar.OnSee
                         .change_black_word);
                 open_btn_light_xin_feng.setImageResource(R.drawable
                         .open_black_word);
+//                open();
+                statusflag = "0";
+                break;//关灯
+
+            case R.id.close_btn_new_cloud_tiao://close
+                close_btn_light_xin_feng.setImageResource(R.drawable
+                        .guan_white_word);
+                change_btn_xin_feng.setImageResource(R.drawable
+                        .change_black_word);
+                open_btn_light_xin_feng.setImageResource(R.drawable
+                        .open_black_word);
+
+                open_btn_lignt_new_cloud_tiao.setImageResource(R.drawable
+                        .open_black_word);
+                close_btn_new_cloud_tiao.setImageResource(R.drawable
+                        .guan_white_word);
 //                open();
                 statusflag = "0";
                 break;//关灯
@@ -661,6 +760,21 @@ public class AddlamplightActivity extends Basecactivity implements SeekBar.OnSee
                 close_btn_light_xin_feng.setImageResource(R.drawable
                         .guan_black_word);
                 statusflag = "1";
+                break;
+
+            case R.id.open_btn_lignt_new_cloud_tiao://打开灯
+                open_btn_light_xin_feng.setImageResource(R.drawable
+                        .open_white_word);
+                change_btn_xin_feng.setImageResource(R.drawable
+                        .change_black_word);
+                close_btn_light_xin_feng.setImageResource(R.drawable
+                        .guan_black_word);
+                statusflag = "1";
+
+                close_btn_new_cloud_tiao.setImageResource(R.drawable
+                        .guan_black_word);
+                open_btn_lignt_new_cloud_tiao.setImageResource(R.drawable
+                        .open_white_word);
                 break;
             case R.id.windspeedrelative_xin_feng:
                 //风速状态
@@ -703,7 +817,6 @@ public class AddlamplightActivity extends Basecactivity implements SeekBar.OnSee
              * 新风
              */
 
-
             /**
              * 空调，和调光共用开，关，切换这三个按钮
              */
@@ -714,6 +827,8 @@ public class AddlamplightActivity extends Basecactivity implements SeekBar.OnSee
                         .change_black_word);
                 open_btn_light_kong_tiao.setImageResource(R.drawable
                         .open_black_word);
+
+
 //                open();
                 statusflag = "0";
                 break;//关灯
@@ -742,7 +857,7 @@ public class AddlamplightActivity extends Basecactivity implements SeekBar.OnSee
 
             case R.id.close_btn_lignt://close
                 close_btn_light.setImageResource(R.drawable
-                .guan_white_word);
+                        .guan_white_word);
                 change_btn.setImageResource(R.drawable
                         .change_black_word);
                 open_btn_light.setImageResource(R.drawable
@@ -768,6 +883,20 @@ public class AddlamplightActivity extends Basecactivity implements SeekBar.OnSee
                 close_btn_light.setImageResource(R.drawable
                         .guan_black_word);
                 statusflag = "1";
+                break;
+            case R.id.img_door_lock://打开灯
+                switch (type) {
+                    case "15":
+                        img_door_lock.setImageResource(R.drawable
+                                .open_white_word);
+                        statusflag = "1";
+                        break;
+                    case "16":
+                        statusflag = "0";
+                        img_door_lock.setImageResource(R.drawable
+                                .guan_white_word);
+                        break;
+                }
                 break;
 
             case R.id.open:
@@ -846,6 +975,44 @@ public class AddlamplightActivity extends Basecactivity implements SeekBar.OnSee
                     default:
                         break;
                 }
+                break;
+            case R.id.fengsu_new_cloud_tiao:
+                //风速状态
+                switch (windflag) {
+                    case "1":
+                        windspeedtwo_id.setText("中风");
+                        windspeed_id.setText("中风");
+                        windflag = "2";
+                        break;
+                    case "2":
+                        windspeedtwo_id.setText("高风");
+                        windspeed_id.setText("高风");
+                        windflag = "3";
+                        break;
+                    case "3":
+                        windspeedtwo_id.setText("强力");
+                        windspeed_id.setText("强力");
+                        windflag = "4";
+                        break;
+                    case "4":
+                        windspeedtwo_id.setText("送风");
+                        windspeed_id.setText("送风");
+                        windflag = "5";
+                        break;
+                    case "5":
+                        windspeedtwo_id.setText("自动");
+                        windspeed_id.setText("自动");
+                        windflag = "6";
+                        break;
+                    case "6":
+                        windspeedtwo_id.setText("低风");
+                        windspeed_id.setText("低风");
+                        windflag = "1";
+                        break;
+                    default:
+                        break;
+                }
+
                 break;
             case R.id.patternrelative:
                 setMode();
@@ -1267,6 +1434,7 @@ public class AddlamplightActivity extends Basecactivity implements SeekBar.OnSee
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+//        super.onBackPressed();
+        finshAdd();
     }
 }

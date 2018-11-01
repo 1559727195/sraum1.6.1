@@ -144,11 +144,17 @@ public class AddWifiYaoKongQiScucessActivity extends Basecactivity {
                         sraum_addWifiApple(map, name);
                     }
                 }, AddWifiYaoKongQiScucessActivity.this, dialogUtil) {
-                    @Override
                     public void onError(Call call, Exception e, int id) {
                         super.onError(call, e, id);
-                        AddWifiYaoKongQiScucessActivity.this.finish();
+//                        AddWifiHongWaiScucessActivity.this.finish();
+                        ToastUtil.showToast(AddWifiYaoKongQiScucessActivity.this, "修改名字失败");
                     }
+
+                    @Override
+                    public void pullDataError() {
+                        ToastUtil.showToast(AddWifiYaoKongQiScucessActivity.this, "修改名字失败");
+                    }
+
 
                     @Override
                     public void onSuccess(User user) {
@@ -163,13 +169,18 @@ public class AddWifiYaoKongQiScucessActivity extends Basecactivity {
                     }
 
                     @Override
+                    public void wrongBoxnumber() {
+                        ToastUtil.showToast(AddWifiYaoKongQiScucessActivity.this, "名称已存在");
+                    }
+
+                    @Override
                     public void threeCode() {
-                        super.threeCode();
+                        ToastUtil.showToast(AddWifiYaoKongQiScucessActivity.this, "修改名字失败");
                     }
 
                     @Override
                     public void fourCode() {
-                        super.fourCode();
+                        ToastUtil.showToast(AddWifiYaoKongQiScucessActivity.this, "修改名字失败");
                     }
                 });
     }

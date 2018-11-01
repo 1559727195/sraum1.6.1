@@ -95,6 +95,19 @@ public class LinkageListAdapter extends BaseAdapter<User.deviceLinkList> {
 //        viewHolderContentType.device_type_pic.setImageResource(element);
         final ViewHolderContentType finalViewHolderContentType = viewHolderContentType;
 
+        //成员，业主accountType->addrelative_id
+        String accountType = (String) SharedPreferencesUtil.getData(context, "accountType", "");
+        switch (accountType) {
+            case "1":
+                viewHolderContentType.swipe_content_linear.setEnabled(true);
+                finalViewHolderContentType.swipemenu_layout.setLeftSwipe(true);
+                break;//业主
+            case "2":
+                viewHolderContentType.swipe_content_linear.setEnabled(false);
+                finalViewHolderContentType.swipemenu_layout.setLeftSwipe(false);
+                break;//家庭成员
+        }
+
         String isUse = list.get(position).isUse;
         if (isUse != null) {
             switch (isUse) {
@@ -363,7 +376,6 @@ public class LinkageListAdapter extends BaseAdapter<User.deviceLinkList> {
             public void wrongToken() {
                 super.wrongToken();
                 //重新去获取togglen,这里是因为没有拉到数据所以需要重新获取togglen
-
             }
 
             @Override
@@ -485,7 +497,6 @@ public class LinkageListAdapter extends BaseAdapter<User.deviceLinkList> {
         final Dialog dialog = new Dialog(context, R.style.BottomDialog);
         dialog.setContentView(view);
         dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-
         DisplayMetrics dm = context.getResources().getDisplayMetrics();
         int displayWidth = dm.widthPixels;
         int displayHeight = dm.heightPixels;
@@ -529,9 +540,14 @@ public class LinkageListAdapter extends BaseAdapter<User.deviceLinkList> {
                     ToastUtil.showToast(context, "云场景名称已存在");
                     return;
                 }
-                linkage_rename(id, edit_password_gateway.getText().toString() == null ? "" :
-                                edit_password_gateway.getText().toString()
-                        , dialog);
+
+                if (name.equals(var)) {
+                    dialog.dismiss();
+                } else {
+                    linkage_rename(id, edit_password_gateway.getText().toString() == null ? "" :
+                                    edit_password_gateway.getText().toString()
+                            , dialog);
+                }
             }
         });
     }

@@ -8,14 +8,17 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import com.Util.AppManager;
 import com.Util.SharedPreferencesUtil;
 import com.base.Basecactivity;
 import com.yanzhenjie.statusview.StatusUtils;
 import com.yanzhenjie.statusview.StatusView;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+
 import butterknife.InjectView;
 import lecho.lib.hellocharts.model.Line;
 
@@ -300,7 +303,6 @@ public class UnderWaterActivity extends Basecactivity {
             startActivity(intent);
         }
     }
-
 
     //7-门磁，8-人体感应，9-水浸检测器，10-入墙PM2.5
     //11-紧急按钮，12-久坐报警器，13-烟雾报警器，14-天然气报警器，15-智能门锁，16-直流电阀机械手

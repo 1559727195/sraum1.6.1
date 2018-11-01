@@ -7,11 +7,9 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.base.BaseAdapter;
 import com.data.User;
 import com.massky.sraum.R;
-
 import java.util.HashMap;
 import java.util.List;
 
@@ -62,7 +60,7 @@ public class AddsignAdapter extends BaseAdapter<User.device> {
                 mHolder.imageone.setImageResource(R.drawable.dimminglights);
                 break;
             case "3":
-                mHolder.imageone.setImageResource(R.drawable.home_26);
+                mHolder.imageone.setImageResource(R.drawable.icon_kongtiao_40);
                 break;
             case "4":
                 mHolder.imageone.setImageResource(R.drawable.home_curtain);
@@ -87,6 +85,15 @@ public class AddsignAdapter extends BaseAdapter<User.device> {
                 break;
             case "11":
                 mHolder.imageone.setImageResource(R.drawable.emergency_button);
+                break;
+            case "15":
+                mHolder.imageone.setImageResource(R.drawable.icon_zhinengmensuo_40);
+                break;
+            case "16":
+                mHolder.imageone.setImageResource(R.drawable.icon_jixieshou_40);
+                break;
+            case "17"://
+                mHolder.imageone.setImageResource(R.drawable.icon_kaiguan_socket_40);
                 break;
             default:
                 mHolder.imageone.setImageResource(R.drawable.marklamph);

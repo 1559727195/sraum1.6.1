@@ -71,7 +71,7 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true">
 
-            <com.Util.ClearEditText
+            <com.Util.ClearLengthEditText
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
@@ -79,10 +79,9 @@
                 android:id="@+id/dev_name"
                 android:gravity="left"
                 android:hint="输入自定义名称"
-                android:maxLength="15"
                 android:padding="8dp"
                 android:textSize="14sp"
-                app:layout_widthPercent="65%"></com.Util.ClearEditText>
+                app:layout_widthPercent="65%"></com.Util.ClearLengthEditText>
         </android.support.percent.PercentRelativeLayout>
 
     </LinearLayout>

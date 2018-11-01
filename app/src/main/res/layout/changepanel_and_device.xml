@@ -160,7 +160,7 @@
           android:layout_toRightOf="@+id/panel_name_txt"
           app:layout_widthPercent="70%">
 
-        <com.Util.ClearEditText
+        <com.Util.ClearLengthEditText
             android:id="@+id/panelname"
             android:layout_width="@dimen/p312"
             android:layout_height="@dimen/p72"
@@ -229,7 +229,7 @@
           android:layout_toRightOf="@+id/onekey_device"
           app:layout_widthPercent="70%">
 
-        <com.Util.ClearEditText
+        <com.Util.ClearLengthEditText
             android:id="@+id/onekey_device_txt"
             android:layout_width="@dimen/p312"
             android:layout_height="@dimen/p72"
@@ -297,7 +297,7 @@
           android:layout_toRightOf="@+id/twokey_device"
           app:layout_widthPercent="70%">
 
-        <com.Util.ClearEditText
+        <com.Util.ClearLengthEditText
             android:id="@+id/twokey_device_txt"
             android:layout_width="@dimen/p312"
             android:layout_height="@dimen/p72"
@@ -363,7 +363,7 @@
           android:layout_toRightOf="@+id/threekey_device"
           app:layout_widthPercent="70%">
 
-        <com.Util.ClearEditText
+        <com.Util.ClearLengthEditText
             android:id="@+id/threekey_device_txt"
             android:layout_width="@dimen/p312"
             android:layout_height="@dimen/p72"
@@ -431,7 +431,7 @@
           android:layout_toRightOf="@+id/fourkey_device"
           app:layout_widthPercent="70%">
 
-        <com.Util.ClearEditText
+        <com.Util.ClearLengthEditText
             android:id="@+id/fourkey_device_txt"
             android:layout_width="@dimen/p312"
             android:layout_height="@dimen/p72"

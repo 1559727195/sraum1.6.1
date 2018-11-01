@@ -107,12 +107,13 @@ public class SelectControlApplianceActivity extends Basecactivity {
         //在这里先调
         //设置网关模式-sraum-setBox
         Map map = new HashMap();
-        String phoned = getDeviceId(SelectControlApplianceActivity.this);
+//        String phoned = getDeviceId(SelectControlApplianceActivity.this);
         map.put("token", TokenUtil.getToken(SelectControlApplianceActivity.this));
         String boxnumber = (String) SharedPreferencesUtil.getData(SelectControlApplianceActivity.this,
                 "boxnumber", "");
         map.put("boxNumber", boxnumber);
-        map.put("phoneId", phoned);
+        String regId = (String) SharedPreferencesUtil.getData(SelectControlApplianceActivity.this, "regId", "");
+        map.put("phoneId", regId);
         switch (yangshi) {
             case "normal":
                 map.put("status", "1");//普通进入设置模式

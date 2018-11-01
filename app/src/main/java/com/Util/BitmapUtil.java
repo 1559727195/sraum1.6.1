@@ -8,10 +8,7 @@ import android.graphics.PixelFormat;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.Base64;
-
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 
 /**
  *
@@ -58,7 +55,6 @@ public class BitmapUtil {
         drawable.setBounds(0, 0, width, height);
         drawable.draw(canvas);
         return bitmap;
-
     }
 
     /**

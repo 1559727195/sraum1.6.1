@@ -685,7 +685,10 @@ public class EachMatchFragment extends Basecfragment implements View.OnTouchList
                         if (ykanInterface == null) {
                             return;
                         }
-                        ykanInterface.getRemoteMatched(currGizWifiDevice.getMacAddress(),
+
+                        String mac = currGizWifiDevice.getMacAddress();
+                        if (mac == null) return;
+                        ykanInterface.getRemoteMatched(mac,
                                 bid, Integer.parseInt(tid), new YKanHttpListener() {
                                     //String mac, int bid, int type, YKanHttpListener listener
                                     @Override

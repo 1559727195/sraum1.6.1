@@ -251,10 +251,11 @@ public class SelectSensorActivity extends Basecactivity implements
                     mapdevice.put("type", user.deviceList.get(i).type);
                     mapdevice.put("boxNumber", user.deviceList.get(i).boxNumber);
                     mapdevice.put("boxName", user.deviceList.get(i).boxName);
+//                    if (user.deviceList.get(i).type.equals("10"))
+//                        continue;
                     list_hand_scene.add(mapdevice);
                     setPicture(user.deviceList.get(i).type);
                 }
-
 
                 selectexcutesceneresultadapter.setLists(list_hand_scene, listint, listintwo);
                 selectexcutesceneresultadapter.notifyDataSetChanged();
@@ -333,6 +334,7 @@ public class SelectSensorActivity extends Basecactivity implements
                 map_link.put("condition", "");
                 map_link.put("minValue", "");
                 map_link.put("maxValue", "");
+                map_link.put("boxName", "");
                 map_link.put("name1", "手动执行");
                 boolean add_condition = (boolean) SharedPreferencesUtil.getData(SelectSensorActivity.this, "add_condition", false);
                 if (add_condition) {
@@ -404,15 +406,17 @@ public class SelectSensorActivity extends Basecactivity implements
         String deviceType = (String) list_hand_scene.get(position).get("type");
         String deviceId = (String) list_hand_scene.get(position).get("number");
         String name = (String) list_hand_scene.get(position).get("name");
+        String boxName = (String) list_hand_scene.get(position).get("boxName");
         Map map = new HashMap();
         map.put("deviceType", deviceType);
         map.put("deviceId", deviceId);
         map.put("name", name);
+        map.put("boxName", boxName);
         map.put("type", "100");
         if (deviceType == null) return;
         switch (deviceType) {
             case "10":
-                intent = new Intent(SelectSensorActivity.this, SelectPmDataActivity.class);
+                intent = new Intent(SelectSensorActivity.this, SelectPmOneActivity.class);
                 intent.putExtra("map_link", (Serializable) map);
                 startActivity(intent);
                 break;//pm2.5

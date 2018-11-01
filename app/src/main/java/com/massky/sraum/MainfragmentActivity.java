@@ -1,34 +1,38 @@
 package com.massky.sraum;
 
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.AbstractThreadedSyncAdapter;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.os.Environment;
 import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Looper;
 import android.os.Message;
+import android.os.StatFs;
+import android.provider.Settings;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.TelephonyManager;
+import android.text.TextUtils;
+import android.text.format.Formatter;
+import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.PopupWindow;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.AddTogenInterface.AddTogglenInterfacer;
 import com.Util.ApiHelper;
@@ -62,24 +66,29 @@ import com.fragment.MysetFragment;
 import com.fragment.PanelFragment;
 import com.gizwits.gizwifisdk.api.GizWifiDevice;
 import com.gizwits.gizwifisdk.enumration.GizWifiErrorCode;
+import com.ipcamera.demo.BridgeService;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jpush.Constants;
 import com.jpush.ExampleUtil;
 import com.larksmart7618.sdk.communication.tools.commen.ToastTools;
 import com.permissions.RxPermissions;
-import com.service.SimpleIntentService;
+import com.service.NotificationMonitorService;
 import com.yaokan.sdk.api.YkanSDKManager;
 import com.yaokan.sdk.ir.InitYkanListener;
 import com.yaokan.sdk.utils.Logger;
-import com.yaokan.sdk.utils.ProgressDialogUtils;
 import com.yaokan.sdk.utils.Utility;
 import com.yaokan.sdk.wifi.DeviceManager;
 import com.yaokan.sdk.wifi.GizWifiCallBack;
-import com.ypy.eventbus.EventBus;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.lang.ref.WeakReference;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -89,15 +98,19 @@ import cn.jpush.android.api.JPushInterface;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import okhttp3.Call;
+import vstc2.nativecaller.NativeCaller;
 
 import static com.fragment.LeftFragment.MESSAGE_TONGZHI;
 import static com.massky.sraum.R.id.addscene_id;
+import static com.massky.sraum.R.id.swibtnone;
 
 /**
  * Created by masskywcy on 2016-09-05.
  */
 /*用于主界面设置*/
 public class MainfragmentActivity extends Basecfragmentactivity implements Mainviewpager.MyInterface, InitYkanListener {
+    public static final String MESSAGE_RECEIVED_FROM_ABOUT_FRAGMENT = "com.massky.sraum.from_about_fragment";
+    private static final int TONGZHI_APK_UPGRATE = 0x0012;
     //    @InjectView(R.id.sideslip_id)
 //    RelativeLayout sideslip_id;
 //    @InjectView(R.id.addrelative_id)
@@ -139,22 +152,85 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
             init_jizhiyun();
         }
     };
+    public static final String MESSAGE_RECEIVED_ACTION_APK_LOAD = "com.Util.MESSAGE_RECEIVED_ACTION_APK_LOAD";
+    private Dialog dialog1;
+    private MessageReceiver mMessageReceiver_aboutfragment;
+    public static final String MESSAGE_TONGZHI_DOOR = "com.massky.sraum.message.tongzhi.door";
+
+    public static final String SRAUM_IS_DOWN_LOAD = "sraum_is_download";
+    private MessageReceiver mMessageReceiver_apk_down_load;
+    private WeakReference<Activity> weakReference;
+    private boolean iswait_down_load;//等待NotificationListenerService这个服务唤醒
+
 
     @Override
     protected int viewId() {
         return R.layout.main;
     }
 
+    /**
+     * 唤醒NotifacationService
+     */
+    private void toggleNotificationListenerService() {
+        PackageManager pm = getPackageManager();
+        pm.setComponentEnabledSetting(new ComponentName(this, NotificationMonitorService.class),
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+        pm.setComponentEnabledSetting(new ComponentName(this, NotificationMonitorService.class),
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+//        requestRebind(ComponentName componentName) 方法来支持重新绑定。
+//        NotificationMonitorService.requestRebind(new ComponentName(this, NotificationMonitorService.class));
+
+    }
+
     @Override
     protected void onView() {
+        iswait_down_load = false;
         dialogUtil = new DialogUtil(this);
         initPermission();
+        toggleNotificationListenerService();
+        over_camera_list();//结束wifi摄像头的tag
         new Thread(new Runnable() {
             @Override
             public void run() {
                 handler_wifi.sendEmptyMessage(0);
             }
         }).start();
+
+        Intent intent = new Intent();
+        intent.setClass(MainfragmentActivity.this, BridgeService.class);
+        startService(intent);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    NativeCaller.PPPPInitialOther("ADCBBFAOPPJAHGJGBBGLFLAGDBJJHNJGGMBFBKHIBBNKOKLDHOBHCBOEHOKJJJKJBPMFLGCPPJMJAPDOIPNL");
+                    Thread.sleep(3000);
+                    Message msg = new Message();
+                    NativeCaller.SetAPPDataPath(getApplicationContext().getFilesDir().getAbsolutePath());
+                } catch (Exception e) {
+
+                }
+            }
+        }).start();
+
+
+//        /**
+//         * 关闭download监听service
+//         */
+//        Intent intent_apk_close = new Intent();
+//        intent_apk_close.setClass(MainfragmentActivity.this, NotificationMonitorService.class);
+//        stopService(intent_apk_close);
+//
+//        /**
+//         * 开启download监听service
+//         */
+//        Intent intent_apk_down = new Intent();
+//        intent_apk_down.setClass(MainfragmentActivity.this, NotificationMonitorService.class);
+//        startService(intent_apk_down);
+
+
+        showCenterDeleteDialog("需要监听sraum下载通知",
+                "是否去开启sraum通知使用权");
 
 //        /**
 //         * 开启机智云小苹果服务(service)
@@ -177,21 +253,114 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
             usertype = IntentUtil.getIntentString(MainfragmentActivity.this, "addflag");
             LogUtil.eLength("这是数据", usertype + "s数据问题");
             if (usertype.equals("1")) {
-                setTabSelection(4);
+                setTabSelection(5, "", "");
             } else {
-                setTabSelection(0);
+                setTabSelection(0, "", "");
             }
         }
         getSupportFragmentManager().beginTransaction().replace(R.id.menu_frame, new LeftFragment()).commitAllowingStateLoss();
 //        sideslip_id.setOnClickListener(this);
         getDialog();
         boolean netflag = NetUtils.isNetworkConnected(MainfragmentActivity.this);
-        if (netflag) {
-            updateApk();
+        if (netflag) {//获取版本号
+            if (!isEnabled()) {
+                if (!dialog1.isShowing()) {
+                    dialog1.show();
+                }
+            } else {
+                updateApk();
+            }
         }
         registerMessageReceiver();
+        registerMessageReceiver_fromAbout();
+        registerMessageReceiver_fromApk_Down();
         init_notifacation();//通知初始化
+        SharedPreferencesUtil.saveData(MainfragmentActivity.this, "loadapk", false);//apk版本正在更新中
     }
+
+    // 判断是否打开了通知监听权限
+    private boolean isEnabled() {
+        String pkgName = getPackageName();
+        final String flat = Settings.Secure.getString(getContentResolver(), "enabled_notification_listeners");
+        if (!TextUtils.isEmpty(flat)) {
+            final String[] names = flat.split(":");
+            for (int i = 0; i < names.length; i++) {
+                final ComponentName cn = ComponentName.unflattenFromString(names[i]);
+                if (cn != null) {
+                    if (TextUtils.equals(pkgName, cn.getPackageName())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * 获取文件长度
+     */
+    public long getFileSize(File file) {
+        if (file.exists() && file.isFile()) {
+            String fileName = file.getName();
+            System.out.println("文件" + fileName + "的大小是：" + file.length());
+            return file.length();
+        }
+        return 0;
+    }
+
+    public static long SDCardSizeTest(File apkFile) {
+//
+//           // 取得SDCard当前的状态
+//           String sDcString = android.os.Environment.getExternalStorageState();
+//
+//           if (sDcString.equals(android.os.Environment.MEDIA_MOUNTED)) {
+//
+//                   // 取得sdcard文件路径
+//                   File pathFile = android.os.Environment
+//                            .getExternalStorageDirectory();
+
+        android.os.StatFs statfs = new android.os.StatFs(apkFile.getPath());
+
+        // 获取SDCard上BLOCK总数
+        long nTotalBlocks = statfs.getBlockCount();
+
+        // 获取SDCard上每个block的SIZE
+        long nBlocSize = statfs.getBlockSize();
+
+        // 获取可供程序使用的Block的数量
+        long nAvailaBlock = statfs.getAvailableBlocks();
+
+        // 获取剩下的所有Block的数量(包括预留的一般程序无法使用的块)
+        long nFreeBlock = statfs.getFreeBlocks();
+
+        // 计算SDCard 总容量大小MB
+        long nSDTotalSize = nTotalBlocks * nBlocSize / 1024 / 1024;
+
+        // 计算 SDCard 剩余大小MB
+        long nSDFreeSize = nAvailaBlock * nBlocSize / 1024 / 1024;
+
+        return (nTotalBlocks * nBlocSize - nAvailaBlock * nBlocSize) / 1024;
+
+    }// end of if
+    // end of func
+
+    /**
+     * 获取指定文件大小
+     *
+     * @return
+     * @throws Exception
+     */
+//    public long getFileSize(File file) throws Exception {
+//        long size = 0;
+//        if (file.exists()) {
+//            FileInputStream fis = null;
+//            fis = new FileInputStream(file);
+//            size = fis.available();
+//            fis.close();
+//        }
+//        return size;
+//    }
 
 
     /**
@@ -201,7 +370,7 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
         initListener();
         // 初始化SDK
 
-        dialogUtil.loadDialog();
+//        dialogUtil.loadDialog();
 
         YkanSDKManager.init(MainfragmentActivity.this, MainfragmentActivity.this);
         //需要剥离机智云的用户调用此方法初始化
@@ -389,13 +558,10 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
                     Logger.e(TAG, "load device  sucess");
                     update(deviceList);
 //                    if(deviceList.get(0).getNetStatus()==GizWifiDeviceNetStatus.GizDeviceOffline)
-
                     break;
                 default:
                     break;
-
             }
-
         }
     };
 
@@ -466,7 +632,8 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
                 try {
                     json = new JSONObject(extras);
                     String type = json.getString("type");
-                    sendBroad(type);
+                    String uid = json.getString("uid");
+                    sendBroad(type, uid);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -480,6 +647,7 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
     public static final String KEY_TITLE = "title";
     public static final String KEY_MESSAGE = "message";
     public static final String KEY_EXTRAS = "extras";
+    public static String ACTION_SRAUM_SETBOX = "ACTION_SRAUM_SETBOX";//notifactionId = 8 ->设置网关模式，sraum_setBox
 
     public void registerMessageReceiver() {
         mMessageReceiver = new MessageReceiver();
@@ -489,8 +657,23 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, filter);
     }
 
+    public void registerMessageReceiver_fromAbout() {
+        mMessageReceiver_aboutfragment = new MessageReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
+        filter.addAction(MESSAGE_RECEIVED_FROM_ABOUT_FRAGMENT);
+        registerReceiver(mMessageReceiver_aboutfragment, filter);
+    }
 
-    public static class MessageReceiver extends BroadcastReceiver {
+    public void registerMessageReceiver_fromApk_Down() {
+        mMessageReceiver_apk_down_load = new MessageReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
+        filter.addAction(SRAUM_IS_DOWN_LOAD);
+        registerReceiver(mMessageReceiver_apk_down_load, filter);
+    }
+
+    public class MessageReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -507,22 +690,32 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
 //                    ToastUtil.showToast(CommonData.mNowContext,"MainfragmentActivity-loginflag:" + loginflag);
                     if (loginflag)
                         ToastUtils.getInstances().showDialog("账号在其他地方登录，请重新登录。");
+                } else if (MESSAGE_RECEIVED_FROM_ABOUT_FRAGMENT.equals(intent.getAction())) {
+                    String UpApkUrl = ApiHelper.UpdateApkUrl + "sraum" + Version + ".apk";
+                    String apkName = "sraum" + Version + ".apk";
+                    Log.e("fei", "UpApkUrl:" + UpApkUrl);
+                    UpdateManager manager = new UpdateManager(MainfragmentActivity.this, UpApkUrl, apkName);
+                    updateApkListener = (UpdateApkListener) manager;
+                    manager.showDownloadDialog();
+                } else if (SRAUM_IS_DOWN_LOAD.equals(intent.getAction())) {//apk正在下载
+//                    ToastUtil.showToast(MainfragmentActivity.this, "apk正在下载中");
+                    iswait_down_load = true;
                 }
-            } catch (Exception e) {
+            } catch (Exception e) {//SRAUM_IS_DOWN_LOAD
 
             }
         }
     }
 
     /*
-    * 通知
-    * */
-    private void sendBroad(String content) {
+     * 通知
+     * */
+    private void sendBroad(String content, String bundle) {
         Intent mIntent = new Intent(MESSAGE_TONGZHI);
+        mIntent.putExtra("uid", bundle == null ? "" : bundle);//    launchIntent.putExtra(Constants.EXTRA_BUNDLE, args);
         mIntent.putExtra("type", content);
         sendBroadcast(mIntent);
     }
-
 
     //拦截侧滑
     public void gotoStop() {
@@ -548,6 +741,7 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
         permissions.request(android.Manifest.permission.WRITE_EXTERNAL_STORAGE, android.Manifest.permission.READ_EXTERNAL_STORAGE).subscribe(new Observer<Boolean>() {
             @Override
             public void onSubscribe(Disposable d) {
+
             }
 
             @Override
@@ -557,6 +751,7 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
 
             @Override
             public void onError(Throwable e) {
+
             }
 
             @Override
@@ -583,8 +778,44 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
                         Log.e("fei", "Version:" + Version);
                         int sracode = Integer.parseInt(user.versionCode);
                         if (versionCode < sracode) {
-                            belowtext_id.setText("版本更新至" + Version);
-                            viewDialog.loadViewdialog();
+                            //在这里判断有没有正在更新的apk,文件大小小于总长度即可
+                            weakReference = new WeakReference<Activity>(MainfragmentActivity.this);
+                            File apkFile = new File(weakReference.get().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "app_name.apk");
+                            if (apkFile != null && apkFile.exists()) {
+//                                long istext = main_get_real_size(apkFile);
+//                                long istext = 0;
+//                                try {
+//                                    istext = getFileSizes(apkFile);
+//                                } catch (Exception e) {
+//                                    e.printStackTrace();
+//                                }
+////                                long istext = SDCardSizeTest(apkFile);
+//                                Log.e("robin debug", "istext:" + istext + "");
+                                long apksize = 0;
+                                try {
+                                    apksize = getFileSize(apkFile);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                //获取已经下载字节数
+//                               String totalSize =  getDataTotalSize(MainfragmentActivity.this,apkFile.getAbsolutePath());
+//                              Integer.parseInt(totalSize);
+
+                                int totalapksize = (int) SharedPreferencesUtil.getData(MainfragmentActivity.this, "apk_fileSize", 0);
+                                if (totalapksize == 0) {//则说明，还没有下载过
+                                    belowtext_id.setText("版本更新至" + Version);
+                                    viewDialog.loadViewdialog();
+                                    return;
+                                }
+                                if (apksize - totalapksize == 0) { //说明正在下载或者下载完毕，安装失败时，//->或者是下载完毕后没有去安装；
+                                    down_load_thread();
+                                }
+                            } else {//不存在，apk文件
+                                belowtext_id.setText("版本更新至" + Version);
+                                viewDialog.loadViewdialog();
+                            }
+                        } else {//没有可更新的apk时
+                            SharedPreferencesUtil.saveData(MainfragmentActivity.this, "apk_fileSize", 0);
                         }
                     }
 
@@ -593,6 +824,103 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
                         super.wrongToken();
                     }
                 });
+    }
+
+    /**
+     * 下载线程
+     */
+    private void down_load_thread() {
+        final int[] add_wait_notifacation = {0};
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (!iswait_down_load) {
+                    add_wait_notifacation[0] += 1;
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    if (add_wait_notifacation[0] == 15) {//倒计时用完时
+                        iswait_down_load = true;//已经唤醒notifacationService
+                    }
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (add_wait_notifacation[0] == 15) {
+                            belowtext_id.setText("版本更新至" + Version);
+                            viewDialog.loadViewdialog();
+                        }
+                    }
+                });
+            }
+        }).start();
+    }
+
+    public String getDataTotalSize(Context context, String absolutePath) {
+        StatFs sf = new StatFs(absolutePath);
+        long blockSize = sf.getBlockSize();
+        long totalBlocks = sf.getBlockCount();
+        return Formatter.formatFileSize(context, blockSize * totalBlocks);
+    }
+
+    /*得到传入文件的大小*/
+    public long getFileSizes(File f) throws Exception {
+
+        long s = 0;
+        if (f.exists()) {
+            FileInputStream fis = null;
+            fis = new FileInputStream(f);
+            s = fis.available();
+            fis.close();
+        } else {
+            f.createNewFile();
+            System.out.println("文件夹不存在");
+        }
+        return s;
+    }
+
+    public long main_get_real_size(File f) {
+        FileChannel fc = null;
+        long size = 0;
+        try {
+//            File f= new File("D:\\CentOS-6.5-x86_64-bin-DVD1.iso");
+            if (f.exists() && f.isFile()) {
+                FileInputStream fis = new FileInputStream(f);
+                // 2.定义存储空间
+                byte[] buffer = new byte[1024];
+                // 3.开始读文件
+                int len = -1;
+
+                if (fis != null) {
+                    while ((len = fis.read(buffer)) != -1) {
+                        // 将Buffer中的数据写到outputStream对象中
+//                            outputStream.write(buffer, 0, len);
+                        size += len;
+                        Log.e("robin debug", "size:" + size);
+                    }
+                }
+//                fc = fis.getChannel();
+//                logger.info(fc.size());
+                return size;
+            } else {
+//                logger.info("file doesn't exist or is not a file");
+            }
+        } catch (FileNotFoundException e) {
+
+        } catch (IOException e) {
+
+        } finally {
+            if (null != fc) {
+                try {
+                    fc.close();
+                } catch (IOException e) {
+
+                }
+            }
+        }
+        return 0;
     }
 
     //用于设置dialog展示
@@ -620,7 +948,7 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
         super.onSaveInstanceState(outState);
     }
 
-    public void setTabSelection(int index) {
+    public void setTabSelection(int index, String type, String uid) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         hideFragments(transaction);
         switch (index) {
@@ -631,10 +959,11 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
 //                cenimage_id.setVisibility(View.VISIBLE);
 //                centext_id.setVisibility(View.GONE);
                 if (mainviewpager == null) {
-                    mainviewpager = new Mainviewpager();
+                    mainviewpager = Mainviewpager.newInstance(type);
                     transaction.add(R.id.content_frame, mainviewpager);
                     LogUtil.i("数据", "setTabSelection: ");
                 } else {
+                    tongzhi_door(type, uid);
                     LogUtil.i("展示数据", "setTabSelection: ");
                     transaction.show(mainviewpager);
                 }
@@ -795,6 +1124,13 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
         menu.showContent();
     }
 
+    private void tongzhi_door(String type, String uid) {
+        Intent mIntent = new Intent(MESSAGE_TONGZHI_DOOR);
+        mIntent.putExtra("type", type);
+        mIntent.putExtra("uid", uid);
+        sendBroadcast(mIntent);
+    }
+
     private void hideFragments(FragmentTransaction transaction) {
         if (mainviewpager != null) {
             transaction.hide(mainviewpager);
@@ -892,13 +1228,22 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
                 viewDialog.removeviewDialog();
                 String UpApkUrl = ApiHelper.UpdateApkUrl + "sraum" + Version + ".apk";
                 Log.e("fei", "UpApkUrl:" + UpApkUrl);
-                UpdateManager manager = new UpdateManager(MainfragmentActivity.this, UpApkUrl);
+                String apkName = "sraum" + Version + ".apk";
+                UpdateManager manager = new UpdateManager(MainfragmentActivity.this, UpApkUrl, apkName);
+                updateApkListener = (UpdateApkListener) manager;
                 manager.showDownloadDialog();
+
                 break;
             case R.id.qxbutton_id:
                 viewDialog.removeviewDialog();
                 break;
         }
+    }
+
+    private UpdateApkListener updateApkListener;
+
+    public interface UpdateApkListener {
+        void sendTo_UPApk();
     }
 
     @Override
@@ -907,13 +1252,125 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
             if ((System.currentTimeMillis() - exitTime) > 2000) {
                 ToastUtil.showDelToast(MainfragmentActivity.this, "再按一次退出程序");
                 exitTime = System.currentTimeMillis();
+
             } else {
+                //-----
+//                boolean loadapk = (boolean) SharedPreferencesUtil.getData(MainfragmentActivity.this, "loadapk", false);
+//                if (loadapk) {
+//                    if (!dialog1.isShowing()) {
+//                        dialog1.show();
+//                    }
+//                } else {
+//                    dialog1.dismiss();
+//                    over_camera_list();//结束wifi摄像头的tag
+//                    MainfragmentActivity.this.finish();
+////                    System.exit(0);
+//                }
+
+//                dialog1.dismiss();
+//                if (!dialog1.isShowing()) {
+//                    dialog1.show();
+//                }
+
+                iswait_down_load = true;
+                over_camera_list();//结束wifi摄像头的tag
                 MainfragmentActivity.this.finish();
-                System.exit(0);
+
             }
             return true;
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+
+    //自定义dialog,centerDialog删除对话框
+
+    public void showCenterDeleteDialog(final String name1, final String name2) {
+//        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+//        // 布局填充器
+//        LayoutInflater inflater = LayoutInflater.from(getActivity());
+//        View view = inflater.inflate(R.layout.user_name_dialog, null);
+//        // 设置自定义的对话框界面
+//        builder.setView(view);
+//
+//        cus_dialog = builder.create();
+//        cus_dialog.show();
+
+        View view = LayoutInflater.from(MainfragmentActivity.this).inflate(R.layout.promat_dialog, null);
+        TextView confirm; //确定按钮
+        TextView cancel; //确定按钮
+        TextView tv_title;
+        TextView name_gloud;
+//        final TextView content; //内容
+        cancel = (TextView) view.findViewById(R.id.call_cancel);
+        confirm = (TextView) view.findViewById(R.id.call_confirm);
+        tv_title = (TextView) view.findViewById(R.id.tv_title);//name_gloud
+        name_gloud = (TextView) view.findViewById(R.id.name_gloud);
+        name_gloud.setText(name1);
+        tv_title.setText(name2);
+//        tv_title.setText("是否拨打119");
+//        content.setText(message);
+        //显示数据
+        dialog1 = new Dialog(MainfragmentActivity.this, R.style.BottomDialog);
+        dialog1.setContentView(view);
+        dialog1.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        dialog1.setCancelable(false);//设置它可以取消
+        dialog1.setCanceledOnTouchOutside(false);
+
+        DisplayMetrics dm = getResources().getDisplayMetrics();
+        int displayWidth = dm.widthPixels;
+        int displayHeight = dm.heightPixels;
+        android.view.WindowManager.LayoutParams p = dialog1.getWindow().getAttributes(); //获取对话框当前的参数值
+        p.width = (int) (displayWidth * 0.8); //宽度设置为屏幕的0.5
+//        p.height = (int) (displayHeight * 0.5); //宽度设置为屏幕的0.5
+//        dialog.setCanceledOnTouchOutside(false);// 设置点击屏幕Dialog不消失
+        dialog1.getWindow().setAttributes(p);  //设置生效
+//        dialog1.show();
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog1.dismiss();
+                dialog1.dismiss();
+                over_camera_list();//结束wifi摄像头的tag
+                MainfragmentActivity.this.finish();
+            }
+        });
+
+        confirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                SharedPreferencesUtil.saveData(MainfragmentActivity.this, "loadapk", false);
+//                over_broad_apk_load();
+                startActivityForResult(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"), TONGZHI_APK_UPGRATE);
+            }
+        });
+    }
+
+    private void over_broad_apk_load() {
+//        Intent broadcast = new Intent(MESSAGE_RECEIVED_ACTION_APK_LOAD);
+//        sendBroadcast(broadcast);
+        if (updateApkListener != null) {
+            updateApkListener.sendTo_UPApk();
+        }
+        MainfragmentActivity.this.finish();
+        over_camera_list();//结束wifi摄像头的tag
+    }
+
+    /**
+     * 清除wifi摄像头列表
+     */
+    private void over_camera_list() {
+        List<Map> list = SharedPreferencesUtil.getInfo_List(MainfragmentActivity.this, "list_wifi_camera_first");
+        List<Map> list_second = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            Map map = new HashMap();
+            map.put("did", list.get(i).get("did"));
+            map.put("tag", 0);
+            list_second.add(map);
+        }
+        SharedPreferencesUtil.saveInfo_List(MainfragmentActivity.this, "list_wifi_camera_first", new ArrayList<Map>());
+        SharedPreferencesUtil.saveInfo_List(MainfragmentActivity.this, "list_wifi_camera_first", list_second);
     }
 
     @Override
@@ -950,10 +1407,29 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        String szImei = TelephonyMgr.getDeviceId();
+//        String szImei = TelephonyMgr.getDeviceId();
+        String szImei = (String) SharedPreferencesUtil.getData(MainfragmentActivity.this, "regId", "");
         init_islogin(mobilePhone, szImei);
     }
 
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case TONGZHI_APK_UPGRATE:
+                if (isEnabled()) {//监听通知权限开启
+                    if (dialog1 != null)
+                        dialog1.dismiss();
+                    updateApk();
+                } else {
+                    if (!dialog1.isShowing()) {
+                        dialog1.show();
+                    }
+                }
+                break;
+        }
+    }
 
     /**
      * 初始化登录
@@ -1002,7 +1478,22 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
     protected void onDestroy() {
         super.onDestroy();
 //        ToastUtil.showToast(MainfragmentActivity.this,"MainfragmentActivity:destroy");
+        over_camera_list();//结束wifi摄像头的tag
         common_second();
+//        over_broad_apk_load();
+        if (dialog1 != null) {
+            dialog1.dismiss();
+        }
+        unregisterReceiver(mMessageReceiver_aboutfragment);
+        unregisterReceiver(mMessageReceiver_apk_down_load);
+        iswait_down_load = false;
+
+//        /**
+//         * 开启download监听service
+//         */
+//        Intent intent_apk_down = new Intent();
+//        intent_apk_down.setClass(MainfragmentActivity.this, NotificationMonitorService.class);
+//        stopService(intent_apk_down);
     }
 
 

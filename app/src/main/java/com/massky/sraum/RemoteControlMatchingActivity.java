@@ -65,7 +65,7 @@ public class RemoteControlMatchingActivity extends Basecfragmentactivity impleme
     private FragmentManager fm;
     private EachMatchFragment eachmatchfragment;
     private OneKeyMatchFragment onekeymatchfragment;
-    private IntelligentMatchFragment intelligenmatchfragment;
+//    private IntelligentMatchFragment intelligenmatchfragment;
     private List<Fragment> list = new ArrayList<Fragment>();
     //    private RoomFragment roomFragment;
 
@@ -147,16 +147,16 @@ public class RemoteControlMatchingActivity extends Basecfragmentactivity impleme
             }
         });
 
-        intelligenmatchfragment = IntelligentMatchFragment.newInstance(new IntelligentMatchFragment.OnDeviceMessageFragListener() {
-
-            @Override
-            public void ondevice_message_frag() {
-
-            }
-        });
+//        intelligenmatchfragment = IntelligentMatchFragment.newInstance(new IntelligentMatchFragment.OnDeviceMessageFragListener() {
+//
+//            @Override
+//            public void ondevice_message_frag() {
+//
+//            }
+//        });
         list.add(eachmatchfragment);
         list.add(onekeymatchfragment);
-        list.add(intelligenmatchfragment);
+//        list.add(intelligenmatchfragment);
 //        list.add(roomFragment);
         adapter = new FragmentViewPagerAdapter(fm, viewpager_id, list);
         adapter.setOnExtraPageChangeListener(new FragmentViewPagerAdapter.OnExtraPageChangeListener() {

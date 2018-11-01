@@ -24,7 +24,7 @@ public class MyServcie extends Service {
         // TODO Auto-generated method stub
         super.onCreate();
         if (player == null) {
-            player = MediaPlayer.create(MyServcie.this, R.raw.di);
+            player = MediaPlayer.create(MyServcie.this, R.raw.di);//原来为di
         }
     }
 

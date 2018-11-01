@@ -3,6 +3,7 @@ package com.massky.sraum;
 import android.content.Intent;
 import android.graphics.Color;
 import android.text.format.Time;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -54,7 +55,7 @@ public class SelectPmDataActivity extends Basecactivity {
     TextView next_step_txt;
     @InjectView(R.id.project_select)
     TextView project_select;
-    int[] mData = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9,};
+    int[] mData = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     String text_pm = "";
     private Map map_link = new HashMap();
     private String condition = "0";
@@ -85,9 +86,20 @@ public class SelectPmDataActivity extends Basecactivity {
         int pos1 = wheel1.getSelectedItemPosition();
         int pos2 = wheel2.getSelectedItemPosition();
         int pos3 = wheel3.getSelectedItemPosition();
-        text_pm = String.format("%d%d%d", pos1, pos2, pos3);
+
+        if (pos1 == 0) {
+            text_pm = String.format("%d%d", pos2, pos3);
+            if (pos2 == 0) {
+                text_pm = String.format("%d", pos3);
+            } else {
+                text_pm = String.format("%d%d", pos2, pos3);
+            }
+        } else {
+            text_pm = String.format("%d%d%d", pos1, pos2, pos3);
+        }
+        Log.e("robin debug", "text_pm:" + text_pm);
 //        mTextView.setText(text);
-        condition = "1";
+//        condition = "1";
     }
 
 
@@ -97,6 +109,40 @@ public class SelectPmDataActivity extends Basecactivity {
             statusView.setBackgroundColor(Color.BLACK);
         }
         StatusUtils.setFullToStatusBar(this);  // StatusBar.
+        init_data();
+    }
+
+    private void init_data() {
+        init_view();
+        map_link = (Map) getIntent().getSerializableExtra("map_link");
+        if (map_link == null) return;
+        switch (map_link.get("pm_action").toString()) {
+            case "0":
+                init_common_data("温度", 0, 2, 6);
+                condition = "2";
+                break;
+            case "1":
+                condition = "3";
+                init_common_data("湿度", 0, 5, 0);
+                break;
+            case "2":
+                condition = "1";
+                init_common_data("PM2.5", 1, 0, 0);
+                break;
+        }
+    }
+
+    private void init_common_data(String s, int one, int two, int thee) {
+        project_select.setText(s);
+//        wheel1.setSelection(9);
+//        wheel2.setSelection(9);
+//        wheel3.setSelection(9);
+        wheel1.setSelection(one);
+        wheel2.setSelection(two);
+        wheel3.setSelection(thee);
+    }
+
+    private void init_view() {
         wheel1.setScrollCycle(true);
         wheel2.setScrollCycle(true);
         wheel3.setScrollCycle(true);
@@ -110,115 +156,79 @@ public class SelectPmDataActivity extends Basecactivity {
         wheel3.setOnItemSelectedListener(mListener);
 
 
-        formatData();
+//        formatData();
 
         mDecorView = getWindow().getDecorView();
-//        String type = (String) getIntent().getSerializableExtra("type");
-//        switch (type) {
-//            case "birthday":
-//                titlecen_id.setText(R.string.birth);
-//                break;
-//            case "select_time":
-//                titlecen_id.setText("选择时间");
-//                break;
-//        }
-        //Intent intent = getIntent();
-        //String birthtime = intent.getStringExtra("birthtime");
-//        DatepicketColor.setDatePickerDividerColor(datePicker);
-//        Time time = new Time("GMT+8");
-//        time.setToNow();
-//        yearb = time.year;
-//        monthb = time.month;
-//        dayb = time.monthDay;
-//        /*
-//        * if (birthtime == null || birthtime.equals("")) {
-//
-//        } else {
-//            yearb = Integer.parseInt(birthtime.substring(0, 4).trim());
-//            monthb = Integer.parseInt(birthtime.substring(5, 7).trim());
-//            dayb = Integer.parseInt(birthtime.substring(8, 10).trim());
-//        }*/
-//        datePicker.init(yearb, monthb, dayb, new DatePicker.OnDateChangedListener() {
-//            @Override
-//            public void onDateChanged(DatePicker view, int year,
-//                                      int monthOfYear, int dayOfMonth) {
-//                LogUtil.i("日期选择", year + "年" + monthOfYear + "月" + dayOfMonth + "日");
-//                yearb = year;
-//                monthb = monthOfYear + 1;
-//                dayb = dayOfMonth;
-//            }
-//        });
         back.setOnClickListener(this);
         next_step_txt.setOnClickListener(this);
-        map_link = (Map) getIntent().getSerializableExtra("map_link");
-        if (map_link == null) return;
-        project_select.setText(map_link.get("name").toString());
-//        setPicture(map_link.get("deviceType").toString());
     }
 
     @Override
     public void onClick(View v) {
-//        switch (v.getId()) {
-//            case R.id.backrela_id:
-//                String month;
-//                String day;
-//                if (monthb < 10) {
-//                    month = "0" + monthb;
-//                } else {
-//                    month = Integer.toString(monthb);
-//                }
-//                if (dayb < 10) {
-//                    day = "0" + dayb;
-//                } else {
-//                    day = Integer.toString(dayb);
-//                }
-//                //String str = yearb + "-" + month + "-" + day;
-//                Intent intent = new Intent();
-//                intent.putExtra("birthactivity", yearb + "-" + month + "-" + day);// 把数据塞入intent里面
-//                SelectPmDataActivity.this.setResult(10, intent);// 跳转回原来的activity
-//                SelectPmDataActivity.this.finish();
-//                break;
         switch (v.getId()) {
             case R.id.back:
                 SelectPmDataActivity.this.finish();
                 break;
             case R.id.next_step_txt:
-//                Intent intent = null;
-//                switch (again_elements[position]) {
-//                    case "10":
-//                        intent = new Intent(SelectSensorActivity.this,  SelectPmDataActivity.class);
-//                        startActivity(intent);
-//                        break;//pm2.5
-//                    default:
-//                        intent = new Intent(SelectSensorActivity.this,  UnderWaterActivity.class);
-//                        intent.putExtra("type",(Serializable) again_elements[position]);
-//                        startActivityForResult(intent, REQUEST_SENSOR);
-//                        break;
-                boolean add_condition = (boolean) SharedPreferencesUtil.getData(SelectPmDataActivity.this, "add_condition", false);
-                Intent intent = null;
-                map_link.put("condition", condition);
-                map_link.put("minValue", "");
-                map_link.put("maxValue", text_pm);
-                if (add_condition) {
-//                    AppManager.getAppManager().removeActivity_but_activity_cls(MainfragmentActivity.class);
-                    //                AppManager.getAppManager().finishActivity_current(AirLinkageControlActivity.class);
-//                AppManager.getAppManager().finishActivity_current(SelectiveLinkageDeviceDetailSecondActivity.class);
-                    AppManager.getAppManager().finishActivity_current(SelectSensorActivity.class);
-                    AppManager.getAppManager().finishActivity_current(EditLinkDeviceResultActivity.class);
-                    intent = new Intent(SelectPmDataActivity.this, EditLinkDeviceResultActivity.class);
-                    intent.putExtra("sensor_map", (Serializable) map_link);
-                    startActivity(intent);
-                    SelectPmDataActivity.this.finish();
+                result_selectpmdata();
+                break;
+        }
+    }
 
-                } else {
-                    intent = new Intent(SelectPmDataActivity.this,
-                            SelectiveLinkageActivity.class);
-                    intent.putExtra("link_map", (Serializable) map_link);
-                    startActivity(intent);
-                }
+    private void result_selectpmdata() {
+        boolean add_condition = (boolean) SharedPreferencesUtil.getData(SelectPmDataActivity.this, "add_condition", false);
+        Intent intent = null;
+        map_link.put("condition", condition);
+//                map_link.put("pm_condition", "0");
+        String temp = "";
+        switch (map_link.get("pm_condition").toString()) {
+            case "0":
+                temp = "大于等于 ";
+                break;
+            case "1":
+                temp = "小于等于 ";
+                break;
+        }
+        switch (map_link.get("pm_condition").toString()) {
+            case "0":
+
+                map_link.put("maxValue", text_pm);
+                break;
+            case "1":
+
+                map_link.put("minValue", text_pm);
                 break;
         }
 
+        switch (map_link.get("pm_action").toString()) {
+            case "0":
+                map_link.put("action", "温度 " + temp + text_pm + "℃");
+                break;
+            case "1":
+                map_link.put("action", "湿度 " + temp + text_pm + "%");
+                break;
+            case "2":
+                map_link.put("action", "PM2.5 " + temp + text_pm);
+                break;
+        }
+
+
+        if (add_condition) { //
+//                    AppManager.getAppManager().removeActivity_but_activity_cls(MainfragmentActivity.class);
+            //                AppManager.getAppManager().finishActivity_current(AirLinkageControlActivity.class);
+//                AppManager.getAppManager().finishActivity_current(SelectiveLinkageDeviceDetailSecondActivity.class);
+            AppManager.getAppManager().finishActivity_current(SelectSensorActivity.class);
+            AppManager.getAppManager().finishActivity_current(EditLinkDeviceResultActivity.class);
+            intent = new Intent(SelectPmDataActivity.this, EditLinkDeviceResultActivity.class);
+            intent.putExtra("sensor_map", (Serializable) map_link);
+            startActivity(intent);
+            SelectPmDataActivity.this.finish();
+        } else { //
+            intent = new Intent(SelectPmDataActivity.this,
+                    SelectiveLinkageActivity.class);
+            intent.putExtra("link_map", (Serializable) map_link);
+            startActivity(intent);
+        }
     }
 
     private class NumberAdapter extends BaseAdapter {
@@ -260,9 +270,7 @@ public class SelectPmDataActivity extends Basecactivity {
             if (null == txtView) {
                 txtView = (TextView) convertView;
             }
-
             txtView.setText(text);
-
             return convertView;
         }
     }

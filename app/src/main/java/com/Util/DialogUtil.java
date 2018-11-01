@@ -142,7 +142,13 @@ public class DialogUtil {
     public void removeDialog() {
         if (progressDialog != null) {
             if (progressDialog.isShowing()) {
-                progressDialog.dismiss();
+                Activity activity = (Activity) context;
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressDialog.dismiss();
+                    }
+                });
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.fragment;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -20,6 +21,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.AddTogenInterface.AddTogglenInterfacer;
 import com.Util.ApiHelper;
+import com.Util.App;
 import com.Util.DialogUtil;
 import com.Util.IntentUtil;
 import com.Util.LogUtil;
@@ -29,7 +31,6 @@ import com.Util.Mycallback;
 import com.Util.SharedPreferencesUtil;
 import com.Util.ToastUtil;
 import com.Util.TokenUtil;
-import com.adapter.MyscefargmentAdapter;
 import com.adapter.ScenefargmentAdapter;
 import com.andview.refreshview.XRefreshView;
 import com.base.Basecfragment;
@@ -94,6 +95,7 @@ public class SceneFragment extends Basecfragment implements
     private boolean musicflag;
     private List<Map> list = new ArrayList<>();
     private String type = "";
+    private Activity activity;
 
     @Override
     protected int viewId() {
@@ -175,9 +177,13 @@ public class SceneFragment extends Basecfragment implements
 
     private void getData(int dialogflag) {
         Map<String, Object> map = new HashMap<>();
-        map.put("boxNumber", TokenUtil.getBoxnumber(getActivity()));
-        map.put("token", TokenUtil.getToken(getActivity()));
+        //
+        String boxnumberre = (String) SharedPreferencesUtil.getData_second(App.getInstance().getApplicationContext(), "boxnumber", "");
+//        map.put("boxNumber", TokenUtil.getBoxnumber(getActivity()));
+        map.put("boxNumber", boxnumberre);
+        map.put("token",  (String) SharedPreferencesUtil.getData_second(App.getInstance().getApplicationContext(), "sraumtoken", ""));
         if (dialogflag != 2) {
+            if(dialogUtil != null)
             dialogUtil.loadDialog();
         }
         get_all_scene(map);
@@ -327,12 +333,21 @@ public class SceneFragment extends Basecfragment implements
         mrelativefour.setOnClickListener(this);
     }
 
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        this.activity = activity;
+    }
+
     @Override
     public void initData() {
         index_toggen = 0;
-        SharedPreferencesUtil.saveData(getActivity(), "pagetag", "3");
+        SharedPreferencesUtil.saveData_second(App.getInstance().getApplicationContext(), "pagetag", "3");
+
 //        boolean flag = TokenUtil.getTokenflag(getActivity());
-        String boxnumberre = TokenUtil.getBoxnumber(getActivity());
+        String boxnumberre = (String) SharedPreferencesUtil.getData_second(App.getInstance().getApplicationContext(), "boxnumber", "");
+//        String boxnumberre = TokenUtil.getBoxnumber();
 //        if (flag) {
         if (boxnumberre.equals("")) {
             scenelist.clear();
@@ -516,9 +531,9 @@ public class SceneFragment extends Basecfragment implements
                 }
                 if (musicflag) {
                     LogUtil.i("铃声响起");
-                    MusicUtil.startMusic(getActivity(), 1);
+                    MusicUtil.startMusic(getActivity(), 1, "");
                 } else {
-                    MusicUtil.stopMusic(getActivity());
+                    MusicUtil.stopMusic(getActivity(), "");
                 }
             }
 

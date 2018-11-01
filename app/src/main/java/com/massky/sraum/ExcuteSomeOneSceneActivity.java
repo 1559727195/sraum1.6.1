@@ -58,6 +58,7 @@ public class ExcuteSomeOneSceneActivity extends Basecactivity
     private List<String> listtype = new ArrayList();
     private ExcuteOneSceneAdapter adapter;
     private Map sensor_map = new HashMap();//传感器map
+    private List<String> listbox = new ArrayList();
 
     @Override
     protected int viewId() {
@@ -124,6 +125,7 @@ public class ExcuteSomeOneSceneActivity extends Basecactivity
                 }
                 for (User.scenelist us : scenelist) {
                     setPicture(us.sceneType);
+                    listbox.add(us.boxName);
                 }
                 adapter = new ExcuteOneSceneAdapter(ExcuteSomeOneSceneActivity.this, scenelist, listint, false);
                 maclistview_id.setAdapter(adapter);
@@ -208,7 +210,7 @@ public class ExcuteSomeOneSceneActivity extends Basecactivity
         map_value.put("type", "100");
         map_value.put("name1", "场景");
         map_value.put("action", sceneName);
-
+        map_value.put("boxName", listbox.get(position));
         map_value.put("number", sceneId);
         map_value.put("status", "1");
         map_value.put("dimmer", "");

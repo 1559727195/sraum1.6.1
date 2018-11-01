@@ -78,7 +78,7 @@
             android:layout_centerInParent="true"
             android:layout_toRightOf="@+id/txt_dev">
 
-            <com.Util.ClearEditText
+            <com.Util.ClearLengthEditText
                 android:id="@+id/input_panel_name_edit"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -87,10 +87,9 @@
                 android:background="@drawable/typein"
                 android:gravity="left"
                 android:hint="输入自定义名称"
-                android:maxLength="15"
                 android:padding="8dp"
                 android:textSize="14sp"
-                app:layout_widthPercent="60%"></com.Util.ClearEditText>
+                app:layout_widthPercent="60%"></com.Util.ClearLengthEditText>
 
             <RelativeLayout
                 android:layout_width="0dp"
@@ -188,7 +187,7 @@
                 android:paddingRight="15dp"
                 android:paddingTop="5dp">
 
-                <com.Util.ClearEditText
+                <com.Util.ClearLengthEditText
                     android:id="@+id/edit_one"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -196,10 +195,9 @@
                     android:background="@drawable/typein"
                     android:gravity="left|center_vertical"
                     android:hint="输入第一路灯控自定义名称"
-                    android:maxLength="15"
                     android:padding="8dp"
                     android:textSize="14sp"
-                    app:layout_widthPercent="60%"></com.Util.ClearEditText>
+                    app:layout_widthPercent="60%"></com.Util.ClearLengthEditText>
 
                 <RelativeLayout
                     android:layout_width="0dp"
@@ -266,7 +264,7 @@
                 android:paddingRight="15dp"
                 android:paddingTop="5dp">
 
-                <com.Util.ClearEditText
+                <com.Util.ClearLengthEditText
                     android:id="@+id/edit_two"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -274,10 +272,9 @@
                     android:background="@drawable/typein"
                     android:gravity="left|center_vertical"
                     android:hint="输入第二路灯控自定义名称"
-                    android:maxLength="15"
                     android:padding="8dp"
                     android:textSize="14sp"
-                    app:layout_widthPercent="60%"></com.Util.ClearEditText>
+                    app:layout_widthPercent="60%"></com.Util.ClearLengthEditText>
 
                 <RelativeLayout
                     android:layout_width="0dp"
@@ -342,7 +339,7 @@
                 android:paddingRight="15dp"
                 android:paddingTop="5dp">
 
-                <com.Util.ClearEditText
+                <com.Util.ClearLengthEditText
                     android:id="@+id/edit_three"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -350,10 +347,9 @@
                     android:background="@drawable/typein"
                     android:gravity="left|center_vertical"
                     android:hint="输入第三路灯控自定义名称"
-                    android:maxLength="15"
                     android:padding="8dp"
                     android:textSize="14sp"
-                    app:layout_widthPercent="60%"></com.Util.ClearEditText>
+                    app:layout_widthPercent="60%"></com.Util.ClearLengthEditText>
 
                 <RelativeLayout
                     android:layout_width="0dp"
@@ -418,7 +414,7 @@
                 android:paddingRight="15dp"
                 android:paddingTop="5dp">
 
-                <com.Util.ClearEditText
+                <com.Util.ClearLengthEditText
                     android:id="@+id/edit_four"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -426,10 +422,9 @@
                     android:background="@drawable/typein"
                     android:gravity="left|center_vertical"
                     android:hint="输入第四路灯控自定义名称"
-                    android:maxLength="15"
                     android:padding="8dp"
                     android:textSize="14sp"
-                    app:layout_widthPercent="60%"></com.Util.ClearEditText>
+                    app:layout_widthPercent="60%"></com.Util.ClearLengthEditText>
 
                 <RelativeLayout
                     android:layout_width="0dp"

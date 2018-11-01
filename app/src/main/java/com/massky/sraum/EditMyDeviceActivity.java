@@ -12,6 +12,7 @@ import com.AddTogenInterface.AddTogglenInterfacer;
 import com.Util.ApiHelper;
 import com.Util.AppManager;
 import com.Util.ClearEditText;
+import com.Util.ClearLengthEditText;
 import com.Util.DialogUtil;
 import com.Util.ListViewForScrollView_New;
 import com.Util.MyOkHttp;
@@ -35,7 +36,6 @@ import java.util.regex.Pattern;
 import butterknife.InjectView;
 import okhttp3.Call;
 
-
 /**
  * Created by zhu on 2018/1/8.
  */
@@ -46,30 +46,23 @@ public class EditMyDeviceActivity extends Basecactivity {
     @InjectView(R.id.status_view)
     StatusView statusView;
     @InjectView(R.id.input_panel_name_edit)
-    ClearEditText input_panel_name_edit;
-
+    ClearLengthEditText input_panel_name_edit;
     @InjectView(R.id.edit_one)
-    ClearEditText edit_one;
+    ClearLengthEditText edit_one;
     @InjectView(R.id.button_one_id)
     Button button_one_id;
-
     @InjectView(R.id.edit_two)
-    ClearEditText edit_two;
+    ClearLengthEditText edit_two;
     @InjectView(R.id.button_two_id)
     Button button_two_id;
-
-
     @InjectView(R.id.edit_three)
-    ClearEditText edit_three;
+    ClearLengthEditText edit_three;
     @InjectView(R.id.button_three_id)
     Button button_three_id;
-
-
     @InjectView(R.id.edit_four)
-    ClearEditText edit_four;
+    ClearLengthEditText edit_four;
     @InjectView(R.id.button_four_id)
     Button button_four_id;
-
     @InjectView(R.id.linear_one)
     LinearLayout linear_one;
     @InjectView(R.id.linear_two)
@@ -78,7 +71,6 @@ public class EditMyDeviceActivity extends Basecactivity {
     LinearLayout linear_three;
     @InjectView(R.id.linear_four)
     LinearLayout linear_four;
-
     @InjectView(R.id.first_txt)
     TextView first_txt;
     @InjectView(R.id.second_txt)
@@ -115,7 +107,6 @@ public class EditMyDeviceActivity extends Basecactivity {
     @InjectView(R.id.list_for_air_mode)
     LinearLayout list_for_air_mode;
 
-
     @Override
     protected int viewId() {
         return R.layout.edit_my_device_act;
@@ -132,7 +123,6 @@ public class EditMyDeviceActivity extends Basecactivity {
         onData();
     }
 
-
     private void onEvent() {
         back.setOnClickListener(this);
         next_step_txt.setOnClickListener(this);
@@ -143,7 +133,6 @@ public class EditMyDeviceActivity extends Basecactivity {
         button_four_id.setOnClickListener(this);
         find_panel_btn.setOnClickListener(this);
     }
-
 
     private void onData() {
         panelItem_map = (Map) getIntent().getSerializableExtra("panelItem");
@@ -158,6 +147,8 @@ public class EditMyDeviceActivity extends Basecactivity {
             setCommon(type);
             switch (type) {
                 case "AA02"://AA02WIFi模块
+                case "AA03"://AA02WIFi模块
+                case "AA04"://AA02WIFi模块
                 case "202":
                 case "206":
 
@@ -182,6 +173,10 @@ public class EditMyDeviceActivity extends Basecactivity {
             case "AA02":
                 method = ApiHelper.sraum_updateWifiAppleName;
                 break;
+            case "AA03":
+            case "AA04":
+                method = ApiHelper.sraum_updateWifiCameraName;
+                break;
             case "202":
             case "206":
                 method = ApiHelper.sraum_updateWifiAppleDeviceName;
@@ -203,7 +198,7 @@ public class EditMyDeviceActivity extends Basecactivity {
 
             @Override
             public void pullDataError() {
-                super.pullDataError();
+                ToastUtil.showToast(EditMyDeviceActivity.this, "更新失败");
             }
 
             @Override
@@ -250,11 +245,23 @@ public class EditMyDeviceActivity extends Basecactivity {
                     case "A302":
                     case "A303":
                     case "A401":
+
+                    case "A311":
+                    case "A312":
+                    case "A313":
+                    case "A321":
+                    case "A322"://
+                    case "A331":
                         save_panel();
                         break;
                     case "A511":
+                    case "A611":
+                    case "A711":
                         save_air_model();
                         break;
+                    case "B201":
+                    case "B101":
+                    case "B301":
                     case "A501":
                     case "A801":
                     case "A901":
@@ -270,7 +277,12 @@ public class EditMyDeviceActivity extends Basecactivity {
                         if (input_panel_name_edit_txt_str.equals("")) {
                             ToastUtil.showToast(EditMyDeviceActivity.this, "设备名称为空");
                         } else {
-                            sraum_update_panel_name(input_panel_name_edit_txt_str, number, false);//更新面板信息
+                            if (name.equals(input_panel_name_edit_txt_str)) {
+//                                AppManager.getAppManager().removeActivity_but_activity_cls(MainfragmentActivity.class);
+                                updateDeviceInfo();//更新设备信息
+                            } else {
+                                sraum_update_panel_name(input_panel_name_edit_txt_str, number, false);//更新面板信息
+                            }
                         }
                         break;
                     case "AA02"://WIFI红外模块
@@ -279,7 +291,26 @@ public class EditMyDeviceActivity extends Basecactivity {
                         if (input_panel_name_edit_txt_str.equals("")) {
                             ToastUtil.showToast(EditMyDeviceActivity.this, "设备名称为空");
                         } else {
-                            sraum_updateWifiAppleName(number, input_panel_name_edit_txt_str);
+
+                            if (name.equals(input_panel_name_edit_txt_str)) {
+                                AppManager.getAppManager().removeActivity_but_activity_cls(MainfragmentActivity.class);
+                            } else {
+                                sraum_updateWifiAppleName(number, input_panel_name_edit_txt_str);
+                            }
+                        }
+                        break;
+                    case "AA03"://WIFI红外模块
+                    case "AA04":
+                        input_panel_name_edit_txt_str = input_panel_name_edit.getText().toString().trim() == null
+                                || input_panel_name_edit.getText().toString().trim() == "" ? "" : input_panel_name_edit.getText().toString().trim();
+                        if (input_panel_name_edit_txt_str.equals("")) {
+                            ToastUtil.showToast(EditMyDeviceActivity.this, "设备名称为空");
+                        } else {
+                            if (name.equals(input_panel_name_edit_txt_str)) {
+                                AppManager.getAppManager().removeActivity_but_activity_cls(MainfragmentActivity.class);
+                            } else {
+                                sraum_updateWifiAppleName(number, input_panel_name_edit_txt_str);
+                            }
                         }
                         break;
                     case "202":
@@ -289,7 +320,11 @@ public class EditMyDeviceActivity extends Basecactivity {
                         if (input_panel_name_edit_txt_str.equals("")) {
                             ToastUtil.showToast(EditMyDeviceActivity.this, "设备名称为空");
                         } else {
-                            sraum_updateWifiAppleName(number, input_panel_name_edit_txt_str);
+                            if (name.equals(input_panel_name_edit_txt_str)) {
+                                AppManager.getAppManager().removeActivity_but_activity_cls(MainfragmentActivity.class);
+                            } else {
+                                sraum_updateWifiAppleName(number, input_panel_name_edit_txt_str);
+                            }
                         }
                         break;
                 }
@@ -302,20 +337,19 @@ public class EditMyDeviceActivity extends Basecactivity {
                 find_common_dev(deviceList.get(0).number);
                 break;
             case R.id.button_two_id://找设备
-                find_common_dev(deviceList.get(0).number);
+                find_common_dev(deviceList.get(1).number);
 
                 break;
             case R.id.button_three_id://找设备
-                find_common_dev(deviceList.get(0).number);
+                find_common_dev(deviceList.get(2).number);
 
                 break;
             case R.id.button_four_id://找设备
-                find_common_dev(deviceList.get(1).number);
+                find_common_dev(deviceList.get(3).number);
                 break;
             case R.id.find_panel_btn://找面板
                 sraum_find_panel(number);
                 break;
-
         }
     }
 
@@ -356,7 +390,12 @@ public class EditMyDeviceActivity extends Basecactivity {
                 ToastUtil.showToast(EditMyDeviceActivity.this, "输入框不能为空");
             } else {
                 dialogUtil.loadDialog();
-                sraum_update_panel_name(input_panel_name_edit_txt_str, number, false);//更新面板信息
+                if (name.equals(input_panel_name_edit_txt_str)) {
+//                    AppManager.getAppManager().removeActivity_but_activity_cls(MainfragmentActivity.class);
+                    updateDeviceInfo();//更新设备信息
+                } else {
+                    sraum_update_panel_name(input_panel_name_edit_txt_str, number, false);//更新面板信息
+                }
                 //更新面板下的设备列表信息
 //                int count_device = deviceList.size();
                 //updateDeviceInfo();//更新设备信息\
@@ -376,9 +415,18 @@ public class EditMyDeviceActivity extends Basecactivity {
             case "A301"://
             case "A302":
             case "A303":
-                find_device(deviceList.get(0).number);
+            case "A311"://
+            case "A312":
+            case "A313":
+            case "A321"://
+            case "A322":
+            case "A331":
+                find_device(number2);
                 break;
             case "A401":
+            case "A511":
+            case "A611":
+            case "A711":
                 find_device(number2);
                 break;
         }
@@ -456,7 +504,12 @@ public class EditMyDeviceActivity extends Basecactivity {
                 ToastUtil.showToast(EditMyDeviceActivity.this, "输入框不能为空");
             } else {
                 dialogUtil.loadDialog();
-                sraum_update_panel_name(input_panel_name_edit_txt_str, number, false);//更新面板信息
+                if (name.equals(input_panel_name_edit_txt_str)) {
+                    updateDeviceInfo();//更新设备信息
+//                    AppManager.getAppManager().removeActivity_but_activity_cls(MainfragmentActivity.class);
+                } else {
+                    sraum_update_panel_name(input_panel_name_edit_txt_str, number, false);//更新面板信息
+                }
                 //更新面板下的设备列表信息
 //                int count_device = deviceList.size();
                 //updateDeviceInfo();//更新设备信息
@@ -465,7 +518,6 @@ public class EditMyDeviceActivity extends Basecactivity {
             ToastUtil.showToast(EditMyDeviceActivity.this, "所输入内容重复");
         }
     }
-
 
     /**
      * 找面板
@@ -545,7 +597,6 @@ public class EditMyDeviceActivity extends Basecactivity {
         });
     }
 
-
     public String replaceBlank(String src) {
         String dest = "";
         if (src != null) {
@@ -607,11 +658,14 @@ public class EditMyDeviceActivity extends Basecactivity {
                 edit_one.setText(replaceBlank(deviceList.get(0).name));
                 break;
             case "A202"://二灯控
+            case "A311"://二灯控
                 edit_one.setText(replaceBlank(deviceList.get(0).name));
                 edit_two.setText(replaceBlank(deviceList.get(1).name));
 
                 break;
             case "A203"://三灯控
+            case "A312"://三灯控
+            case "A321"://三灯控
                 edit_one.setText(replaceBlank(deviceList.get(0).name));
                 edit_two.setText(replaceBlank(deviceList.get(1).name));
                 edit_three.setText(replaceBlank(deviceList.get(2).name));
@@ -626,6 +680,9 @@ public class EditMyDeviceActivity extends Basecactivity {
             case "A301"://一键调光，3键灯控  设备4个
             case "A302"://两键调光，2键灯控
             case "A303"://三键调光，一键灯控
+            case "A313"://三灯控
+            case "A322"://三灯控
+            case "A331"://三灯控
 //            case "A304"://四键调光
                 edit_one.setText(replaceBlank(deviceList.get(0).name));
                 edit_two.setText(replaceBlank(deviceList.get(1).name));
@@ -642,39 +699,7 @@ public class EditMyDeviceActivity extends Basecactivity {
                 break;//窗帘 ，窗帘第八个按钮为八键灯控名称修改
 
             case "A511":
-                List<Map> list = new ArrayList<>();
-                for (int i = 0; i < deviceList.size(); i++) {
-                    Map map = new HashMap();
-                    map.put("name", "第" + (i + 1) + "个空调名称");
-                    list.add(map);
-                }
-                NormalAdapter normalAdapter = new NormalAdapter(EditMyDeviceActivity.this, list,
-                        deviceList,
-                        new NormalAdapter.BackToMainListener() {
-
-                            @Override
-                            public void sendToMain(List<User.device> strings) {
-//                                deviceList.clear();
-                                deviceList = strings;
-                                for (int i = 0; i < strings.size(); i++) {
-//                                    if (s.name.equals("")) {
-//                                        s.name = "empty";
-//                                    }
-                                    Log.e("zhu", "name:" + deviceList.get(i).name + ",position:" + i);
-                                }
-                            }
-
-                            @Override
-                            public void finddevice(int position) {//找设备
-                                find_common_dev(deviceList.get(position).number);
-                            }
-
-                            @Override
-                            public void srcolltotop(ClearEditText edtInput) {//把edittext推到上面去
-
-                            }
-                        });
-                list_view.setAdapter(normalAdapter);
+                init_common(panelType);
                 break;
             case "A501"://空调-设备1个
             case "A601"://新风
@@ -682,10 +707,63 @@ public class EditMyDeviceActivity extends Basecactivity {
 //                edit_one.setText(deviceList.get(0).name);
                 break;
             default:
-
+                break;
+            case "A611":
+                init_common(panelType);
+                break;
+            case "A711":
+                init_common(panelType);
                 break;
             //updateDeviceInfo();
         }
+    }
+
+    private void init_common(String panelType) {
+        String name = "";
+        switch (panelType) {
+            case "A511":
+                name = "个空调名称";
+                break;
+            case "A611":
+                name = "个新风名称";
+                break;
+            case "A711":
+                name = "个地暖名称";
+                break;
+        }
+        List<Map> list = new ArrayList<>();
+        for (int i = 0; i < deviceList.size(); i++) {
+            Map map = new HashMap();
+            map.put("name", "第" + (i + 1) + name);
+            list.add(map);
+        }
+        NormalAdapter normalAdapter = new NormalAdapter(EditMyDeviceActivity.this, list,
+                deviceList,
+                new NormalAdapter.BackToMainListener() {
+
+                    @Override
+                    public void sendToMain(List<User.device> strings) {
+//                                deviceList.clear();
+                        deviceList = strings;
+                        for (int i = 0; i < strings.size(); i++) {
+//                                    if (s.name.equals("")) {
+//                                        s.name = "empty";
+//                                    }
+                            Log.e("zhu", "name:" + deviceList.get(i).name + ",position:" + i);
+                        }
+                    }
+
+                    @Override
+                    public void finddevice(int position) {//找设备
+                        find_common_dev(deviceList.get(position).number);
+                    }
+
+                    @Override
+                    public void srcolltotop(ClearLengthEditText edtInput) {//把edittext推到上面去
+
+                    }
+                });
+        list_view.setAdapter(normalAdapter);
     }
 
 
@@ -701,12 +779,15 @@ public class EditMyDeviceActivity extends Basecactivity {
                 control_device_name_change_one(edit_one_txt_str, 0);
                 break;
             case "A202"://二灯控
+            case "A311"://二灯控
                 edit_one_txt_str = edit_one.getText().toString().trim();
                 edit_two_txt_str = edit_two.getText().toString().trim();
                 device_index = 1;
                 control_device_name_change_one(edit_one_txt_str, 0);//从0 -1 开始
                 break;
             case "A203"://三灯控
+            case "A312"://二灯控
+            case "A321"://二灯控
                 edit_one_txt_str = edit_one.getText().toString().trim();
                 edit_two_txt_str = edit_two.getText().toString().trim();
                 edit_three_txt_str = edit_three.getText().toString().trim();
@@ -714,6 +795,9 @@ public class EditMyDeviceActivity extends Basecactivity {
                 control_device_name_change_one(edit_one_txt_str, 0);//从0 - 2开始
                 break;
             case "A204"://四灯控
+            case "A313"://二灯控
+            case "A322"://二灯控
+            case "A331"://二灯控
                 edit_one_txt_str = edit_one.getText().toString().trim();
                 edit_two_txt_str = edit_two.getText().toString().trim();
                 edit_three_txt_str = edit_three.getText().toString().trim();
@@ -754,6 +838,8 @@ public class EditMyDeviceActivity extends Basecactivity {
                 //窗帘前3个搞定，最后一个按钮为八键灯控名称修改
                 break;//窗帘 ，窗帘第八个按钮为八键灯控名称修改
             case "A511"://空调模块模块时更新，为列表
+            case "A611"://新风模块模块时更新，为列表
+            case "A711"://地暖模块模块时更新，为列表
                 for (int i = 0; i < deviceList.size(); i++) {
                     sraum_update_others(deviceList.get(i).name, deviceList.get(i).number, i);
                 }
@@ -767,6 +853,9 @@ public class EditMyDeviceActivity extends Basecactivity {
             case "AC01":
             case "AD01":
             case "B001":
+            case "B101":
+            case "B201":
+            case "B301":
                 for (int i = 0; i < deviceList.size(); i++) {
                     input_panel_name_edit_txt_str = input_panel_name_edit.getText().toString().trim() == null
                             || input_panel_name_edit.getText().toString().trim() == "" ? "" : input_panel_name_edit.getText().toString().trim();
@@ -778,14 +867,14 @@ public class EditMyDeviceActivity extends Basecactivity {
                     }
                 }
                 break;
-            case "A601"://新风
-                updateDeviceInfo(edit_one.getText().toString().trim(), "", "",
-                        deviceList.get(0).number, "", 0);
-                break;
-            case "A701"://地暖
-                updateDeviceInfo(edit_one.getText().toString().trim(), "", "",
-                        deviceList.get(0).number, "", 0);
-                break;
+//            case "A611"://新风
+//                updateDeviceInfo(edit_one.getText().toString().trim(), "", "",
+//                        deviceList.get(0).number, "", 0);
+//                break;
+//            case "A711"://地暖
+//                updateDeviceInfo(edit_one.getText().toString().trim(), "", "",
+//                        deviceList.get(0).number, "", 0);
+//                break;
 
             default:
                 break;
@@ -1131,6 +1220,14 @@ public class EditMyDeviceActivity extends Basecactivity {
                 edit_one.setHint("输入第一路灯控自定义名称");
                 edit_two.setHint("输入第二路灯控自定义名称");
                 break;
+            case "A311":
+                linear_one.setVisibility(View.VISIBLE);
+                linear_two.setVisibility(View.VISIBLE);
+                first_txt.setText("第一路调光名称");
+                second_txt.setText("第二路灯控名称");
+                edit_one.setHint("输入第一路调光自定义名称");
+                edit_two.setHint("输入第二路灯控自定义名称");
+                break;
             case "A203":
                 linear_one.setVisibility(View.VISIBLE);
                 linear_two.setVisibility(View.VISIBLE);
@@ -1141,6 +1238,43 @@ public class EditMyDeviceActivity extends Basecactivity {
                 edit_one.setHint("输入第一路灯控自定义名称");
                 edit_two.setHint("输入第二路灯控自定义名称");
                 edit_three.setHint("输入第三路灯控自定义名称");
+                break;
+            case "A312":
+                linear_one.setVisibility(View.VISIBLE);
+                linear_two.setVisibility(View.VISIBLE);
+                linear_three.setVisibility(View.VISIBLE);
+                first_txt.setText("第一路调光名称");
+                second_txt.setText("第二路灯控名称");
+                three_txt.setText("第三路灯控名称");
+                edit_one.setHint("输入第一路调光自定义名称");
+                edit_two.setHint("输入第二路灯控自定义名称");
+                edit_three.setHint("输入第三路灯控自定义名称");
+                break;
+            case "A321":
+                linear_one.setVisibility(View.VISIBLE);
+                linear_two.setVisibility(View.VISIBLE);
+                linear_three.setVisibility(View.VISIBLE);
+                first_txt.setText("第一路调光名称");
+                second_txt.setText("第二路调光名称");
+                three_txt.setText("第三路灯控名称");
+                edit_one.setHint("输入第一路调光自定义名称");
+                edit_two.setHint("输入第二路调光自定义名称");
+                edit_three.setHint("输入第三路灯控自定义名称");
+                break;
+            case "A322":
+                common_second("第一路调光名称", "第二路调光名称", "第三路灯控名称", "第四路灯控名称",
+                        "输入第一路调光自定义名称", "输入第二路调光自定义名称", "输入第三路灯控自定义名称",
+                        "输入第四路灯控自定义名称");
+                break;
+            case "A331":
+                common_second("第一路调光名称", "第二路调光名称", "第三路调光名称", "第四路灯控名称",
+                        "输入第一路调光自定义名称", "输入第二路调光自定义名称", "输入第三路调光自定义名称",
+                        "输入第四路灯控自定义名称");
+                break;
+            case "A313":
+                common_second("第一路调光名称", "第二路灯控名称", "第三路灯控名称", "第四路灯控名称",
+                        "输入第一路调光自定义名称", "输入第二路灯控自定义名称", "输入第三路灯控自定义名称",
+                        "输入第四路灯控自定义名称");
                 break;
             case "A204":
                 common_second("第一路灯控名称", "第二路灯控名称", "第三路灯控名称", "第四路灯控名称",
@@ -1168,6 +1302,8 @@ public class EditMyDeviceActivity extends Basecactivity {
                         "输入第八路灯控自定义名称");
                 break;
             case "A511"://空调模块时列表
+            case "A611"://空调模块时列表
+            case "A711"://空调模块时列表
 //                init_air_mode();
                 list_for_air_mode.setVisibility(View.VISIBLE);
                 break;
@@ -1184,11 +1320,14 @@ public class EditMyDeviceActivity extends Basecactivity {
             case "AD02":
             case "B001":
             case "B201":
+            case "B101":
             case "B202":
             case "B301":
             case "AA02":
             case "202":
             case "206":
+            case "AA03":
+            case "AA04":
                 find_panel_btn.setVisibility(View.GONE);
                 break;
         }

@@ -16,6 +16,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.Util.ClearEditText;
+import com.Util.ClearLengthEditText;
 import com.data.User;
 import com.massky.sraum.R;
 
@@ -65,7 +66,7 @@ public class NormalAdapter extends BaseAdapter {
                     R.layout.item
                     , null);
             mHolder = new Holder();
-            mHolder.edtInput = (ClearEditText) convertView
+            mHolder.edtInput = (ClearLengthEditText) convertView
                     .findViewById(R.id.edtGroupContent);
             mHolder.button_one_id = (Button) convertView.findViewById(R.id.button_one_id);
             mHolder.first_txt = (TextView) convertView.findViewById(R.id.first_txt);
@@ -160,7 +161,7 @@ public class NormalAdapter extends BaseAdapter {
     }
 
     private static final class Holder {
-        ClearEditText edtInput;
+        ClearLengthEditText edtInput;
         Button button_one_id;
         TextView first_txt;
     }
@@ -170,7 +171,7 @@ public class NormalAdapter extends BaseAdapter {
 
         void finddevice(int position);
 
-        void  srcolltotop(ClearEditText edtInput);
+        void  srcolltotop(ClearLengthEditText edtInput);
     }
 
 }

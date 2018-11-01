@@ -301,7 +301,7 @@ public class MacdetailActivity extends Basecactivity {
             @Override
             public void wrongBoxnumber() {
                 super.wrongBoxnumber();
-                ToastUtil.showDelToast(MacdetailActivity.this, "网关不正确");
+                ToastUtil.showDelToast(MacdetailActivity.this, "不存在");
             }
 
             @Override

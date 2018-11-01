@@ -14,6 +14,7 @@ import com.AddTogenInterface.AddTogglenInterfacer;
 import com.Util.ApiHelper;
 import com.Util.AppManager;
 import com.Util.ClearEditText;
+import com.Util.ClearLengthEditText;
 import com.Util.DialogUtil;
 import com.Util.IntentUtil;
 import com.Util.MyOkHttp;
@@ -51,28 +52,26 @@ public class ChangePanelAndDeviceActivity extends Basecactivity {
     TextView fourkey_device;
 
     @InjectView(R.id.onekey_device_txt)
-    ClearEditText onekey_device_txt;
+    ClearLengthEditText onekey_device_txt;
     @InjectView(R.id.twokey_device_txt)
-    ClearEditText twokey_device_txt;
+    ClearLengthEditText twokey_device_txt;
     @InjectView(R.id.threekey_device_txt)
-    ClearEditText threekey_device_txt;
+    ClearLengthEditText threekey_device_txt;
     @InjectView(R.id.fourkey_device_txt)
-    ClearEditText fourkey_device_txt;
+    ClearLengthEditText fourkey_device_txt;
 
     @InjectView(R.id.panelmac)
     TextView panelmac;
     @InjectView(R.id.paneltype)
     TextView paneltype;
     @InjectView(R.id.panelname)
-    ClearEditText panelname;
+    ClearLengthEditText panelname;
     @InjectView(R.id.titlecen_id)
     TextView titlecen_id;//面板标题
     @InjectView(R.id.save_panel)
     TextView save_panel;
-
     @InjectView(R.id.backrela_id)
     RelativeLayout backrela_id;
-
     @InjectView(R.id.findpanel)
     ImageButton findpanel;
     private List<User.panellist> panelList = new ArrayList<>();
@@ -125,16 +124,22 @@ public class ChangePanelAndDeviceActivity extends Basecactivity {
                 onekey_device_txt.setText(deviceList.get(0).name);
                 break;
             case "A202"://二灯控
+            case "A311":
                 onekey_device_txt.setText(deviceList.get(0).name);
                 twokey_device_txt.setText(deviceList.get(1).name);
 
                 break;
             case "A203"://三灯控
+            case "A312":
+            case "A321":
                 onekey_device_txt.setText(deviceList.get(0).name);
                 twokey_device_txt.setText(deviceList.get(1).name);
                 threekey_device_txt.setText(deviceList.get(2).name);
                 break;
             case "A204"://四灯控
+            case "A313":
+            case "A322":
+            case "A331":
                 onekey_device_txt.setText(deviceList.get(0).name);
                 twokey_device_txt.setText(deviceList.get(1).name);
                 threekey_device_txt.setText(deviceList.get(2).name);
@@ -148,7 +153,7 @@ public class ChangePanelAndDeviceActivity extends Basecactivity {
                 onekey_device_txt.setText(deviceList.get(0).name);
                 twokey_device_txt.setText(deviceList.get(1).name);
                 threekey_device_txt.setText(deviceList.get(2).name);
-                fourkey_device_txt.setText(deviceList.get(3).name);
+                fourkey_device_txt.setText(deviceList.get(3).name);//-----
                 break;//一键-4键调光
 
             case "A401"://设备2个
@@ -222,7 +227,7 @@ public class ChangePanelAndDeviceActivity extends Basecactivity {
      *
      * @param type
      */
-    private void show_device_from_panel(String type) {
+    private void show_device_from_panel(String type) { //
         switch (type) {
             case "A201"://一灯控
                 show_one_item();
@@ -233,6 +238,45 @@ public class ChangePanelAndDeviceActivity extends Basecactivity {
                 onekey_device.setText("一路灯控名称");
                 twokey_device.setText("二路灯控名称");
                 break;
+            case "A311"://二灯控
+                show_two_item();
+                onekey_device.setText("一路调光名称");
+                twokey_device.setText("一路灯控名称");
+                break;
+            case "A312"://二灯控
+                show_three_item();
+                onekey_device.setText("一路调光名称");
+                twokey_device.setText("一路灯控名称");
+                threekey_device.setText("二路灯控名称");
+                break;
+            case "A313"://二灯控
+                show_three_item();
+                onekey_device.setText("一路调光名称");
+                twokey_device.setText("一路灯控名称");
+                threekey_device.setText("二路灯控名称");
+                fourkey_device.setText("三路灯控名称");
+                break;
+            case "A321"://二灯控
+                show_three_item();
+                onekey_device.setText("一路调光名称");
+                twokey_device.setText("二路调光名称");
+                threekey_device.setText("一路灯控名称");
+                break;
+            case "A322"://二灯控
+                four_all_show();
+                onekey_device.setText("一路调光名称");
+                twokey_device.setText("二路调光名称");
+                threekey_device.setText("一路灯控名称");
+                fourkey_device.setText("二路灯控名称");
+                break;
+            case "A331"://二灯控
+                four_all_show();
+                onekey_device.setText("一路调光名称");
+                twokey_device.setText("二路调光名称");
+                threekey_device.setText("三路调光名称");
+                fourkey_device.setText("一路灯控名称");
+                break;
+
             case "A203"://三灯控
                 show_three_item();
                 onekey_device.setText("一路灯控名称");
@@ -345,130 +389,6 @@ public class ChangePanelAndDeviceActivity extends Basecactivity {
                 break;
         }
     }
-
-    /**
-     * 添加面板下的设备信息
-     */
-    private void getPanel_devices() {
-        Map<String, Object> map = new HashMap<>();
-        map.put("token", TokenUtil.getToken(ChangePanelAndDeviceActivity.this));
-        map.put("boxNumber", TokenUtil.getBoxnumber(ChangePanelAndDeviceActivity.this));
-        map.put("panelNumber", panelNumber);
-        MyOkHttp.postMapObject(ApiHelper.sraum_getPanelDevices, map,
-                new Mycallback(new AddTogglenInterfacer() {
-                    @Override
-                    public void addTogglenInterfacer() {
-                        getPanel_devices();
-                    }
-                }, ChangePanelAndDeviceActivity.this, dialogUtil) {
-
-                    @Override
-                    public void onError(Call call, Exception e, int id) {
-                        super.onError(call, e, id);
-                    }
-
-                    @Override
-                    public void onSuccess(User user) {
-                        super.onSuccess(user);
-                        panelList.clear();
-                        deviceList.clear();
-                        deviceList.addAll(user.deviceList);
-
-                        //面板的详细信息
-                        panelType = user.panelType;
-                        panelName = user.panelName;
-                        panelMAC = user.panelMAC;
-                        panelmac.setText(panelMAC);
-                        panelname.setText(panelName);
-                        paneltype.setText(panelType);
-                        Log.e("robin debug", " panelType:" + panelType + ",panelName:" + panelName);
-                        show_device_from_panel(panelType);
-//                        //在这里显示设备列表信息
-//                        switch (deviceList.size()) {
-//                            case 1:
-//                                onekey_device_txt.setText(deviceList.get(0).deviceName);
-//                                break;
-//                            case 2:
-//                                onekey_device_txt.setText(deviceList.get(0).deviceName);
-//                                twokey_device_txt.setText(deviceList.get(1).deviceName);
-//                                break;
-//                            case 3:
-//                                onekey_device_txt.setText(deviceList.get(0).deviceName);
-//                                twokey_device_txt.setText(deviceList.get(1).deviceName);
-//                                threekey_device_txt.setText(deviceList.get(2).deviceName);
-//                                break;
-//                            case 4:
-//                                onekey_device_txt.setText(deviceList.get(0).deviceName);
-//                                twokey_device_txt.setText(deviceList.get(1).deviceName);
-//                                threekey_device_txt.setText(deviceList.get(2).deviceName);
-//                                fourkey_device_txt.setText(deviceList.get(3).deviceName);
-//                                break;
-//                        }
-//                    }
-
-
-                        panel_and_device_information();
-                    }
-
-                    @Override
-                    public void wrongToken() {
-                        super.wrongToken();
-                    }
-                });
-    }
-
-//    private void getData() {
-//        Map<String, Object> map = new HashMap<>();
-//        map.put("token", TokenUtil.getToken(ChangePanelAndDeviceActivity.this));
-//        map.put("boxNumber", TokenUtil.getBoxnumber(ChangePanelAndDeviceActivity.this));
-//
-//        MyOkHttp.postMapObject(ApiHelper.sraum_getAllPanel, map,
-//                new Mycallback(new AddTogglenInterfacer() {
-//                    @Override
-//                    public void addTogglenInterfacer() {
-//                        getData();
-//                    }
-//                }, ChangePanelAndDeviceActivity.this, dialogUtil) {
-//
-//                    @Override
-//                    public void onError(Call call, Exception e, int id) {
-//                        super.onError(call, e, id);
-//                    }
-//
-//                    @Override
-//                    public void onSuccess(User user) {
-//                        super.onSuccess(user);
-//                        panelList.clear();
-//                        panelList = user.panelList;
-//
-//                        for (int i = 0; i < panelList.size(); i++) {
-//                            if (panelid.equals(panelList.get(i).id)) {//找到该面板
-//                                //
-//
-//                                //显示面板信息
-//
-////                                @InjectView(R.id.panelmac)
-////                                TextView panelmac;
-////                                @InjectView(R.id.paneltype)
-////                                TextView paneltype;
-////                                @InjectView(R.id.panelname)
-////                                ClearEditText panelname;
-//                                panel_position = i;
-//                                panelmac.setText(panelList.get(i).mac);
-//                                paneltype.setText(panelList.get(i).type);
-//                                panelname.setText(panelList.get(i).name);
-//
-//                                show_device_from_panel(panelList.get(i).type);
-//                            }
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void wrongToken() {
-//                        super.wrongToken();
-//                    }
-//                });
-//    }
 
     /**
      * 显示三个
@@ -674,12 +594,15 @@ public class ChangePanelAndDeviceActivity extends Basecactivity {
                 control_device_name_change_one(onekey_device_txt_str, 0);
                 break;
             case "A202"://二灯控
+            case "A311"://二灯控
                 onekey_device_txt_str = onekey_device_txt.getText().toString().trim();
                 twokey_device_txt_str = twokey_device_txt.getText().toString().trim();
                 device_index = 1;
                 control_device_name_change_one(onekey_device_txt_str, 0);//从0 -1 开始
                 break;
             case "A203"://三灯控
+            case "A312"://二灯控
+            case "A321"://二灯控
                 onekey_device_txt_str = onekey_device_txt.getText().toString().trim();
                 twokey_device_txt_str = twokey_device_txt.getText().toString().trim();
                 threekey_device_txt_str = threekey_device_txt.getText().toString().trim();
@@ -687,6 +610,9 @@ public class ChangePanelAndDeviceActivity extends Basecactivity {
                 control_device_name_change_one(onekey_device_txt_str, 0);//从0 - 2开始
                 break;
             case "A204"://四灯控
+            case "A313"://二灯控
+            case "A322"://二灯控
+            case "A331"://二灯控
                 onekey_device_txt_str = onekey_device_txt.getText().toString().trim();
                 twokey_device_txt_str = twokey_device_txt.getText().toString().trim();
                 threekey_device_txt_str = threekey_device_txt.getText().toString().trim();
@@ -881,7 +807,7 @@ public class ChangePanelAndDeviceActivity extends Basecactivity {
             @Override
             public void wrongBoxnumber() {
                 super.wrongBoxnumber();
-                select_device_byway("网关不正确");
+                select_device_byway("不存在");
             }
 
             @Override
