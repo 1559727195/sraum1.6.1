@@ -14,16 +14,14 @@ android {
         applicationId "com.massky.sraum"
         minSdkVersion 15
         targetSdkVersion 28
-        versionCode 22
-
-
-        versionName "1.8.6"  //最新23,1.8.6
+        versionCode 25
+        versionName "1.8.8"  //最新25,1.8.8
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         //添加如下配置就OK了
         /* Enabling multidex support.*/
         ndk {
             //设置支持的SO库架构
-            abiFilters 'armeabi', 'armeabi-v7a' //, 'x86', , 'x86_64', 'arm64-v8a'方便去除模擬器的，縮小apk體積
+            abiFilters 'armeabi', 'armeabi-v7a', 'x86'//, , 'x86_64', 'arm64-v8a'方便去除模擬器的，縮小apk體積
         }
         javaCompileOptions { annotationProcessorOptions { includeCompileClasspath = true } }
 //        multiDexEnabled true//设置
@@ -32,6 +30,7 @@ android {
     }
 
     buildTypes {
+
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -47,7 +46,6 @@ android {
         checkReleaseBuilds false
         abortOnError false
     }
-
 }
 
 repositories {
@@ -129,5 +127,8 @@ dependencies {
     implementation files('libs/jpush-android-3.1.6.jar')
 //    implementation 'com.jakewharton:butterknife:8.8.1'
 //    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+
+    implementation 'com.squareup.retrofit2:retrofit:2.0.2'
+    implementation 'com.squareup.retrofit2:converter-gson:2.0.2'
 
 }
