@@ -14,8 +14,8 @@ android {
         applicationId "com.massky.sraum"
         minSdkVersion 15
         targetSdkVersion 28
-        versionCode 25
-        versionName "1.8.8"  //最新25,1.8.8
+        versionCode 26
+        versionName "1.8.9"  //最新26,1.8.9
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         //添加如下配置就OK了
         /* Enabling multidex support.*/

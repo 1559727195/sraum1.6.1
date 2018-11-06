@@ -90,7 +90,7 @@ public class SelectZigbeeDeviceActivity extends Basecactivity {
     private int[] iconName = {R.string.yijianlight, R.string.liangjianlight, R.string.sanjianlight, R.string.sijianlight,
             R.string.yilutiaoguang1, R.string.lianglutiaoguang1, R.string.sanlutiao1, R.string.window_panel1
             , R.string.menci, R.string.rentiganying, R.string.jiuzuo, R.string.yanwu, R.string.tianranqi, R.string.jinjin_btn,
-            R.string.zhineng, R.string.pm25, R.string.shuijin, R.string.duogongneng,R.string.cha_zuo_1
+            R.string.zhineng, R.string.pm25, R.string.shuijin, R.string.duogongneng,R.string.cha_zuo_2
     };
     private SelectWifiDevAdapter adapter_wifi;
     private DialogUtil dialogUtil;

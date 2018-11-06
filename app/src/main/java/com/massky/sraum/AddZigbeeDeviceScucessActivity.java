@@ -11,10 +11,13 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.TextView;
+
 import com.AddTogenInterface.AddTogglenInterfacer;
 import com.Util.ApiHelper;
 import com.Util.AppManager;
 import com.Util.ClearEditText;
+import com.Util.ClearLengthEditText;
 import com.Util.DialogUtil;
 import com.Util.MyOkHttp;
 import com.Util.Mycallback;
@@ -24,12 +27,15 @@ import com.base.Basecactivity;
 import com.data.User;
 import com.yanzhenjie.statusview.StatusUtils;
 import com.yanzhenjie.statusview.StatusView;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import butterknife.InjectView;
 import okhttp3.Call;
+
 import static com.Util.ClearEditText.dip2px;
 
 /**
@@ -54,9 +60,22 @@ public class AddZigbeeDeviceScucessActivity extends Basecactivity {
     private String deviceNumber;
     private String panelMAC;
     @InjectView(R.id.dev_name)
-    ClearEditText dev_name;
+    ClearLengthEditText dev_name;
     @InjectView(R.id.btn_login_gateway)
     Button btn_login_gateway;
+
+
+    private int[] iconName = {R.string.yijianlight, R.string.liangjianlight, R.string.sanjianlight, R.string.sijianlight,
+            R.string.yilutiaoguang, R.string.lianglutiaoguang, R.string.sanlutiao, R.string.window_panel, R.string.air_panel,
+            R.string.air_mode, R.string.xinfeng_mode, R.string.dinuan_mode
+            , R.string.menci, R.string.rentiganying, R.string.jiuzuo, R.string.yanwu, R.string.tianranqi, R.string.jinjin_btn,
+            R.string.zhineng, R.string.pm25, R.string.shuijin, R.string.jixieshou, R.string.cha_zuo_1, R.string.cha_zuo, R.string.wifi_hongwai,
+            R.string.wifi_camera, R.string.one_light_control, R.string.two_light_control, R.string.three_light_control
+            , R.string.two_dimming_one_control, R.string.two_dimming_two_control, R.string.two_dimming_trhee_control, R.string.keshimenling
+    };
+    private TextView type_txt;
+    private TextView mac_txt;
+
 
     @Override
     protected int viewId() {
@@ -73,7 +92,7 @@ public class AddZigbeeDeviceScucessActivity extends Basecactivity {
         dialogUtil = new DialogUtil(this);
         next_step_txt.setOnClickListener(this);
         StatusUtils.setFullToStatusBar(this);  // StatusBar.
-//        get_panel_detail();
+        get_panel_detail();
     }
 
 
@@ -99,6 +118,11 @@ public class AddZigbeeDeviceScucessActivity extends Basecactivity {
         try {
             View view = LayoutInflater.from(AddZigbeeDeviceScucessActivity.this).inflate(
                     R.layout.add_devsucesspopupwindow, null);
+            type_txt = (TextView) view.findViewById(R.id.type);
+//           //mac
+            mac_txt = (TextView) view.findViewById(R.id.mac);
+            set_type(panelType);
+            mac_txt.setText(panelMAC);
             popupWindow = new PopupWindow(view, WindowManager.LayoutParams.WRAP_CONTENT,
                     WindowManager.LayoutParams.WRAP_CONTENT);
             popupWindow.setFocusable(true);
@@ -124,6 +148,134 @@ public class AddZigbeeDeviceScucessActivity extends Basecactivity {
         }
     }
 
+    /**
+     * 根据面板类型命名
+     *
+     * @param type
+     */
+    private void set_type(String type) {
+        switch (type) {
+            case "A201":
+                type_txt.setText(iconName[0]);
+                break;
+            case "A202":
+                type_txt.setText(iconName[1]);
+                break;
+            case "A203":
+                type_txt.setText(iconName[2]);
+                break;
+            case "A204":
+                type_txt.setText(iconName[3]);
+                break;
+            case "A301":
+                type_txt.setText(iconName[4]);
+                break;
+            case "A302":
+                type_txt.setText(iconName[5]);
+                break;
+            case "A303":
+                type_txt.setText(iconName[6]);
+                break;
+            case "A401":
+                type_txt.setText(iconName[7]);
+                break;
+            case "A501":
+                type_txt.setText(iconName[8]);
+                break;
+            case "A511":
+                type_txt.setText(iconName[9]);
+                break;
+            case "A611":
+                type_txt.setText(iconName[10]);
+                break;
+            case "A711":
+                type_txt.setText(iconName[11]);
+                break;
+            case "A801":
+                type_txt.setText(iconName[12]);
+                break;
+            case "A901":
+                type_txt.setText(iconName[13]);
+                break;
+            case "A902":
+                type_txt.setText(iconName[14]);
+                break;
+            case "AB01":
+                type_txt.setText(iconName[15]);
+                break;
+            case "AB04":
+                type_txt.setText(iconName[16]);
+                break;
+            case "B001":
+                type_txt.setText(iconName[17]);
+                break;
+            case "B201":
+                type_txt.setText(iconName[18]);
+                break;
+            case "AD01":
+                type_txt.setText(iconName[19]);
+                break;
+            case "AC01":
+                type_txt.setText(iconName[20]);
+                break;
+            case "B301":
+                type_txt.setText(iconName[21]);
+                break;
+            case "B101":
+                type_txt.setText(iconName[22]);
+                break;
+            case "B102":
+                type_txt.setText(iconName[23]);
+                break;
+            case "AA02"://WIFI转发模块
+                type_txt.setText(iconName[24]);
+//                rel_yaokongqi.setVisibility(View.VISIBLE);
+//                view_yaokongqi.setVisibility(View.VISIBLE);
+//                dev_txt.setText("WIFI");
+//                banben_txt.setText(panelItem_map.get("wifi").toString());
+//                //controllerId
+//                mac_txt.setText(panelItem_map.get("controllerId").toString());
+                break;
+
+            case "AA03"://WIFI转发模块
+                type_txt.setText(iconName[25]);
+//                dev_txt.setText("WIFI");
+//                banben_txt.setText(panelItem_map.get("wifi").toString());
+//                //controllerId
+//                mac_txt.setText(panelItem_map.get("controllerId").toString());
+                break;
+            case "A311":
+                type_txt.setText(iconName[26]);
+                break;
+            case "A312":
+                type_txt.setText(iconName[27]);
+                break;
+            case "A313":
+                type_txt.setText(iconName[28]);
+                break;
+            case "A321":
+                type_txt.setText(iconName[29]);
+                break;
+            case "A322":
+                type_txt.setText(iconName[30]);
+                break;
+            case "A331":
+                type_txt.setText(iconName[31]);
+                break;
+            case "AA04"://WIFI转发模块
+                type_txt.setText(iconName[32]);
+//                dev_txt.setText("WIFI");
+//                banben_txt.setText(panelItem_map.get("wifi").toString());
+//                //controllerId
+//                mac_txt.setText(panelItem_map.get("controllerId").toString());
+                break;
+
+        }
+
+
+    }
+
+
     // 设置popupWindow背景半透明
     public void backgroundAlpha(float bgAlpha) {
         WindowManager.LayoutParams lp = getWindow().getAttributes();
@@ -143,7 +295,8 @@ public class AddZigbeeDeviceScucessActivity extends Basecactivity {
         panelType = getIntent().getStringExtra("panelType");
         panelName = getIntent().getStringExtra("panelName");
         panelMAC = getIntent().getStringExtra("panelMAC");
-        dev_name.setText(panelName);
+        if (panelName != null)
+            dev_name.setText(panelName);
     }
 
     /**

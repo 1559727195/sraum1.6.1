@@ -6,8 +6,8 @@ package com.Util;
 //sraum API的调用
 public class ApiHelper {
 
-    public static String api = "https://test.sraum.com/SmartHome/";//
-//    public static String api = "https://app.sraum.com/SmartHome/";//正式：
+//    public static String api = "https://test.sraum.com/SmartHome/";//
+        public static String api = "https://app.sraum.com/SmartHome/";//正式：
     public static String sraum_register = api + "sraum_register";
     public static String sraum_getToken = api + "sraum_getToken";
     public static String sraum_checkMobilePhone = api + "sraum_checkMobilePhone";
@@ -47,7 +47,9 @@ public class ApiHelper {
     public static String sraum_changeBox = api + "sraum_changeBox";
     public static String sraum_updatePanelName = api + "sraum_updatePanelName";
     public static String sraum_deletePanel = api + "sraum_deletePanel";
-    public static String UpdateApkUrl = "https://app.sraum.com/version/";
+    //    public static String UpdateApkUrl = "https://app.sraum.com/version/";
+    //https://massky-download.oss-cn-hangzhou.aliyuncs.com/
+    public static String UpdateApkUrl = "https://massky-download.oss-cn-hangzhou.aliyuncs.com/";
     public static String sraum_isLogin = api + "sraum_isLogin";
     public static String sraum_setBox = api + "sraum_setBox";
     public static String sraum_getPanelDevices = api + "sraum_getPanelDevices";

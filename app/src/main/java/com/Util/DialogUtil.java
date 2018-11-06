@@ -1,10 +1,10 @@
 package com.Util;
 
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -26,20 +26,24 @@ public class DialogUtil {
     private int bottom;
     private Dialog progressDialog;
     private boolean cantrue;
+    private Handler handler;
 
     public DialogUtil(Context context) {
         this.context = context;
+        handler = new Handler();
     }
 
     public DialogUtil(Context context, View view) {
         this.context = context;
         this.view = view;
+        handler = new Handler();
     }
 
     public DialogUtil(Context context, View viewbottom, int bottom) {
         this.context = context;
         this.viewbottom = viewbottom;
         this.bottom = bottom;
+        handler = new Handler();
     }
 
     /*用于加载progressbar dialog*/
@@ -140,16 +144,21 @@ public class DialogUtil {
 
     /*网络加载dialog移除*/
     public void removeDialog() {
-        if (progressDialog != null) {
-            if (progressDialog.isShowing()) {
-                Activity activity = (Activity) context;
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        progressDialog.dismiss();
-                    }
-                });
+        // 构建Runnable对象，在runnable中更新界面
+        final Runnable runnableUi = new Runnable() {
+            @Override
+            public void run() {
+                //更新界面
+                if (progressDialog != null) {
+                    progressDialog.dismiss();
+                }
             }
-        }
+        };
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                handler.post(runnableUi);
+            }
+        }).start();
     }
 }

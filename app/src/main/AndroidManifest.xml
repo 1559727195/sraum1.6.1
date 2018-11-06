@@ -167,7 +167,7 @@
         <activity
             android:name=".MainfragmentActivity"
             android:launchMode="singleTask"
-            android:screenOrientation="portrait"></activity>
+         ></activity>
 
         <activity
             android:name=".SelectYaoKongQiActivity"
@@ -195,7 +195,6 @@
         <activity
             android:name=".SearchgatewayActivity"
             android:launchMode="singleTask"
-            android:screenOrientation="portrait"
             android:theme="@style/otherPageStyle"></activity>
         <activity
             android:name=".GatedetailActivity"

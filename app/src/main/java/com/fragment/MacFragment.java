@@ -999,7 +999,7 @@ public class MacFragment extends Basecfragment implements
                 mapdevice.put("status", "0");
                 break;
             case "15":
-            case "17":
+//            case "17":
                 mapdevice.put("status", "1");
                 break;
             default:
@@ -1264,9 +1264,15 @@ public class MacFragment extends Basecfragment implements
      * 获取门磁等第三方设备
      */
     private void getOtherDevices() { // ----
-        if (dialogUtil != null) {
-            dialogUtil.loadDialog();
-        }
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (dialogUtil != null) {
+                    dialogUtil.loadDialog();
+                }
+            }
+        });
+
         Map<String, String> mapdevice = new HashMap<>();
         mapdevice.put("token", TokenUtil.getToken(getActivity()));
 //        mapdevice.put("boxNumber", TokenUtil.getBoxnumber(SelectSensorActivity.this));
@@ -1741,6 +1747,7 @@ public class MacFragment extends Basecfragment implements
                 super.onSuccess(user);
                 switch (user.status) {
                     case "1":
+                    case "17":
                         sraum_device_control(mapdevice);
                         break;
                     case "0":
@@ -2032,7 +2039,7 @@ public class MacFragment extends Basecfragment implements
 
                     init_Camera(did);
 
-              /*      textView_top_show.setText(getResources().getString(resid));*/
+                    /*      textView_top_show.setText(getResources().getString(resid));*/
                     if (msgParam == ContentCommon.PPPP_STATUS_ON_LINE) {
                         NativeCaller.PPPPGetSystemParams(did, ContentCommon.MSG_TYPE_GET_PARAMS);
                     }
@@ -2144,7 +2151,7 @@ public class MacFragment extends Basecfragment implements
 
     private void test() {
         Map map1 = JSON.parseObject("{\"CREATOR\":{},\"MSG_RECV\":5,\"XPGWifiDeviceHardwareFirmwareIdKey\":\"firmwareId\",\"XPGWifiDeviceHardwareFirmwareVerKey\":\"firmwareVer\",\"XPGWifiDeviceHardwareMCUHardVerKey\":\"mcuHardVer\",\"XPGWifiDeviceHardwareMCUSoftVerKey\":\"mcuSoftVer\",\"XPGWifiDeviceHardwareProductKey\":\"productKey\",\"XPGWifiDeviceHardwareWifiHardVerKey\":\"wifiHardVer\",\"XPGWifiDeviceHardwareWifiSoftVerKey\":\"wifiSoftVer\",\"alias\":\"\",\"app_sn_queue\":[],\"dest\":{\"blobAshmemSize\":0},\"deviceMcuFirmwareVer\":\"\",\"deviceModuleFirmwareVer\":\"\",\"did\":\"KSgszGjyN9cNyVfUuAYRLo\",\"flags\":0,\"han\":{\"looper\":{\"currentThread\":false,\"queue\":{\"idle\":true,\"polling\":true},\"thread\":{\"alive\":true,\"daemon\":false,\"id\":1,\"interrupted\":false,\"name\":\"main\",\"priority\":5,\"stackTrace\":[{\"className\":\"android.os.MessageQueue\",\"fileName\":\"MessageQueue.java\",\"lineNumber\":-2,\"methodName\":\"nativePollOnce\",\"nativeMethod\":true},{\"className\":\"android.os.MessageQueue\",\"fileName\":\"MessageQueue.java\",\"lineNumber\":356,\"methodName\":\"next\",\"nativeMethod\":false},{\"className\":\"android.os.Looper\",\"fileName\":\"Looper.java\",\"lineNumber\":138,\"methodName\":\"loop\",\"nativeMethod\":false},{\"className\":\"android.app.ActivityThread\",\"fileName\":\"ActivityThread.java\",\"lineNumber\":6523,\"methodName\":\"main\",\"nativeMethod\":false},{\"className\":\"java.lang.reflect.Method\",\"fileName\":\"Method.java\",\"lineNumber\":-2,\"methodName\":\"invoke\",\"nativeMethod\":true},{\"className\":\"com.android.internal.os.ZygoteInit$MethodAndArgsCaller\",\"fileName\":\"ZygoteInit.java\",\"lineNumber\":942,\"methodName\":\"run\",\"nativeMethod\":false},{\"className\":\"com.android.internal.os.ZygoteInit\",\"fileName\":\"ZygoteInit.java\",\"lineNumber\":832,\"methodName\":\"main\",\"nativeMethod\":false}],\"state\":\"RUNNABLE\",\"threadGroup\":{\"daemon\":false,\"destroyed\":false,\"maxPriority\":10,\"name\":\"main\",\"parent\":{\"daemon\":false,\"destroyed\":false,\"maxPriority\":10,\"name\":\"system\"}},\"uncaughtExceptionHandler\":{\"$ref\":\"$.han.looper.thread.threadGroup\"}}}},\"hand\":{\"looper\":{\"$ref\":\"$.han.looper\"}},\"handler\":{\"looper\":{\"$ref\":\"$.han.looper\"}},\"hasProductDefine\":true,\"ipAddress\":\"192.168.169.219\",\"isBind\":false,\"isDisabled\":false,\"isLAN\":true,\"loginning\":false,\"logintimeout\":0,\"mListener\":{},\"macAddress\":\"5CCF7FB6C07C\",\"netStatus\":\"GizDeviceOnline\",\"notify_status_sn\":0,\"oldIsConnected\":false,\"oldIsOnline\":true,\"productKey\":\"0f998d408465430ea435b48f58a7ac3b\",\"productName\":\"小苹果\",\"productType\":\"GizDeviceNormal\",\"productUI\":\"{\\\"object\\\":{\\\"version\\\":4,\\\"showEditButton\\\":false},\\\"sections\\\":[{\\\"elements\\\":[{\\\"boolValue\\\":false,\\\"object\\\":{\\\"action\\\":\\\"entity0\\\",\\\"bind\\\":[\\\"entity0.switch\\\"],\\\"perm\\\":\\\"W\\\"},\\\"type\\\":\\\"QBooleanElement\\\",\\\"key\\\":\\\"entity0.switch\\\",\\\"title\\\":\\\"开关（未使用）\\\"},{\\\"items\\\":[\\\"低风\\\",\\\"中风\\\",\\\"高风\\\"],\\\"object\\\":{\\\"action\\\":\\\"entity0\\\",\\\"bind\\\":[\\\"entity0.fan_speed\\\"],\\\"perm\\\":\\\"W\\\"},\\\"type\\\":\\\"QRadioElement\\\",\\\"key\\\":\\\"entity0.fan_speed\\\",\\\"title\\\":\\\"风速（未使用）\\\"},{\\\"keyboardType\\\":\\\"NumbersAndPunctuation\\\",\\\"title\\\":\\\"遥控码\\\",\\\"object\\\":{\\\"action\\\":\\\"entity0\\\",\\\"bind\\\":[\\\"entity0.cmd_key\\\"],\\\"perm\\\":\\\"W\\\"},\\\"value\\\":0,\\\"key\\\":\\\"entity0.cmd_key\\\",\\\"maxLength\\\":1800,\\\"type\\\":\\\"QMultilineElement\\\"},{\\\"object\\\":{\\\"action\\\":\\\"entity0\\\",\\\"bind\\\":[\\\"entity0.room_temp\\\"],\\\"uint_spec\\\":{\\\"max\\\":35,\\\"step\\\":1,\\\"min\\\":-10},\\\"perm\\\":\\\"N\\\"},\\\"type\\\":\\\"QLabelElement\\\",\\\"key\\\":\\\"entity0.room_temp\\\",\\\"title\\\":\\\"室内温度（未使用）\\\"}]}]}\",\"remark\":\"\",\"sharingRole\":\"GizDeviceSharingNormal\",\"subscribed\":true}");
-/*        mGizWifiDevice = EntityUtils.mapToEntity(map1, GizWifiDevice.CREATOR);*/
+        /*        mGizWifiDevice = EntityUtils.mapToEntity(map1, GizWifiDevice.CREATOR);*/
 //        parcel.setDataPosition(0);
 //        String  macAddress = parcel.readString();
 

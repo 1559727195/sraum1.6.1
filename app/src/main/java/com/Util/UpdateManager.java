@@ -169,7 +169,7 @@ public class UpdateManager implements MainfragmentActivity.UpdateApkListener {
             if (!saveDir.exists()) saveDir.mkdir();  //如果文件不存在的话指定目录,这里可创建多层目录
             SharedPreferencesUtil.saveData(mContext, "loadapk", true);
 //            download(UpApkUrl, saveDir);
-            AppDownloadManager appDownloadManager = new AppDownloadManager(mContext);
+            AppDownloadManager appDownloadManager = new AppDownloadManager(App.getInstance());
 
             appDownloadManager.downloadApk(UpApkUrl, "sraum正在下载", apkName);
         } else {

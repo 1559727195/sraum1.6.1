@@ -310,6 +310,7 @@ public class AddlamplightActivity extends Basecactivity implements SeekBar.OnSee
         switch (type) {
             //普通灯
             case "1":
+            case "17":
                 open.setVisibility(View.VISIBLE);
                 noairconditioned_id.setVisibility(View.GONE);//空调
                 mainairrea_id.setVisibility(View.GONE);
@@ -474,6 +475,7 @@ public class AddlamplightActivity extends Basecactivity implements SeekBar.OnSee
                     } else {
                         switch (type) {
                             case "1":
+                            case "17":
                                 statusflag = "1";
                                 open_btn_light.setImageResource(R.drawable
                                         .open_white_word);
@@ -545,6 +547,7 @@ public class AddlamplightActivity extends Basecactivity implements SeekBar.OnSee
     private void init_add_secene() {
         switch (type) {
             case "1":
+            case "17":
                 switch (statusflag) {
                     case "0":
                         close_btn_light.setImageResource(R.drawable
@@ -1225,6 +1228,7 @@ public class AddlamplightActivity extends Basecactivity implements SeekBar.OnSee
         switch (type) {
             //普通灯
             case "1":
+            case "17":
                 break;
             //调光灯
             case "2":

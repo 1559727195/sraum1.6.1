@@ -97,7 +97,7 @@
             android:layout_height="@dimen/d30"
           android:layout_centerInParent="true"
             android:background="@drawable/graylinerecra"
-            android:text="下一步"
+            android:text="完成"
             android:textSize="@dimen/s13"
             app:layout_widthPercent="80%" />
     </android.support.percent.PercentRelativeLayout>

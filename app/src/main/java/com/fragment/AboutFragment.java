@@ -1,8 +1,11 @@
 package com.fragment;
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -12,6 +15,7 @@ import android.widget.Toast;
 
 import com.AddTogenInterface.AddTogglenInterfacer;
 import com.Util.ApiHelper;
+import com.Util.App;
 import com.Util.DialogUtil;
 import com.Util.IntentUtil;
 import com.Util.MyOkHttp;
@@ -26,11 +30,14 @@ import com.data.User;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.massky.sraum.DeveloperActivity;
 import com.massky.sraum.HelpYouActivity;
+import com.massky.sraum.MainfragmentActivity;
 import com.massky.sraum.ProductActivity;
 import com.massky.sraum.R;
 import com.massky.sraum.YinSiActivity;
 import com.permissions.RxPermissions;
 
+import java.io.File;
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -71,6 +78,7 @@ public class AboutFragment extends Basecfragment {
     private int versionCode;
     private String Version;
     private static SlidingMenu mySlidingMenu;
+    private WeakReference<Context> weakReference;
 
     public static AboutFragment newInstance(SlidingMenu mySlidingMenu1) {
         AboutFragment newFragment = new AboutFragment();
@@ -181,13 +189,15 @@ public class AboutFragment extends Basecfragment {
                 IntentUtil.startActivity(getActivity(), YinSiActivity.class);
                 break;
             case R.id.asixrelative_upgrate:
-                boolean loadapk = (boolean) SharedPreferencesUtil.getData(getActivity(), "loadapk", false);
-                if (loadapk) {
-                    ToastUtil.showToast(getActivity(), "正在更新中");
-                } else {
-                    viewDialog.loadDialog();
-                    about_togglen();
-                }
+//                boolean loadapk = (boolean) SharedPreferencesUtil.getData(getActivity(), "loadapk", false);
+//                if (loadapk) {
+//                    ToastUtil.showToast(getActivity(), "正在更新中");
+//                } else {
+//                    viewDialog.loadDialog();
+//                    about_togglen();
+//                }
+                viewDialog.loadDialog();
+                about_togglen();
                 break;
         }
     }
@@ -209,8 +219,33 @@ public class AboutFragment extends Basecfragment {
                 if (versionCode >= sracode) {
                     ToastUtil.showDelToast(getActivity(), "您的应用为最新版本");
                 } else {
-                    belowtext_id.setText("版本更新至" + Version);
-                    viewDialog.loadViewdialog();
+//                    belowtext_id.setText("版本更新至" + Version);
+//                    viewDialog.loadViewdialog();
+                    //在这里判断有没有正在更新的apk,文件大小小于总长度即可
+                    weakReference = new WeakReference<Context>(App.getInstance());
+                    File apkFile = new File(weakReference.get().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "app_name.apk");
+                    if (apkFile != null && apkFile.exists()) {
+                        long apksize = 0;
+                        try {
+                            apksize = getFileSize(apkFile);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        int totalapksize = (int) SharedPreferencesUtil.getData(getActivity(), "apk_fileSize", 0);
+                        if (totalapksize == 0) {//则说明，还没有下载过
+                            belowtext_id.setText("版本更新至" + Version);
+                            viewDialog.loadViewdialog();
+                            return;
+                        }
+
+                        if (apksize - totalapksize == 0) { //说明正在下载或者下载完毕，安装失败时，//->或者是下载完毕后没有去安装；
+//                                    down_load_thread();
+                            ToastUtil.showToast(getActivity(), "检测到有新版本，正在下载中");
+                        }
+                    } else {//不存在，apk文件
+                        belowtext_id.setText("版本更新至" + Version);
+                        viewDialog.loadViewdialog();
+                    }
                 }
             }
 
@@ -219,6 +254,19 @@ public class AboutFragment extends Basecfragment {
                 super.wrongToken();
             }
         });
+    }
+
+
+    /**
+     * 获取文件长度
+     */
+    public long getFileSize(File file) {
+        if (file.exists() && file.isFile()) {
+            String fileName = file.getName();
+            System.out.println("文件" + fileName + "的大小是：" + file.length());
+            return file.length();
+        }
+        return 0;
     }
 
     @Override

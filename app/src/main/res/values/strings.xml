@@ -313,7 +313,7 @@
     <string name="next">下一步</string>
     <string name="aboutmain">关于</string>
 
-    <string name="about">sraum v1.8.6</string>
+    <string name="about">sraum v1.8.9</string>
     <string name="aboutone">产品介绍</string>
     <string name="abouttwo">使用帮助</string>
     <string name="aboutthree">意见反馈</string>
@@ -472,9 +472,9 @@
     <string name="wifi_hongwai">WIFI红外转发</string>
     <string name="kongtiao_panel">空调面板</string>
     <string name="cha_zuo">86插座两位</string>
-    <string name="cha_zuo_1">86插座一位</string>
+    <string name="cha_zuo_1">入墙式智能插座</string>
+    <string name="cha_zuo_2">智能插座</string>
     <string name="mobilenumber_hint">The phone number can only start with a "+" or a number,other can only contain "-" and Numbers</string>
-
 
     <string name="path">/sdcard/test0.mp4</string>
     <!-- 应有程序 -->
@@ -954,4 +954,5 @@
     <string name="two_dimming_trhee_control">三调光一灯控</string>
     <string name="keshimenling">可视门铃</string>
     <string name="tuisongtongzhi">推送通知</string>
+    <string name="zhinengchazuo_promat">连续按键3次，指示灯快闪</string>
 </resources>

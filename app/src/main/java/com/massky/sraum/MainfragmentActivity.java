@@ -36,6 +36,7 @@ import android.widget.TextView;
 
 import com.AddTogenInterface.AddTogglenInterfacer;
 import com.Util.ApiHelper;
+import com.Util.App;
 import com.Util.DialogUtil;
 import com.Util.IntentUtil;
 import com.Util.LogUtil;
@@ -159,8 +160,9 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
 
     public static final String SRAUM_IS_DOWN_LOAD = "sraum_is_download";
     private MessageReceiver mMessageReceiver_apk_down_load;
-    private WeakReference<Activity> weakReference;
+    private WeakReference<Context> weakReference;
     private boolean iswait_down_load;//等待NotificationListenerService这个服务唤醒
+    private String isdo;
 
 
     @Override
@@ -182,12 +184,14 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
 
     }
 
+
+
     @Override
     protected void onView() {
-        iswait_down_load = false;
+//        iswait_down_load = false;
         dialogUtil = new DialogUtil(this);
         initPermission();
-        toggleNotificationListenerService();
+//        toggleNotificationListenerService();
         over_camera_list();//结束wifi摄像头的tag
         new Thread(new Runnable() {
             @Override
@@ -228,9 +232,8 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
 //        intent_apk_down.setClass(MainfragmentActivity.this, NotificationMonitorService.class);
 //        startService(intent_apk_down);
 
-
-        showCenterDeleteDialog("需要监听sraum下载通知",
-                "是否去开启sraum通知使用权");
+//        showCenterDeleteDialog("需要监听sraum下载通知",
+//                "是否去开启sraum通知使用权");
 
 //        /**
 //         * 开启机智云小苹果服务(service)
@@ -261,19 +264,21 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
         getSupportFragmentManager().beginTransaction().replace(R.id.menu_frame, new LeftFragment()).commitAllowingStateLoss();
 //        sideslip_id.setOnClickListener(this);
         getDialog();
-        boolean netflag = NetUtils.isNetworkConnected(MainfragmentActivity.this);
-        if (netflag) {//获取版本号
-            if (!isEnabled()) {
-                if (!dialog1.isShowing()) {
-                    dialog1.show();
-                }
-            } else {
-                updateApk();
-            }
-        }
+//        boolean netflag = NetUtils.isNetworkConnected(MainfragmentActivity.this);
+//        if (netflag) {//获取版本号
+////            if (!isEnabled()) {
+////                if (!dialog1.isShowing()) {
+////                    dialog1.show();
+////                }
+////            } else {
+////                updateApk();
+////            }
+//
+//            updateApk("oncreate");
+//        }
         registerMessageReceiver();
         registerMessageReceiver_fromAbout();
-        registerMessageReceiver_fromApk_Down();
+//        registerMessageReceiver_fromApk_Down();
         init_notifacation();//通知初始化
         SharedPreferencesUtil.saveData(MainfragmentActivity.this, "loadapk", false);//apk版本正在更新中
     }
@@ -779,7 +784,7 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
                         int sracode = Integer.parseInt(user.versionCode);
                         if (versionCode < sracode) {
                             //在这里判断有没有正在更新的apk,文件大小小于总长度即可
-                            weakReference = new WeakReference<Activity>(MainfragmentActivity.this);
+                            weakReference = new WeakReference<Context>(App.getInstance());
                             File apkFile = new File(weakReference.get().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "app_name.apk");
                             if (apkFile != null && apkFile.exists()) {
 //                                long istext = main_get_real_size(apkFile);
@@ -808,7 +813,8 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
                                     return;
                                 }
                                 if (apksize - totalapksize == 0) { //说明正在下载或者下载完毕，安装失败时，//->或者是下载完毕后没有去安装；
-                                    down_load_thread();
+//                                    down_load_thread();
+                                    ToastUtil.showToast(MainfragmentActivity.this, "检测到有新版本，正在下载中");
                                 }
                             } else {//不存在，apk文件
                                 belowtext_id.setText("版本更新至" + Version);
@@ -1391,6 +1397,18 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
 //        返回100就继续能用返回别的就直接跳到登录
 //        init_jlogin();
         init_jlogin();
+        boolean netflag = NetUtils.isNetworkConnected(MainfragmentActivity.this);
+        if (netflag) {//获取版本号
+//            if (!isEnabled()) {
+//                if (!dialog1.isShowing()) {
+//                    dialog1.show();
+//                }
+//            } else {
+//                updateApk();
+//            }
+
+            updateApk();
+        }
         super.onResume();
     }
 
@@ -1416,19 +1434,19 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case TONGZHI_APK_UPGRATE:
-                if (isEnabled()) {//监听通知权限开启
-                    if (dialog1 != null)
-                        dialog1.dismiss();
-                    updateApk();
-                } else {
-                    if (!dialog1.isShowing()) {
-                        dialog1.show();
-                    }
-                }
-                break;
-        }
+//        switch (requestCode) {
+//            case TONGZHI_APK_UPGRATE:
+//                if (isEnabled()) {//监听通知权限开启
+//                    if (dialog1 != null)
+//                        dialog1.dismiss();
+//                    updateApk();
+//                } else {
+//                    if (!dialog1.isShowing()) {
+//                        dialog1.show();
+//                    }
+//                }
+//                break;
+//        }
     }
 
     /**
@@ -1485,8 +1503,8 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
             dialog1.dismiss();
         }
         unregisterReceiver(mMessageReceiver_aboutfragment);
-        unregisterReceiver(mMessageReceiver_apk_down_load);
-        iswait_down_load = false;
+//        unregisterReceiver(mMessageReceiver_apk_down_load);
+//        iswait_down_load = false;
 
 //        /**
 //         * 开启download监听service

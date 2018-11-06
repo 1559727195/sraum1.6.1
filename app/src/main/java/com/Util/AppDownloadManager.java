@@ -24,9 +24,6 @@ import com.yaokan.sdk.utils.Logger;
 import java.io.File;
 import java.lang.ref.WeakReference;
 
-import static com.massky.sraum.MainfragmentActivity.SDCardSizeTest;
-
-
 /**
  * Created by zhu on 2018/10/26.
  */
@@ -35,7 +32,7 @@ public class AppDownloadManager {
 
     public static final String TAG = "robin debug";
     private final DownloadReceiver mDownloadReceiver;
-    private WeakReference<Activity> weakReference;
+    private WeakReference<Context> weakReference;
     private DownloadManager mDownloadManager;
     private DownloadChangeObserver mDownLoadChangeObserver;
     //    private DownloadReceiver mDownloadReceiver;
@@ -43,13 +40,13 @@ public class AppDownloadManager {
     //    private OnUpdateListener mUpdateListener;
     private String saveFile;
     private File apkFile;
-    private final Activity activity;
+    //    private final Activity activity;
     private Uri uri;
     private OnUpdateListener mUpdateListener;
 
     public AppDownloadManager(Context context) {
-        activity = (Activity) context;
-        weakReference = new WeakReference<Activity>(activity);
+//        activity = (Activity) context;
+        weakReference = new WeakReference<Context>(context);
         mDownloadManager = (DownloadManager) weakReference.get().getSystemService(Context.DOWNLOAD_SERVICE);
         mDownLoadChangeObserver = new DownloadChangeObserver(new Handler());
         mDownloadReceiver = new DownloadReceiver();
@@ -68,10 +65,14 @@ public class AppDownloadManager {
         }
 
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(apkUrl));
+        //http://cdn.llsapp.com/android/LLS-v4.0-595-20160908-143200.apk
+
         //设置title
         request.setTitle(title);
         // 设置描述
+
         request.setDescription(desc);
+
         // 完成后显示通知栏
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
         request.setDestinationInExternalFilesDir(weakReference.get(), Environment.DIRECTORY_DOWNLOADS, "app_name.apk");
@@ -81,6 +82,7 @@ public class AppDownloadManager {
         // request.setDestinationInExternalPublicDir("/codoon/","codoon_health.apk");
 
         request.setMimeType("application/vnd.android.package-archive");
+
         //
         mReqId = mDownloadManager.enqueue(request);
         resume1();
@@ -111,7 +113,6 @@ public class AppDownloadManager {
         weakReference.get().getContentResolver().unregisterContentObserver(mDownLoadChangeObserver);
         weakReference.get().unregisterReceiver(mDownloadReceiver);
     }
-
 
     /**
      * 取消下载
@@ -221,7 +222,6 @@ public class AppDownloadManager {
             } else {
                 installApk(context, intent);
             }
-
         }
     }
 

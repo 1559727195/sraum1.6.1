@@ -303,14 +303,15 @@ public class MacFragAdapter extends android.widget.BaseAdapter {
             case "17":
                 if (list.get(position).get("status").toString().equals("1")) {
 //                    mHolder.itemrela_id.setBackgroundResource(R.drawable.markh);
-                    mHolder.imageitem_id.setImageResource(R.drawable.icon_kaiguan_socket_40);
-                    mHolder.status_txt.setText("打开");
-                    mHolder.status_txt.setTextColor(context.getResources().getColor(R.color.e30));
+                    mHolder.imageitem_id.setImageResource(R.drawable.icon_kaiguan_socket_40_active);
+                    mHolder.status_txt.setText("开");
+                    mHolder.status_txt.setTextColor(context.getResources().getColor(R.color.zongse_color));
+//                    mHolder.status_txt.setTextColor(context.getResources().getColor(R.color.e30));
                 } else {
                     //                    mHolder.itemrela_id.setBackgroundResource(R.drawable.markstarh);
-                    mHolder.imageitem_id.setImageResource(R.drawable.icon_kaiguan_socket_40_active);
-                    mHolder.status_txt.setTextColor(context.getResources().getColor(R.color.zongse_color));
-                    mHolder.status_txt.setText("关闭");//#E2C891
+                    mHolder.imageitem_id.setImageResource(R.drawable.icon_kaiguan_socket_40);
+                    mHolder.status_txt.setText("关");//#E2C891
+                    mHolder.status_txt.setTextColor(context.getResources().getColor(R.color.e30));
                 }
                 break;
 

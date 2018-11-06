@@ -17,6 +17,7 @@ import vstc2.nativecaller.NativeCaller;
 
 public class BridgeService extends Service
 {
+
 	private String TAG = BridgeService.class.getSimpleName();
 	private Notification mNotify2;
 	private NotificationManager notifyManager ;

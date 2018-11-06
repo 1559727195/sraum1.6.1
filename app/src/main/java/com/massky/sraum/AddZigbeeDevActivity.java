@@ -84,6 +84,7 @@ public class AddZigbeeDevActivity extends Basecactivity {
     private int[] iconString = {
             R.string.yijianlight_promat,
             R.string.zigbee_other_promat, R.string.zigbee_promat_btn_down
+            ,R.string.zhinengchazuo_promat
     };
 
     @InjectView(R.id.img_show_zigbee)
@@ -208,7 +209,7 @@ public class AddZigbeeDevActivity extends Basecactivity {
                 break;
             case "B101":
                 img_show_zigbee.setImageResource(icon[19]);
-                promat_zigbee_txt.setText(iconString[2]);
+                promat_zigbee_txt.setText(iconString[3]);
                 break;
         }
         init_status_bar();

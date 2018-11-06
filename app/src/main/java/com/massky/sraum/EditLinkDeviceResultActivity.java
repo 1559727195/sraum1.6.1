@@ -468,7 +468,7 @@ public class EditLinkDeviceResultActivity extends Basecactivity {
                 }
                 break;
             case "15":
-            case "17":
+//            case "17":
                 if (action.equals("1")) {
                     map_link.put("action", "打开");
                 } else {
@@ -491,6 +491,7 @@ public class EditLinkDeviceResultActivity extends Basecactivity {
         String action = "";
         switch (map.get("type").toString()) {
             case "1"://调光关闭
+            case "17":
                 action = init_action_light((String) map.get("status"));
                 break;
             case "100"://打开-》添加调光值数据，
@@ -517,7 +518,7 @@ public class EditLinkDeviceResultActivity extends Basecactivity {
                 break;
             case "15":
             case "16":
-            case "17":
+//            case "17":
                 action = init_action_smart_door_lock((String) map.get("status"));
                 break;
         }

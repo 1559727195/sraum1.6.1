@@ -40,6 +40,7 @@ import com.data.User;
 import com.jpush.Constants;
 import com.jpush.MyReceiver;
 import com.permissions.RxPermissions;
+import com.service.GithubService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,6 +52,10 @@ import cn.jpush.android.api.JPushInterface;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import okhttp3.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 //首次启动界面，用于登录界面
 public class LoginActivity extends Basecactivity {
@@ -83,6 +88,8 @@ public class LoginActivity extends Basecactivity {
 
     @Override
     protected void onView() {
+//        String crashInfo = (String) SharedPreferencesUtil.getData(LoginActivity.this, "crashInfo", "");
+//        ToastUtil.showToast(LoginActivity.this, crashInfo);
         intiData();
         initPermission();
     }
@@ -268,6 +275,10 @@ public class LoginActivity extends Basecactivity {
             maptwo.put("signature", MD5Util.md5(loginAccount + pwd + time));
             LogUtil.eLength("传入时间戳", JSON.toJSONString(maptwo) + "时间戳" + time);
             dialogUtil.loadDialog();
+
+            //retrofit_get_token(maptwo);
+
+
             MyOkHttp.postMapObjectnest(ApiHelper.sraum_getToken, maptwo, new MycallbackNest(new AddTogglenInterfacer() {
                 @Override
                 public void addTogglenInterfacer() {
@@ -358,6 +369,36 @@ public class LoginActivity extends Basecactivity {
                 }
             });
         }
+    }
+
+    /**
+     * 用retrofit进行post-body请求，反应慢
+     *
+     * @param maptwo
+     */
+    private void retrofit_get_token(Map<String, Object> maptwo) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://app.sraum.com/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        GithubService service = retrofit.create(GithubService.class);
+
+        retrofit2.Call<User> userCall = service.createUser(maptwo);
+
+        userCall.enqueue(new Callback<User>() {
+
+
+            @Override
+            public void onResponse(retrofit2.Call<User> call, Response<User> response) {
+
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<User> call, Throwable t) {
+
+            }
+        });
     }
 
     @Override
