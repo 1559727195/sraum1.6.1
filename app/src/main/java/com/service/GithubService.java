@@ -10,5 +10,5 @@ import retrofit2.http.POST;
 
 public interface GithubService {
     @POST("SmartHome/sraum_getToken")
-    Call<User> createUser(@Body Map<String, Object> map);
+    Call<User> createUser(@Body Map<String,String> map);
 }

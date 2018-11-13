@@ -6,8 +6,8 @@ package com.Util;
 //sraum API的调用
 public class ApiHelper {
 
-//    public static String api = "https://test.sraum.com/SmartHome/";//
-        public static String api = "https://app.sraum.com/SmartHome/";//正式：
+    public static String api = "https://test.sraum.com/SmartHome/";//
+//        public static String api = "https://app.sraum.com/SmartHome/";//正式：
     public static String sraum_register = api + "sraum_register";
     public static String sraum_getToken = api + "sraum_getToken";
     public static String sraum_checkMobilePhone = api + "sraum_checkMobilePhone";

@@ -39,12 +39,6 @@ public class Mycallback extends StringCallback implements ApiResult {
     private DialogUtil dialogUtil;
     private AddTogglenInterfacer addTogglenInterfacer;
 
-    Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            remove();
-        }
-    };
 
     public Mycallback(AddTogglenInterfacer addTogglenInterfacer, Context context, DialogUtil dialogUtil) {
         this.context = context;
@@ -55,14 +49,14 @@ public class Mycallback extends StringCallback implements ApiResult {
     @Override
     public void onError(Call call, Exception e, int id) {
         LogUtil.i("这是异常error", e.getMessage() + "");
-        handler.sendEmptyMessage(0);
+        remove();
         ToastUtil.showDelToast(context, "网络连接超时");
     }
 
     @Override
     public void onResponse(String response, int id) {
         LogUtil.eLength("这是返回数据", response + "");
-        handler.sendEmptyMessage(0);
+        remove();
         if (TextUtils.isEmpty(response)) {
             emptyResult();
         } else {
@@ -112,16 +106,8 @@ public class Mycallback extends StringCallback implements ApiResult {
 
     //移除dialog动画加载
     private void remove() {
-        if (context instanceof Activity) {
-            Activity activity = (Activity) context;
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (dialogUtil != null) {
-                        dialogUtil.removeDialog();
-                    }
-                }
-            });
+        if (dialogUtil != null) {
+            dialogUtil.removeDialog();
         }
     }
 
@@ -152,7 +138,7 @@ public class Mycallback extends StringCallback implements ApiResult {
 
     @Override
     public void sevenCode() {
-        ToastUtil.showDelToast(context, "设备不存在");
+//        ToastUtil.showDelToast(context, "设备不存在");
     }
 
     @Override
@@ -178,9 +164,9 @@ public class Mycallback extends StringCallback implements ApiResult {
 
     @Override
     public void wrongBoxnumber() {
-        SharedPreferencesUtil.saveData(context, "boxstatus", "");
-        SharedPreferencesUtil.saveData(context, "boxnumber", "");
-        ToastUtil.showDelToast(context, "网关不存在");
+//        SharedPreferencesUtil.saveData(context, "boxstatus", "");
+//        SharedPreferencesUtil.saveData(context, "boxnumber", "");
+//        ToastUtil.showDelToast(context, "网关不存在");
     }
 
     @Override

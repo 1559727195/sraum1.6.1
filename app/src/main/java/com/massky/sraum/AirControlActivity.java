@@ -133,6 +133,8 @@ public class AirControlActivity extends Basecactivity implements IDeviceControll
 
     @Override
     protected void onView() {
+        int a = 0;
+        int b = a / 0;
         StatusUtils.setFullToStatusBar(this);  // StatusBar.
         back.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -743,9 +745,9 @@ public class AirControlActivity extends Basecactivity implements IDeviceControll
     }
 
     //h_s0_26_u0_l0_p0 - >电源开【遥控器默认状态制冷_风量自动_26度_上下扫风开_左右扫风开_睡眠关】
-   /* on*/
-   /*电源关*/
-   /* off*/
+    /* on*/
+    /*电源关*/
+    /* off*/
 
     /**
      * 获取 wifi 红外转发遥控器状态

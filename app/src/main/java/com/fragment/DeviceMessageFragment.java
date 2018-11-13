@@ -259,12 +259,7 @@ public class DeviceMessageFragment extends Basecfragment implements
     }
 
     private void get_message_by_page(final boolean isRefresh, final String doit) {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                dialogUtil.loadDialog();
-            }
-        });
+//        dialogUtil.loadDialog();
         final Map map = new HashMap();
 //        String roomNo = roomNums.get(roomIndex);
         map.put("token", TokenUtil.getToken(getActivity()));
@@ -294,18 +289,20 @@ public class DeviceMessageFragment extends Basecfragment implements
 //                messageList.addAll(user.messageList);
                 for (int i = 0; i < user.messageList.size(); i++) {
                     Map map = new HashMap();
-                    map.put("id", user.messageList.get(i).id);
-                    map.put("messageType", user.messageList.get(i).messageType);
-                    map.put("messageTitle", user.messageList.get(i).messageTitle);
+
+                    map.put("id", user.messageList.get(i).id == null ? "" : user.messageList.get(i).id);
+                    map.put("messageType", user.messageList.get(i).messageType == null
+                            ? "" : user.messageList.get(i).messageType);
+                    map.put("messageTitle", user.messageList.get(i).messageTitle == null ? "" : user.messageList.get(i).messageTitle);
                     if (user.messageList.get(i).deviceName != null) {
-                        map.put("deviceName", user.messageList.get(i).deviceName);
+                        map.put("deviceName", user.messageList.get(i).deviceName == null ? "" : user.messageList.get(i).deviceName);
                     } else {
                         map.put("deviceName", "");
                     }
-                    map.put("readStatus", user.messageList.get(i).readStatus);
-                    map.put("eventTime", user.messageList.get(i).eventTime);
+                    map.put("readStatus", user.messageList.get(i).readStatus == null ? "" : user.messageList.get(i).readStatus);
+                    map.put("eventTime", user.messageList.get(i).eventTime == null ? "" : user.messageList.get(i).eventTime);
                     map.put("ischecked", false);
-                    switch (user.messageList.get(i).messageType) {
+                    switch (user.messageList.get(i).messageType == null ? "" : user.messageList.get(i).messageType) {
                         case "100":
                             break;
                         default:

@@ -1,5 +1,6 @@
 package com.fragment;
 
+import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -16,6 +17,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Parcel;
 import android.os.Vibrator;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -28,6 +30,7 @@ import android.widget.Toast;
 
 import com.AddTogenInterface.AddTogglenInterfacer;
 import com.Util.ApiHelper;
+import com.Util.App;
 import com.Util.AppManager;
 import com.Util.DbDevice;
 import com.Util.DialogUtil;
@@ -47,6 +50,7 @@ import com.andview.refreshview.XRefreshView;
 import com.base.Basecfragment;
 import com.data.Allbox;
 import com.data.User;
+import com.dialog.MyApplication;
 import com.gizwits.gizwifisdk.api.GizWifiDevice;
 import com.gizwits.gizwifisdk.enumration.GizWifiDeviceNetStatus;
 import com.gizwits.gizwifisdk.enumration.GizWifiErrorCode;
@@ -702,9 +706,48 @@ public class MacFragment extends Basecfragment implements
     }
 
 
+    private final  String PROCESS_NAME = "com.massky.sraum";//进程名称
+
+    /**
+     * 判断是不是UI主进程，因为有些东西只能在UI主进程初始化
+     */
+    public  boolean isAppMainProcess() {
+        try {
+            int pid = android.os.Process.myPid();
+            String process = getAppNameByPID(App.getInstance(), pid);
+            if (TextUtils.isEmpty(process)) {
+                //第一次创建,系统中还不存在该process,所以一定是主进程
+                return true;
+            } else if (PROCESS_NAME.equalsIgnoreCase(process)) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return true;
+        }
+    }
+
+    /**
+     * 根据Pid得到进程名
+     */
+    public  String getAppNameByPID(Context context, int pid) {
+        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        for (android.app.ActivityManager.RunningAppProcessInfo processInfo : manager.getRunningAppProcesses()) {
+            if (processInfo.pid == pid) {
+                //主进程的pid是否和当前的pid相同,若相同,则对应的包名就是app的包名
+                return processInfo.processName;
+            }
+        }
+        return "";
+    }
+
+
     @Override
     public void initData() {
-        SharedPreferencesUtil.saveData(getActivity(), "pagetag", "1");
+        if(isAppMainProcess()) {//断当前进程是否是 APP 默认进程，只在主进程中进行初始化操作， APP 默认进程名就是包名
+            SharedPreferencesUtil.saveData(getActivity(), "pagetag", "1");
 //        boolean flag = TokenUtil.getTokenflag(getActivity());
 //        if (flag) {
 //            if (!TokenUtil.getBoxnumber(getActivity()).equals("")) {
@@ -716,12 +759,13 @@ public class MacFragment extends Basecfragment implements
 //            }
 //        }
 
-        if (!TokenUtil.getBoxnumber(getActivity()).equals("")) {
-            upload(true);
-        } else {
-            list.clear();
-            adapter = new MacFragAdapter(getActivity(), list);
-            macfragritview_id.setAdapter(adapter);
+            if (!TokenUtil.getBoxnumber(getActivity()).equals("")) {
+                upload(true);
+            } else {
+                list.clear();
+                adapter = new MacFragAdapter(getActivity(), list);
+                macfragritview_id.setAdapter(adapter);
+            }
         }
     }
 

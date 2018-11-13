@@ -269,17 +269,18 @@ public class LoginActivity extends Basecactivity {
             ToastUtil.showDelToast(LoginActivity.this, "用户名或密码不能为空");
         } else {
             String time = Timeuti.getTime();
-            Map<String, Object> maptwo = new HashMap<>();
+            Map<String, String> maptwo = new HashMap<>();
             maptwo.put("loginAccount", loginAccount);
             maptwo.put("timeStamp", time);
             maptwo.put("signature", MD5Util.md5(loginAccount + pwd + time));
             LogUtil.eLength("传入时间戳", JSON.toJSONString(maptwo) + "时间戳" + time);
+//            dialogUtil = null;
             dialogUtil.loadDialog();
 
-            //retrofit_get_token(maptwo);
+//            retrofit_get_token(maptwo);
 
 
-            MyOkHttp.postMapObjectnest(ApiHelper.sraum_getToken, maptwo, new MycallbackNest(new AddTogglenInterfacer() {
+            MyOkHttp.postMapString(ApiHelper.sraum_getToken, maptwo, new Mycallback(new AddTogglenInterfacer() {
                 @Override
                 public void addTogglenInterfacer() {
 
@@ -301,7 +302,7 @@ public class LoginActivity extends Basecactivity {
                     SharedPreferencesUtil.saveData(LoginActivity.this, "expires_in", user.expires_in);
                     SharedPreferencesUtil.saveData(LoginActivity.this, "logintime", (int) System.currentTimeMillis());
                     SharedPreferencesUtil.saveData(LoginActivity.this, "tagint", 0);
-                    Map<String, Object> map = new HashMap<>();
+                    Map<String, String> map = new HashMap<>();
                     TelephonyManager TelephonyMgr = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
                     if (ActivityCompat.checkSelfPermission(LoginActivity.this, android.Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
                         // TODO: Consider calling
@@ -320,7 +321,7 @@ public class LoginActivity extends Basecactivity {
                     map.put("regId", regId);//120c83f7601309b9d2b
                     map.put("phoneId", regId);
                     LogUtil.eLength("查看数据", JSON.toJSONString(map));
-                    MyOkHttp.postMapObjectnest(ApiHelper.sraum_login, map, new MycallbackNest(new AddTogglenInterfacer() {
+                    MyOkHttp.postMapString(ApiHelper.sraum_login, map, new Mycallback(new AddTogglenInterfacer() {
                         @Override
                         public void addTogglenInterfacer() {
 
@@ -359,6 +360,11 @@ public class LoginActivity extends Basecactivity {
                             super.pullDataError();
                             ToastUtil.showDelToast(LoginActivity.this, "登录失败,数据解析失败");
                         }
+
+                        @Override
+                        public void wrongBoxnumber() {
+                            ToastUtil.showDelToast(LoginActivity.this, "账号或密码错误");
+                        }
                     });
                 }
 
@@ -367,6 +373,12 @@ public class LoginActivity extends Basecactivity {
                     super.wrongToken();//继承父类，实现父类的方法
                     ToastUtil.showDelToast(LoginActivity.this, "登录失败，账号未注册");
                 }
+
+                @Override
+                public void wrongBoxnumber() {
+                    super.wrongBoxnumber();
+                    ToastUtil.showDelToast(LoginActivity.this, "账号或密码错误");
+                }
             });
         }
     }
@@ -374,32 +386,32 @@ public class LoginActivity extends Basecactivity {
     /**
      * 用retrofit进行post-body请求，反应慢
      *
-     * @param maptwo
+     *
      */
-    private void retrofit_get_token(Map<String, Object> maptwo) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://app.sraum.com/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        GithubService service = retrofit.create(GithubService.class);
-
-        retrofit2.Call<User> userCall = service.createUser(maptwo);
-
-        userCall.enqueue(new Callback<User>() {
-
-
-            @Override
-            public void onResponse(retrofit2.Call<User> call, Response<User> response) {
-
-            }
-
-            @Override
-            public void onFailure(retrofit2.Call<User> call, Throwable t) {
-
-            }
-        });
-    }
+//    private void retrofit_get_token(Map<String, Object> maptwo) {
+//        Retrofit retrofit = new Retrofit.Builder()
+//                .baseUrl("https://app.sraum.com/")
+//                .addConverterFactory(GsonConverterFactory.create())
+//                .build();
+//
+//        GithubService service = retrofit.create(GithubService.class);
+//
+//        retrofit2.Call<User> userCall = service.createUser(maptwo);
+//
+//        userCall.enqueue(new Callback<User>() {
+//
+//
+//            @Override
+//            public void onResponse(retrofit2.Call<User> call, Response<User> response) {
+//
+//            }
+//
+//            @Override
+//            public void onFailure(retrofit2.Call<User> call, Throwable t) {
+//
+//            }
+//        });
+//    }
 
     @Override
     protected void onDestroy() {

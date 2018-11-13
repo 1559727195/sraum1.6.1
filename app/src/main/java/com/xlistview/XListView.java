@@ -299,6 +299,7 @@ public class XListView extends ListView implements OnScrollListener {
 					&& (mFooterView.getBottomMargin() > 0 || deltaY < 0)) {
 				// last item, already pulled up or want to pull up.
 				updateFooterHeight(-deltaY / OFFSET_RADIO);
+
 			}
 			break;
 		default:
@@ -314,7 +315,7 @@ public class XListView extends ListView implements OnScrollListener {
 					}
 				}
 				resetHeaderHeight();
-			} else if (getLastVisiblePosition() == mTotalItemCount - 1) {
+			}  if (getLastVisiblePosition() == mTotalItemCount - 1) {//去掉了else
 				// invoke load more.
 				if (mEnablePullLoad
 						&& mFooterView.getBottomMargin() > PULL_LOAD_MORE_DELTA) {

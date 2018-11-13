@@ -164,7 +164,6 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
     private boolean iswait_down_load;//等待NotificationListenerService这个服务唤醒
     private String isdo;
 
-
     @Override
     protected int viewId() {
         return R.layout.main;
@@ -183,7 +182,6 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
 //        NotificationMonitorService.requestRebind(new ComponentName(this, NotificationMonitorService.class));
 
     }
-
 
 
     @Override
