@@ -7,7 +7,7 @@ package com.Util;
 public class ApiHelper {
 
     public static String api = "https://test.sraum.com/SmartHome/";//
-//        public static String api = "https://app.sraum.com/SmartHome/";//正式：
+//    public static String api = "https://app.sraum.com/SmartHome/";//正式：
     public static String sraum_register = api + "sraum_register";
     public static String sraum_getToken = api + "sraum_getToken";
     public static String sraum_checkMobilePhone = api + "sraum_checkMobilePhone";
@@ -90,4 +90,5 @@ public class ApiHelper {
     public static String sraum_deleteWifiCamera = api + "sraum_deleteWifiCamera";
     public static String sraum_updateWifiCameraName = api + "sraum_updateWifiCameraName";
     public static String sraum_logout = api + "sraum_logout";
+    public static String sraum_setLinkSensorPanelIsUse = api + "sraum_setLinkSensorPanelIsUse";
 }

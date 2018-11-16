@@ -182,6 +182,16 @@
             android:name=".RegisterActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"></activity>
+
+        <activity
+            android:name=".BuFangBaoJingPlanActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"></activity>
+        <!--//SCameraSetPushVideoTimingActivity-->
+        <activity
+            android:name="com.ipcamera.demo.SCameraSetPushVideoTimingActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"></activity>
         <activity
             android:name=".ControlmacActivity"
             android:launchMode="singleTask"

@@ -133,8 +133,6 @@ public class AirControlActivity extends Basecactivity implements IDeviceControll
 
     @Override
     protected void onView() {
-        int a = 0;
-        int b = a / 0;
         StatusUtils.setFullToStatusBar(this);  // StatusBar.
         back.setOnClickListener(new View.OnClickListener() {
             @Override

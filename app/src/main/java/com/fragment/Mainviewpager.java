@@ -184,6 +184,7 @@ public class Mainviewpager extends Basecfragment implements ViewPager.OnPageChan
 
     @Override
     protected void onView() {
+        Log.e("robin debug3","start-time:");
         registerMessageReceiver();
         dialogUtil = new DialogUtil(getActivity());
         addPopwinwow();

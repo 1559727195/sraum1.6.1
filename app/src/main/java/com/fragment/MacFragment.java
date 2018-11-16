@@ -85,6 +85,9 @@ import com.yaokan.sdk.utils.Utility;
 import com.yaokan.sdk.wifi.DeviceManager;
 import com.yaokan.sdk.wifi.GizWifiCallBack;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -107,6 +110,7 @@ import okhttp3.Call;
 import vstc2.nativecaller.NativeCaller;
 
 import static com.fragment.Mainviewpager.MESSAGE_TONGZHI_DOOR_FIRST;
+import static com.massky.sraum.MyDeviceItemActivity.MESSAGE_TONGZHI_VIDEO_FROM_MYDEVICE;
 
 /**
  * Created by masskywcy on 2016-09-05.
@@ -115,6 +119,7 @@ import static com.fragment.Mainviewpager.MESSAGE_TONGZHI_DOOR_FIRST;
 public class MacFragment extends Basecfragment implements
         AdapterView.OnItemClickListener
         , BridgeService.IpcamClientInterface, BridgeService.CallBackMessageInterface {
+    public  static final String MESSAGE_TONGZHI_VIDEO_TO_MYDEVICE = "com.sraum.massky.to.mydevice";
     @InjectView(R.id.bottomimage_id)
     ImageView bottomimage_id;
     @InjectView(R.id.addmacbtn_id)
@@ -157,8 +162,10 @@ public class MacFragment extends Basecfragment implements
     private static final String STR_MSG_PARAM = "msgparam";
     List<Map> list_wifi_camera = new ArrayList<>();
     private boolean playactivityfinsh = true;
-
+    private String videofrom = "";
     public static String MACFRAGMENT_PM25 = "com.fragment.pm25";
+    private Map video_item = new HashMap();//来自devicefragment
+
 
     /**
      * 小苹果绑定列表
@@ -236,30 +243,71 @@ public class MacFragment extends Basecfragment implements
                     }
                     break;
                 case 10://wifi摄像头已经在线了
-                    String content = stringbuffer.toString();
-                    String[] splits = content.split(",");
-                    if (splits.length == 3) {
-                        if (splits[0].equals("未知状态") && splits[1].equals("正在连接") && splits[2].equals("在线")) {
-                            stringbuffer = new StringBuffer();
-//                            AppManager.getAppManager().finishActivity_current(PlayActivity.class);
-                            Intent intent = new Intent("play_finish");
-                            getActivity().sendBroadcast(intent);
-                            again_connection = true;
-                        }
-                    } else {
-                        if (!playactivityfinsh) {
-//                        AppManager.getAppManager().finishActivity_current(PlayActivity.class);
-                            Intent intent = new Intent(getActivity(), PlayActivity.class);
-                            startActivity(intent);
-                        }
+                    switch (videofrom) {//      videofrom = "macfragment";
+                        case "macfragment":
+                            mac_fragment_video_ok();
+                            break;
+                        case "devicefragment"://直接跳转到devicefragmentActivity
+                            tongzhi_to_video("1");
+                            break;
                     }
                     break;
                 case 11://连接失败，在去连
-                    onitem_wifi_shexiangtou(mapdevice);
+                    switch (videofrom) {//      videofrom = "macfragment";
+                        case "macfragment":
+                            onitem_wifi_shexiangtou(mapdevice);
+                            break;
+                        case "devicefragment":
+                            common_video(video_item);
+                            break;
+                    }
                     break;
             }
         }
     };
+
+    @Subscribe
+    public void onEvent(MyEvent event) {
+
+    }
+
+
+    /**
+     * 发送给MyDeviceItemActivity视频的状态，获取摄像头状态，并返回
+     */
+    private void tongzhi_to_video(String status) {
+//        Intent mIntent = new Intent(MESSAGE_TONGZHI_VIDEO_TO_MYDEVICE);
+//        mIntent.putExtra("status", (Serializable) status);
+//        getActivity().sendBroadcast(mIntent);
+        MyEvent event = new MyEvent();
+        event.setMsg(status);
+//...设置event
+        EventBus.getDefault().post(event);
+    }
+
+
+    /**
+     * macfragment video ok
+     */
+    private void mac_fragment_video_ok() {
+        String content = stringbuffer.toString();
+        String[] splits = content.split(",");
+        if (splits.length == 3) {
+            if (splits[0].equals("未知状态") && splits[1].equals("正在连接") && splits[2].equals("在线")) {
+                stringbuffer = new StringBuffer();
+//                            AppManager.getAppManager().finishActivity_current(PlayActivity.class);
+                Intent intent = new Intent("play_finish");
+                getActivity().sendBroadcast(intent);
+                again_connection = true;
+            }
+        } else {
+            if (!playactivityfinsh) {
+//                        AppManager.getAppManager().finishActivity_current(PlayActivity.class);
+                Intent intent = new Intent(getActivity(), PlayActivity.class);
+                startActivity(intent);
+            }
+        }
+    }
 
     private RemoteControl remoteControl;
     private GizWifiDevice mGizWifiDevice = null;
@@ -341,7 +389,7 @@ public class MacFragment extends Basecfragment implements
     protected void onView() {
 //        SharedPreferencesUtil.saveData(getActivity(), "nihao", "nihao");
 //        String str = (String) SharedPreferencesUtil.getData(getActivity(), "nihao", "");
-
+        EventBus.getDefault().register(this);
         init_wifi_camera();
         registerMessageReceiver();
         // 遥控云数据接口分装对象对象
@@ -706,12 +754,12 @@ public class MacFragment extends Basecfragment implements
     }
 
 
-    private final  String PROCESS_NAME = "com.massky.sraum";//进程名称
+    private final String PROCESS_NAME = "com.massky.sraum";//进程名称
 
     /**
      * 判断是不是UI主进程，因为有些东西只能在UI主进程初始化
      */
-    public  boolean isAppMainProcess() {
+    public boolean isAppMainProcess() {
         try {
             int pid = android.os.Process.myPid();
             String process = getAppNameByPID(App.getInstance(), pid);
@@ -732,7 +780,7 @@ public class MacFragment extends Basecfragment implements
     /**
      * 根据Pid得到进程名
      */
-    public  String getAppNameByPID(Context context, int pid) {
+    public String getAppNameByPID(Context context, int pid) {
         ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         for (android.app.ActivityManager.RunningAppProcessInfo processInfo : manager.getRunningAppProcesses()) {
             if (processInfo.pid == pid) {
@@ -746,7 +794,7 @@ public class MacFragment extends Basecfragment implements
 
     @Override
     public void initData() {
-        if(isAppMainProcess()) {//断当前进程是否是 APP 默认进程，只在主进程中进行初始化操作， APP 默认进程名就是包名
+        if (isAppMainProcess()) {//断当前进程是否是 APP 默认进程，只在主进程中进行初始化操作， APP 默认进程名就是包名
             SharedPreferencesUtil.saveData(getActivity(), "pagetag", "1");
 //        boolean flag = TokenUtil.getTokenflag(getActivity());
 //        if (flag) {
@@ -1172,6 +1220,7 @@ public class MacFragment extends Basecfragment implements
 //                map.put("password", "888888");
 //                map.put("wifi", wificamera.get("wifi"));
                 this.mapdevice = mapdevice;
+                this.videofrom = "macfragment";
                 onitem_wifi_shexiangtou(mapdevice);
                 break;
             default:
@@ -1189,19 +1238,38 @@ public class MacFragment extends Basecfragment implements
         playactivityfinsh = false;
         again_connection = false;
         this.mapdevice = mapdevice;
+        common_video(mapdevice);
+    }
+
+    /**
+     * 共同的视频
+     *
+     * @param mapdevice
+     */
+    private void common_video(Map<String, Object> mapdevice) {
         List<Map> list = SharedPreferencesUtil.getInfo_List(getActivity(), "list_wifi_camera_first");
         int tag = 0;
         for (int i = 0; i < list.size(); i++) {
-            if (mapdevice.get("mode").toString().toString()
+            if (mapdevice.get("mode").toString()
                     .equals(list.get(i).get("did"))) {
                 tag = (int) list.get(i).get("tag");
             }
         }
+
         if (tag == 1) {
             handler.sendEmptyMessage(10);//设备已经在线了
 //            Toast.makeText(getActivity(), "设备已经是在线状态了", Toast.LENGTH_SHORT).show();
         } else if (tag == 2) {
-            Toast.makeText(getActivity(), "设备不在线", Toast.LENGTH_SHORT).show();
+
+            switch (videofrom) {//      videofrom = "macfragment";
+                case "macfragment":
+                    Toast.makeText(getActivity(), "设备不在线", Toast.LENGTH_SHORT).show();
+                    break;
+                case "devicefragment"://直接跳转到devicefragmentActivity-》设备已经断线
+                    tongzhi_to_video("0");
+                    break;
+            }
+
         } else {
             done(mapdevice.get("dimmer").toString()
                     , mapdevice.get("temperature").toString()
@@ -1596,7 +1664,6 @@ public class MacFragment extends Basecfragment implements
 
         }
 
-
         /**
          * 获取电视机遥控码
          *
@@ -1891,6 +1958,7 @@ public class MacFragment extends Basecfragment implements
         intent.setClass(getActivity(), BridgeService.class);
         getActivity().stopService(intent);
         tag = 0;
+        EventBus.getDefault().unregister(this);
 //        over_camera_list();
         super.onDestroy();
     }
@@ -1908,10 +1976,12 @@ public class MacFragment extends Basecfragment implements
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_INTENT_RECEIVER);
         filter.addAction(MESSAGE_TONGZHI_DOOR_FIRST);
+        filter.addAction(MESSAGE_TONGZHI_VIDEO_FROM_MYDEVICE);
         getActivity().registerReceiver(mMessageReceiver, filter);
     }
 
     public class MessageReceiver extends BroadcastReceiver {
+
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -1943,8 +2013,13 @@ public class MacFragment extends Basecfragment implements
                 index--;
                 SharedPreferencesUtil.saveData(context, "tongzhi_time", index);
                 if (index == 0) {
+                    videofrom = "macfragment";
                     onitem_wifi_shexiangtou(mapdevice);
                 }
+            } else if (intent.getAction().equals(MESSAGE_TONGZHI_VIDEO_FROM_MYDEVICE)) {//来自设备页获取摄像头状态的通知
+                videofrom = "devicefragment";
+                video_item = (Map) intent.getSerializableExtra("video_item");
+                common_video(video_item);
             }
         }
     }

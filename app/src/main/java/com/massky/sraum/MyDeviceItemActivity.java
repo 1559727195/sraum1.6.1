@@ -1,44 +1,78 @@
 package com.massky.sraum;
 
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.os.Vibrator;
 import android.support.percent.PercentRelativeLayout;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.AddTogenInterface.AddTogglenInterfacer;
 import com.Util.ApiHelper;
 import com.Util.DialogUtil;
+import com.Util.MusicUtil;
 import com.Util.MyOkHttp;
 import com.Util.Mycallback;
 import com.Util.SharedPreferencesUtil;
 import com.Util.ToastUtil;
 import com.Util.TokenUtil;
 import com.base.Basecactivity;
+import com.data.Allbox;
 import com.data.User;
+import com.dialog.ToastUtils;
 import com.example.swipemenuview.SwipeMenuLayout;
+import com.fragment.MacFragment;
+import com.fragment.MyEvent;
+import com.ipcamera.demo.BridgeService;
+import com.ipcamera.demo.MoveNotificationActivity;
+import com.ipcamera.demo.PlayActivity;
+import com.ipcamera.demo.SettingActivity;
+import com.ipcamera.demo.bean.AlermBean;
+import com.ipcamera.demo.utils.ContentCommon;
+import com.ipcamera.demo.utils.SystemValue;
+import com.suke.widget.SwitchButton;
+import com.wujay.fund.GestureEditActivity;
 import com.yanzhenjie.statusview.StatusUtils;
 import com.yanzhenjie.statusview.StatusView;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import butterknife.InjectView;
 import okhttp3.Call;
+import vstc2.nativecaller.NativeCaller;
+
+import static com.fragment.MacFragment.MESSAGE_TONGZHI_VIDEO_TO_MYDEVICE;
 
 /**
  * Created by zhu on 2018/1/16.
  */
 
-public class MyDeviceItemActivity extends Basecactivity {
+public class MyDeviceItemActivity extends Basecactivity implements SwitchButton.OnCheckedChangeListener
+        , BridgeService.AlarmInterface {
+    public static final String MESSAGE_TONGZHI_VIDEO_FROM_MYDEVICE = "com.sraum.massky.from.mydevice";
     @InjectView(R.id.back)
     ImageView back;
     @InjectView(R.id.status_view)
@@ -82,15 +116,52 @@ public class MyDeviceItemActivity extends Basecactivity {
     View view_yaokongqi;
     @InjectView(R.id.dev_txt)
     TextView dev_txt;
+    @InjectView(R.id.slide_btn)
+    SwitchButton slide_btn;
+    @InjectView(R.id.view_bufang)
+    View view_bufang;
+    @InjectView(R.id.rel_bufang)
+    RelativeLayout rel_bufang;
+
+    @InjectView(R.id.view_bufang_baojing)
+    View view_bufang_baojing;
+    @InjectView(R.id.rel_bufang_baojing)
+    RelativeLayout rel_bufang_baojing;
+
+    @InjectView(R.id.view_bufang_plan)
+    View view_bufang_plan;
+    @InjectView(R.id.rel_bufang_plan)
+    RelativeLayout rel_bufang_plan;
+    //slide_btn_baojing
+    @InjectView(R.id.slide_btn_baojing)
+    SwitchButton slide_btn_baojing;
+
+    @InjectView(R.id.slide_btn_plan)
+    SwitchButton slide_btn_plan;
+    private final int ALERMPARAMS = 3;
+
 
     private int[] iconName = {R.string.yijianlight, R.string.liangjianlight, R.string.sanjianlight, R.string.sijianlight,
             R.string.yilutiaoguang, R.string.lianglutiaoguang, R.string.sanlutiao, R.string.window_panel, R.string.air_panel,
-            R.string.air_mode,R.string.xinfeng_mode,R.string.dinuan_mode
+            R.string.air_mode, R.string.xinfeng_mode, R.string.dinuan_mode
             , R.string.menci, R.string.rentiganying, R.string.jiuzuo, R.string.yanwu, R.string.tianranqi, R.string.jinjin_btn,
-            R.string.zhineng, R.string.pm25, R.string.shuijin, R.string.jixieshou,R.string.cha_zuo_1,R.string.cha_zuo, R.string.wifi_hongwai,
-            R.string.wifi_camera,R.string.one_light_control,R.string.two_light_control,R.string.three_light_control
-            ,R.string.two_dimming_one_control,R.string.two_dimming_two_control,R.string.two_dimming_trhee_control,R.string.keshimenling
+            R.string.zhineng, R.string.pm25, R.string.shuijin, R.string.jixieshou, R.string.cha_zuo_1, R.string.cha_zuo, R.string.wifi_hongwai,
+            R.string.wifi_camera, R.string.one_light_control, R.string.two_light_control, R.string.three_light_control
+            , R.string.two_dimming_one_control, R.string.two_dimming_two_control, R.string.two_dimming_trhee_control, R.string.keshimenling
     };
+    private String isUse;
+    private int option = ContentCommon.INVALID_OPTION;
+    private int CameraType = ContentCommon.CAMERA_TYPE_MJPEG;
+    private static final String STR_DID = "did";
+    private static final String STR_MSG_PARAM = "msgparam";
+    List<Map> list_wifi_camera = new ArrayList<>();
+    private int tag;
+    private int connection_wifi_camera_index;
+    private boolean again_connection;
+    private Map mapdevice = new HashMap();
+    private AlermBean alermBean;
+    private String strDID = "";
+
 
     @Override
     protected int viewId() {
@@ -99,6 +170,7 @@ public class MyDeviceItemActivity extends Basecactivity {
 
     @Override
     protected void onView() {
+        EventBus.getDefault().register(this);
         StatusUtils.setFullToStatusBar(this);  // StatusBar.
         dialogUtil = new DialogUtil(this);
         back.setOnClickListener(this);
@@ -117,6 +189,18 @@ public class MyDeviceItemActivity extends Basecactivity {
             banben_txt.setText(panelItem_map.get("firmware").toString());
             panid_txt.setText(panelItem_map.get("hardware").toString());
             panelNumber = panelItem_map.get("id").toString();
+            isUse = panelItem_map.get("isUse").toString();
+
+            switch (panelItem_map.get("isUse").toString() == null ? "" : panelItem_map.get("isUse").toString()) {
+                //传感器布防是否启用
+                case "1":
+                    slide_btn.setChecked(true);
+                    break;
+                case "0":
+                    slide_btn.setChecked(false);
+                    break;
+            }
+
             switch (panelItem_map.get("status").toString()) {
                 case "0":
                     status_txt.setText("离线");
@@ -125,6 +209,7 @@ public class MyDeviceItemActivity extends Basecactivity {
                     status_txt.setText("在线");
                     break;
             }
+
             wangguan_set.setImageResource(imgtype);
             set_type(panelItem_map.get("type").toString());
             //成员，业主accountType->addrelative_id
@@ -140,12 +225,60 @@ public class MyDeviceItemActivity extends Basecactivity {
                     break;//家庭成员
             }
         }
-
         onEvent();
+    }
+
+    //MESSAGE_TONGZHI_VIDEO_TO_MYDEVICE
+
+    /**
+     * 传感器类设置是否启用布防
+     */
+    private void sensor_set_protection(final String isUse) {
+        dialogUtil.loadDialog();
+        Map<String, Object> mapbox = new HashMap<String, Object>();
+        mapbox.put("token", TokenUtil.getToken(MyDeviceItemActivity.this));
+        mapbox.put("panelNumber", panelNumber);
+        mapbox.put("isUse", isUse);
+        MyOkHttp.postMapObject(ApiHelper.sraum_setLinkSensorPanelIsUse, mapbox, new Mycallback(new AddTogglenInterfacer() {
+            @Override
+            public void addTogglenInterfacer() {
+                sensor_set_protection(isUse);
+            }
+        }, MyDeviceItemActivity.this, dialogUtil) {
+            @Override
+            public void onSuccess(User user) {
+                super.onSuccess(user);
+                switch (isUse) {
+                    case "1":
+                        ToastUtil.showToast(MyDeviceItemActivity.this, "布防成功");
+                        break;
+                    case "0":
+                        ToastUtil.showToast(MyDeviceItemActivity.this, "撤防成功");
+                        break;
+                }
+            }
+
+            @Override
+            public void wrongToken() {
+                super.wrongToken();
+                ToastUtil.showToast(MyDeviceItemActivity.this, "token 错误");
+            }
+
+            @Override
+            public void wrongBoxnumber() {
+                super.wrongBoxnumber();
+                ToastUtil.showToast(MyDeviceItemActivity.this, "panelNumber\n" +
+                        "不正确");
+            }
+        });
     }
 
     private void onEvent() {
         rel_yaokongqi.setOnClickListener(this);
+        slide_btn.setOnCheckedChangeListener(this);
+        slide_btn_baojing.setOnCheckedChangeListener(this);
+        slide_btn_plan.setOnCheckedChangeListener(this);
+        rel_bufang_plan.setOnClickListener(this);
     }
 
     private void set_type(String type) {
@@ -188,18 +321,23 @@ public class MyDeviceItemActivity extends Basecactivity {
                 break;
             case "A801":
                 gateway_id_txt.setText(iconName[12]);
+                sensor_common_select();
                 break;
             case "A901":
                 gateway_id_txt.setText(iconName[13]);
+                sensor_common_select();
                 break;
             case "A902":
                 gateway_id_txt.setText(iconName[14]);
+                sensor_common_select();
                 break;
             case "AB01":
                 gateway_id_txt.setText(iconName[15]);
+                sensor_common_select();
                 break;
             case "AB04":
                 gateway_id_txt.setText(iconName[16]);
+                sensor_common_select();
                 break;
             case "B001":
                 gateway_id_txt.setText(iconName[17]);
@@ -212,6 +350,7 @@ public class MyDeviceItemActivity extends Basecactivity {
                 break;
             case "AC01":
                 gateway_id_txt.setText(iconName[20]);
+                sensor_common_select();
                 break;
             case "B301":
                 gateway_id_txt.setText(iconName[21]);
@@ -257,15 +396,54 @@ public class MyDeviceItemActivity extends Basecactivity {
             case "A331":
                 gateway_id_txt.setText(iconName[31]);
                 break;
-            case "AA04"://WIFI转发模块
+            case "AA04"://WIFI摄像头
                 gateway_id_txt.setText(iconName[32]);
                 dev_txt.setText("WIFI");
                 banben_txt.setText(panelItem_map.get("wifi").toString());
                 //controllerId
                 mac_txt.setText(panelItem_map.get("controllerId").toString());
-                break;
 
+                //去获取摄像头的状态
+//                this.mapdevice = mapdevice;
+                mapdevice = new HashMap();
+                //dimmer,temperature,mode
+                mapdevice.put("dimmer", "admin");
+                mapdevice.put("temperature", "888888");
+                mapdevice.put("mode", panelItem_map.get("controllerId").toString());
+//                onitem_wifi_shexiangtou(mapdevice);//(String strUser, String strPwd, String strDID
+                //去首页获取状态，发送广播
+                tongzhi_video(mapdevice);
+                init_nativeCaller();
+                break;
         }
+    }
+
+    /**
+     * 初始化布防参数
+     */
+    private void init_nativeCaller() {
+        strDID = panelItem_map.get("controllerId").toString();
+        NativeCaller.PPPPGetSystemParams(strDID,
+                ContentCommon.MSG_TYPE_GET_PARAMS);
+        alermBean = new AlermBean();
+        BridgeService.setAlarmInterface(this);
+    }
+
+    /**
+     * 发送给首页，获取摄像头状态，并返回
+     */
+    private void tongzhi_video(Map map) {
+        Intent mIntent = new Intent(MESSAGE_TONGZHI_VIDEO_FROM_MYDEVICE);
+        mIntent.putExtra("video_item", (Serializable) map);
+        sendBroadcast(mIntent);
+    }
+
+    /**
+     * 传感器共有
+     */
+    private void sensor_common_select() {
+        view_bufang.setVisibility(View.VISIBLE);
+        rel_bufang.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -298,6 +476,14 @@ public class MyDeviceItemActivity extends Basecactivity {
                 intent = new Intent(MyDeviceItemActivity.this, SelectYaoKongQiActivity.class);
                 intent.putExtra("controllerNumber", panelItem_map.get("controllerId").toString());//controllerNumber
                 startActivity(intent);
+                break;
+            case R.id.rel_bufang_plan://布防报警计划
+//                startActivity(new Intent(MyDeviceItemActivity.this,BuFangBaoJingPlanActivity.class));
+
+                Intent  intentalam = new Intent(MyDeviceItemActivity.this,BuFangBaoJingPlanActivity.class);
+                intentalam.putExtra(ContentCommon.STR_CAMERA_PWD, "888888");
+                intentalam.putExtra(ContentCommon.STR_CAMERA_ID, strDID);
+                startActivity(intentalam);
                 break;
         }
     }
@@ -357,7 +543,6 @@ public class MyDeviceItemActivity extends Basecactivity {
             }
         });
     }
-
 
     /**
      * 删除设备
@@ -419,9 +604,223 @@ public class MyDeviceItemActivity extends Basecactivity {
                 });
     }
 
-
     @Override
     protected void onResume() {
         super.onResume();
+    }
+
+    @Override
+    public void onCheckedChanged(SwitchButton view, boolean isChecked) {//布防启用
+        switch (view.getId()) {
+            case R.id.slide_btn:
+                if (isChecked) {
+                    sensor_set_protection("1");
+                } else {
+                    sensor_set_protection("0");
+                }
+                break;
+            case R.id.slide_btn_baojing:
+                if (isChecked) {
+//                    sensor_set_protection("1");
+                    alermBean.setMotion_armed(1);
+                } else {
+//                    sensor_set_protection("0");
+                    alermBean.setMotion_armed(0);
+                }
+                setAlerm();
+                break;
+            case R.id.slide_btn_plan:
+                if (isChecked) {
+//                    sensor_set_protection("1");
+                } else {
+//                    sensor_set_protection("0");
+                }
+                break;
+        }
+    }
+
+    private void setAlerm() {
+//        if (successFlag) {
+        Log.e("setAlerm", "setAlermTemp: " + alermBean.getAlarm_temp());
+        NativeCaller.PPPPAlarmSetting(strDID, alermBean.getAlarm_audio(),
+                alermBean.getMotion_armed(),
+                alermBean.getMotion_sensitivity(),
+                alermBean.getInput_armed(), alermBean.getIoin_level(),
+                alermBean.getIoout_level(), alermBean.getIolinkage(),
+                alermBean.getAlermpresetsit(), alermBean.getMail(),
+                alermBean.getSnapshot(), alermBean.getRecord(),
+                alermBean.getUpload_interval(),
+                alermBean.getSchedule_enable(),
+                0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+                0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+                0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+                0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+                0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+                0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+                0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+                0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+                0xFFFFFFFF, 0xFFFFFFFF, -1);
+//        } else {
+//            showToast(R.string.alerm_set_failed);
+//        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe
+    public void onEvent(MyEvent event) {
+        String status = event.getMsg();
+        switch (status) {
+            case "1":
+                view_bufang_baojing.setVisibility(View.VISIBLE);
+                rel_bufang_baojing.setVisibility(View.VISIBLE);
+                rel_bufang_plan.setVisibility(View.VISIBLE);
+                view_bufang_plan.setVisibility(View.VISIBLE);
+                break;
+            case "0":
+                view_bufang_baojing.setVisibility(View.GONE);
+                rel_bufang_baojing.setVisibility(View.GONE);
+                rel_bufang_plan.setVisibility(View.GONE);
+                view_bufang_plan.setVisibility(View.GONE);
+                break;
+        }
+//        ToastUtil.showToast(MyDeviceItemActivity.this, "status:" + status);
+    }
+
+    @Override
+    public void callBackAlarmParams(String did, int alarm_audio, int motion_armed,
+                                    int motion_sensitivity, int input_armed, int ioin_level,
+                                    int iolinkage, int ioout_level, int alarmpresetsit, int mail,
+                                    int snapshot, int record, int upload_interval,
+                                    int schedule_enable, int schedule_sun_0, int schedule_sun_1,
+                                    int schedule_sun_2, int schedule_mon_0, int schedule_mon_1,
+                                    int schedule_mon_2, int schedule_tue_0, int schedule_tue_1,
+                                    int schedule_tue_2, int schedule_wed_0, int schedule_wed_1,
+                                    int schedule_wed_2, int schedule_thu_0, int schedule_thu_1,
+                                    int schedule_thu_2, int schedule_fri_0, int schedule_fri_1,
+                                    int schedule_fri_2, int schedule_sat_0, int schedule_sat_1,
+                                    int schedule_sat_2) {
+
+        alermBean.setDid(did);
+        alermBean.setMotion_armed(motion_armed);
+        alermBean.setMotion_sensitivity(motion_sensitivity);
+        alermBean.setInput_armed(input_armed);
+        alermBean.setIoin_level(ioin_level);
+        alermBean.setIolinkage(iolinkage);
+        alermBean.setIoout_level(ioout_level);
+        alermBean.setAlermpresetsit(alarmpresetsit);
+        alermBean.setMail(mail);
+        alermBean.setSnapshot(snapshot);
+        alermBean.setRecord(record);
+        alermBean.setUpload_interval(upload_interval);
+        alermBean.setAlarm_audio(alarm_audio);
+        alermBean.setAlarm_temp(input_armed);
+        alermBean.setSchedule_enable(schedule_enable);
+        mHandler.sendEmptyMessage(ALERMPARAMS);
+    }
+
+    @Override
+    public void callBackSetSystemParamsResult(String did, int paramType,
+                                              int result) {
+        mHandler.sendEmptyMessage(result);
+    }
+
+    private Handler mHandler = new Handler() {
+        public void handleMessage(android.os.Message msg) {
+            switch (msg.what) {
+                case 0:
+                    ToastUtil.showToast(MyDeviceItemActivity.this, "报警设置失败");
+                    break;
+                case 1:
+//                    ToastUtil.showToast(MyDeviceItemActivity.this, "报警设置成功");
+//                    finish();
+                    break;
+                case ALERMPARAMS:
+                    if (0 == alermBean.getMotion_armed()) {//首次读取报警设置
+                        slide_btn_baojing.setChecked(false);
+                    } else {
+                        slide_btn_baojing.setChecked(true);
+                    }
+
+                    if (0 == alermBean.getInput_armed()) {
+
+
+                    } else {
+
+                    }
+
+                    if (0 == alermBean.getIoin_level()) {
+
+                    } else {
+
+                    }
+
+                    if (0 == alermBean.getAlarm_audio()) {
+
+                    } else {
+
+                        if (1 == alermBean.getAlarm_audio()) {
+
+                        } else if (2 == alermBean.getAlarm_audio()) {
+
+                        } else if (3 == alermBean.getAlarm_audio()) {
+
+                        }
+                    }
+
+                    if (0 == alermBean.getAlarm_temp()) {
+
+                    } else {
+
+                        if (1 == alermBean.getAlarm_temp()) {
+
+                        } else if (2 == alermBean.getAlarm_temp()) {
+
+                        } else if (3 == alermBean.getAlarm_temp()) {
+
+                        }
+                    }
+
+                    if (0 == alermBean.getIolinkage()) {
+
+                    } else {
+
+                    }
+
+                    if (0 == alermBean.getIoout_level()) {
+
+                    } else {
+
+                    }
+
+                    if (alermBean.getAlermpresetsit() == 0) {
+
+                    } else {
+
+                    }
+
+                    if (1 == alermBean.getMotion_armed()
+                            || 1 == alermBean.getInput_armed()
+                            || alermBean.getAlarm_audio() != 0) {
+
+                    } else {
+
+                    }
+
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
+
+
+    @Override
+    public void onBackPressed() {
+       MyDeviceItemActivity.this.finish();
     }
 }

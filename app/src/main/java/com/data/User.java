@@ -84,6 +84,7 @@ public class User {
         public String firmware;
         public String hardware;
         public String gatewayid;
+        public String isUse;
     }
 
     //gatewayid面板id panelType面板类型

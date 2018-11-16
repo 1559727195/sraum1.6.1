@@ -11,7 +11,6 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import com.AddTogenInterface.AddTogglenInterfacer;
 import com.Util.ApiHelper;
 import com.Util.DialogUtil;
@@ -25,7 +24,6 @@ import com.example.swipemenuview.SwipeMenuLayout;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.massky.sraum.MyDeviceItemActivity;
 import com.massky.sraum.R;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,7 +44,6 @@ public class MyDeviceAdapter extends android.widget.BaseAdapter {
     private SlidingMenu mySlidingMenu;
     private DialogUtil dialogUtil;
 
-
     public MyDeviceAdapter(Activity context, List<Map> list, List<Integer> listint, List<Integer> listintwo,
                            SelectSensorListener selectSensorListener, String accountType, SlidingMenu mySlidingMenu,
                            DialogUtil dialogUtil) {
@@ -60,7 +57,6 @@ public class MyDeviceAdapter extends android.widget.BaseAdapter {
         this.mySlidingMenu = mySlidingMenu;
         this.dialogUtil = dialogUtil;
     }
-
     @Override
     public int getCount() {
         return list.size();
@@ -135,7 +131,6 @@ public class MyDeviceAdapter extends android.widget.BaseAdapter {
 
         return convertView;
     }
-
 
     private void setPicture(String type) {
         switch (type) {
@@ -297,7 +292,6 @@ public class MyDeviceAdapter extends android.widget.BaseAdapter {
         });
     }
 
-
     /**
      * 删除设备
      *
@@ -366,7 +360,6 @@ public class MyDeviceAdapter extends android.widget.BaseAdapter {
                 });
     }
 
-
     public void setLists(List<Map> list_hand_scene, List<Integer> listint, List<Integer> listintwo) {
         this.list = list_hand_scene;
         this.listint = listint;
@@ -380,7 +373,6 @@ public class MyDeviceAdapter extends android.widget.BaseAdapter {
 //    public static void setIsSelected(HashMap<Integer, Boolean> isSelected) {
 //        SelectSensorSingleAdapter.isSelected = isSelected;
 //    }
-
 
     public static class ViewHolderContentType {
         public ImageView img_guan_scene;

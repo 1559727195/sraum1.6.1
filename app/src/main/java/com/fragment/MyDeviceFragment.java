@@ -269,6 +269,8 @@ public class MyDeviceFragment extends Basecfragment implements AdapterView.OnIte
                     mapdevice.put("firmware", user.panelList.get(i).firmware);
                     mapdevice.put("hardware", user.panelList.get(i).hardware);
                     mapdevice.put("gatewayid", user.panelList.get(i).gatewayid);
+                    //isUse
+                    mapdevice.put("isUse", user.panelList.get(i).isUse);
                     list_hand_scene.add(mapdevice);
                     setPicture(user.panelList.get(i).type);
                 }
@@ -294,12 +296,12 @@ public class MyDeviceFragment extends Basecfragment implements AdapterView.OnIte
                     mapdevice.put("firmware", "");
                     mapdevice.put("hardware", "");
                     mapdevice.put("gatewayid", "");
+                    mapdevice.put("isUse", "");
                     list_hand_scene.add(mapdevice);
                     setPicture(user.wifiList.get(i).type);
                 }
 
                 centext_id.setText("我的设备(" + list_hand_scene.size() + ")");
-
                 mydeviceadapter.setLists(list_hand_scene, listint, listintwo);
                 mydeviceadapter.notifyDataSetChanged();
                 switch (doit) {
@@ -433,18 +435,6 @@ public class MyDeviceFragment extends Basecfragment implements AdapterView.OnIte
 
     }
 
-//    @Override
-//    public void onRefresh(PullToRefreshLayout pullToRefreshLayout) {
-//        refresh_view.refreshFinish(PullToRefreshLayout.SUCCEED);
-//        onData();
-//    }
-//
-//    @Override
-//    public void onLoa dMore(PullToRefreshLayout pullToRefreshLayout) {
-//
-//    }
-
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -505,7 +495,6 @@ public class MyDeviceFragment extends Basecfragment implements AdapterView.OnIte
         }
         LogUtil.eLength("查看显示方法", hidden + "");
     }
-
 
     public void setBackToMainTitleListener(BackToMainTitleListener backToMainTitleListener) {
         this.backToMainTitleListener = backToMainTitleListener;

@@ -313,7 +313,7 @@
     <string name="next">下一步</string>
     <string name="aboutmain">关于</string>
 
-    <string name="about">sraum v1.8.9</string>
+    <string name="about">sraum v1.9.0</string>
     <string name="aboutone">产品介绍</string>
     <string name="abouttwo">使用帮助</string>
     <string name="aboutthree">意见反馈</string>
@@ -447,7 +447,7 @@
     <string name="window_panel1">窗帘面板</string>
     <string name="air_panel">空调面板</string>
     <string name="yanwu">烟雾报警器</string>
-    <string name="tianranqi">天然气报警器</string>
+    <string name="tianranqi">燃气报警器</string>
     <string name="zhineng">智能门锁</string>
     <string name="pm25">PM2.5</string>
     <string name="duogongneng">多功能模块</string>

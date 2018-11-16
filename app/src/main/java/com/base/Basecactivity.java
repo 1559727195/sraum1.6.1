@@ -265,6 +265,5 @@ public abstract class Basecactivity extends AutoLayoutActivity implements View.O
     }
 
 
-
 }
 

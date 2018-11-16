@@ -69,7 +69,6 @@ public class App extends Application implements Application.ActivityLifecycleCal
      */
     private int activityAount = 0;
 
-
     // 开放平台申请的APP key & secret key
     public static String APP_KEY = "ccd38858cc5a459bbeedcf93a25ae6be";
     public static String API_URL = "https://open.ys7.com";

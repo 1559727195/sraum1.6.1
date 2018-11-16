@@ -104,6 +104,7 @@ public class SceneFragment extends Basecfragment implements
 
     @Override
     protected void onView() {
+        Log.e("robin debug3","end-time:");
         registerMessageReceiver();
         myscneaddcircle_id.setVisibility(View.GONE);
         boxNumber = (String) SharedPreferencesUtil.getData(getActivity(), "boxnumber", "");
