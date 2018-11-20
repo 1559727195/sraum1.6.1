@@ -131,6 +131,8 @@ public class MyReceiver extends BroadcastReceiver {
                     case "1":
                     case "2":
                     case "51":
+                    case "53":
+                        SharedPreferencesUtil.saveData(context, "tongzhi_time", 1);//门铃报警通知次数
                         break;
                     case "52":
                         //processCustomMessage_charge(context, bundle);
@@ -150,6 +152,8 @@ public class MyReceiver extends BroadcastReceiver {
                     case "1":
                     case "2":
                     case "51":
+                    case "53":
+                        SharedPreferencesUtil.saveData(context, "tongzhi_time", 1);//门铃报警通知次数
                         break;
                     case "52":
                         SharedPreferencesUtil.saveData(context, "tongzhi_time", 1);//门铃报警通知次数
@@ -343,6 +347,10 @@ public class MyReceiver extends BroadcastReceiver {
         } else if (notifactionId == 52) {//notifactionId = 50 ->升级网关
             //构建对象
             init_soundPool();
+
+        }else if (notifactionId == 53) {//notifactionId = 50 ->升级网关
+            //构建对象
+//            init_soundPool();
 
         }
     }

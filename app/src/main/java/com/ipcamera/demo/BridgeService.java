@@ -630,6 +630,7 @@ public class BridgeService extends Service
 					defense_plan19, defense_plan20, defense_plan21);
 		}
 	}
+
 	/*
 	 * @param alarmtype==0x14(20) 为可视门铃按钮动作
 	 *
@@ -661,7 +662,6 @@ public class BridgeService extends Service
 		default:
 			break;
 		}
-
 	}
 
 	public void CallBack_RecordFileSearchResult(String did, String filename,

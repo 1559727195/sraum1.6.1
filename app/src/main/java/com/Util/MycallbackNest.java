@@ -2,6 +2,8 @@ package com.Util;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import com.AddTogenInterface.AddTogglenInterfacer;
 import com.alibaba.fastjson.JSON;
@@ -214,7 +216,15 @@ public class MycallbackNest extends StringCallback implements ApiResult {
                             public void run() {
                                 try {
                                     Thread.sleep(100);
-                                    addTogglenInterfacer.addTogglenInterfacer();
+                                    Looper.prepare();
+                                    new Handler().post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            addTogglenInterfacer.addTogglenInterfacer();//问题就在这里，
+                                        }
+                                    });//在子线程中直接去new 一个handler
+                                    Looper.loop();//这种情况下，Runnable对象是运行在子线程中的，可以进行联网操作，但是不能更新UI
+                                    //token过期后，Can't create handler inside thread that has not called Looper.prepare()
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
                                 }

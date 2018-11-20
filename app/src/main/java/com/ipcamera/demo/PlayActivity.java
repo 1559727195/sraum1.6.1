@@ -114,7 +114,7 @@ public class PlayActivity extends Activity implements OnTouchListener,OnGestureL
 	private String strDID = null;
 	private View osdView = null;
 	private ToggleButton irSwitch;
-	private boolean bDisplayFinished = true;
+	public static boolean bDisplayFinished = true;
 	private CustomBuffer AudioBuffer = null;
 	private AudioPlayer audioPlayer = null;
 	private boolean bAudioStart = false;

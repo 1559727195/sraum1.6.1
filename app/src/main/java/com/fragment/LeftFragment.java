@@ -135,6 +135,7 @@ public class LeftFragment extends Basecfragment {
                         newContent = 1;
                         break;
                     case "52"://可视门铃报警
+                    case "53"://摄像头报警
                         clear();
                         dialogFlag = true;
                         relative_message_id.setBackgroundColor(BLACK);
@@ -142,7 +143,7 @@ public class LeftFragment extends Basecfragment {
                         break;
                 }
                 if (dialogFlag) {
-                    switchFragment(newContent,type,uid);
+                    switchFragment(newContent, type, uid);
                 }
 //                AppManager.getAppManager().removeActivity_but_activity_cls(MainfragmentActivity.class);
             }
@@ -169,7 +170,7 @@ public class LeftFragment extends Basecfragment {
     @Override
     public void onResume() {
         super.onResume();
-        String  avatar = (String) SharedPreferencesUtil.
+        String avatar = (String) SharedPreferencesUtil.
                 getData(App.getInstance().getApplicationContext(), "avatar", "");
         headportrait_id.setImageBitmap(BitmapUtil.stringtoBitmap(avatar));
         String name = (String) SharedPreferencesUtil.getData(getActivity(), "userName", "");
@@ -311,7 +312,8 @@ public class LeftFragment extends Basecfragment {
 
     /**
      * 切换fragment
-     *  @param index
+     *
+     * @param index
      * @param type
      * @param uid
      */
@@ -321,7 +323,7 @@ public class LeftFragment extends Basecfragment {
         }
         if (getActivity() instanceof MainfragmentActivity) {
             MainfragmentActivity fca = (MainfragmentActivity) getActivity();
-            fca.setTabSelection(index,type,uid);
+            fca.setTabSelection(index, type, uid);
         }
     }
 

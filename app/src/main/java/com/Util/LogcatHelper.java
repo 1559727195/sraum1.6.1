@@ -2,13 +2,11 @@ package com.Util;
 
 import android.content.Context;
 import android.os.Environment;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
 
 public class LogcatHelper {
@@ -78,7 +76,7 @@ public class LogcatHelper {
             this.content = content;
             try {
                 out = new FileOutputStream(new File(dir, "crash-"
-                        + MyDate.getDateEN() + ".log"));
+                        + MyDate.getDateEN() + ".txt"));
             } catch (FileNotFoundException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();

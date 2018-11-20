@@ -299,7 +299,6 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
         return false;
     }
 
-
     /**
      * 获取文件长度
      */
@@ -348,6 +347,7 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
     }// end of if
     // end of func
 
+
     /**
      * 获取指定文件大小
      *
@@ -364,7 +364,6 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
 //        }
 //        return size;
 //    }
-
 
     /**
      * 初始化机智云小苹果
@@ -602,6 +601,8 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
             String title = null;//JingRuiApp
             String content = null;//2017-08-31 10:40:16,客厅,模块报警
             if (bundle != null) {
+                SharedPreferencesUtil.saveData(MainfragmentActivity.this, "tongzhi_time", 1);
+                //视频监控，极光push不太好用；
                 init_nofication(intent);
             }
         }
@@ -609,6 +610,8 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
 
     @Override
     protected void onNewIntent(Intent intent) {
+        SharedPreferencesUtil.saveData(MainfragmentActivity.this, "tongzhi_time", 1);
+        //视频监控，极光push不太好用；
         getNotify(intent);
         setIntent(intent);
     }
@@ -1286,9 +1289,7 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
         return super.onKeyDown(keyCode, event);
     }
 
-
     //自定义dialog,centerDialog删除对话框
-
     public void showCenterDeleteDialog(final String name1, final String name2) {
 //        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 //        // 布局填充器
@@ -1385,7 +1386,7 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
     @Override
     protected void onResume() {
         isForegrounds = true;
-        getNotify(getIntent());
+        getNotify(getIntent());//防止重启亮屏后，重复送出极光数据
         Log.e("zhu-", "MainfragmentActivity:onResume():isForegrounds:" + isForegrounds);
 //      String  extras_login = (String) SharedPreferencesUtil.getData(MainfragmentActivity.this,"extras_login","");
 //        if (extras_login) {

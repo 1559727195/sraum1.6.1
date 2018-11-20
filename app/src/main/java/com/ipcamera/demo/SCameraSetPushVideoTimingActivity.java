@@ -79,6 +79,8 @@ public class SCameraSetPushVideoTimingActivity extends Basecactivity implements
     private int index_select;
     @InjectView(R.id.next_step_txt)
     TextView next_step_txt;
+    @InjectView(R.id.back)
+    TextView back;
 
 //	@Override
 //	protected void onCreate(Bundle savedInstanceState) {
@@ -113,6 +115,7 @@ public class SCameraSetPushVideoTimingActivity extends Basecactivity implements
         startTime = start_time_txt.getText().toString();
         endTime = end_time_txt.getText().toString();
         next_step_txt.setOnClickListener(this);
+        back.setOnClickListener(this);
     }
 
     private void initCustomTimePicker() {
@@ -772,6 +775,9 @@ public class SCameraSetPushVideoTimingActivity extends Basecactivity implements
                 pvCustomTime.show(); //弹出自定义时间选择器
                 break;
             default:
+                break;
+            case R.id.back:
+                SCameraSetPushVideoTimingActivity.this.finish();
                 break;
         }
     }

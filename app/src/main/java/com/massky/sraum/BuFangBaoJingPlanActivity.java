@@ -1,19 +1,24 @@
 package com.massky.sraum;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Handler;
 import android.os.Message;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.Util.DialogUtil;
 import com.base.Basecactivity;
+import com.example.swipemenuview.SwipeMenuLayout;
 import com.ipcamera.demo.BaseActivity;
 import com.ipcamera.demo.BridgeService;
 import com.ipcamera.demo.MoveNotificationActivity;
@@ -46,10 +51,10 @@ public class BuFangBaoJingPlanActivity extends Basecactivity implements BridgeSe
     MyListView lv_info_plan;
     @InjectView(R.id.next_step_txt)
     TextView next_step_txt;
-    private static  HashMap<Integer, Integer> pushplan;
+    private static HashMap<Integer, Integer> pushplan;
     private PushVideoTimingAdapter pushAdapter;
     @InjectView(R.id.back)
-    TextView back;
+    ImageView back;
 
     @Override
     protected int viewId() {
@@ -61,6 +66,7 @@ public class BuFangBaoJingPlanActivity extends Basecactivity implements BridgeSe
         if (!StatusUtils.setStatusBarDarkFont(this, true)) {// Dark font for StatusBar.
             statusView.setBackgroundColor(Color.BLACK);
         }
+
         dialogUtil = new DialogUtil(this);
         StatusUtils.setFullToStatusBar(this);  // StatusBar.
         getDataFromOther();
@@ -92,14 +98,24 @@ public class BuFangBaoJingPlanActivity extends Basecactivity implements BridgeSe
 
         // 移动侦测推送
         pushplan = new HashMap<Integer, Integer>();
-        pushAdapter = new PushVideoTimingAdapter(BuFangBaoJingPlanActivity.this);
-        lv_info_plan.setAdapter(pushAdapter);
-        lv_info_plan.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        pushAdapter = new PushVideoTimingAdapter(BuFangBaoJingPlanActivity.this, new PushVideoTimingAdapter.PushVideoTimingListener() {
+            @Override
+            public void delete(int position) {
+                //弹出框
+                Map<Integer, Integer> item = pushAdapter.movetiming.get(position);
+                int itemplan = item.entrySet().iterator().next().getValue();
+                int key = item.entrySet().iterator().next().getKey();
+//                int key = data.getIntExtra("key", -1);
+                if (key == -1)
+                    return;
+                Message msg = new Message();
+                msg.what = 1;
+                msg.arg1 = key;
+                deleteHandler.sendMessage(msg);
+            }
 
             @Override
-            public void onItemClick(AdapterView<?> arg0, View v, int position,
-                                    long id) {
-                // TODO Auto-generated method stub
+            public void onItemClick(int position) {
                 Map<Integer, Integer> item = pushAdapter.movetiming.get(position);
                 int itemplan = item.entrySet().iterator().next().getValue();
                 int itemplanKey = item.entrySet().iterator().next().getKey();
@@ -109,6 +125,78 @@ public class BuFangBaoJingPlanActivity extends Basecactivity implements BridgeSe
                 it.putExtra("value", itemplan);
                 it.putExtra("key", itemplanKey);
                 startActivityForResult(it, 1);
+            }
+        });
+        lv_info_plan.setAdapter(pushAdapter);
+//        lv_info_plan.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//
+//            @Override
+//            public void onItemClick(AdapterView<?> arg0, View v, int position,
+//                                    long id) {
+//                // TODO Auto-generated method stub
+//                Map<Integer, Integer> item = pushAdapter.movetiming.get(position);
+//                int itemplan = item.entrySet().iterator().next().getValue();
+//                int itemplanKey = item.entrySet().iterator().next().getKey();
+//                Intent it = new Intent(BuFangBaoJingPlanActivity.this,
+//                        SCameraSetPushVideoTimingActivity.class);
+//                it.putExtra("type", 1);
+//                it.putExtra("value", itemplan);
+//                it.putExtra("key", itemplanKey);
+//                startActivityForResult(it, 1);
+//            }
+//        });
+    }
+
+
+    //自定义dialog,centerDialog删除对话框
+    public void showCenterDeleteDialog(final String panelNumber, final String name, final String type,
+                                       final SwipeMenuLayout finalConvertView) {
+
+        View view = LayoutInflater.from(BuFangBaoJingPlanActivity.this).inflate(R.layout.promat_dialog, null);
+        TextView confirm; //确定按钮
+        TextView cancel; //确定按钮
+        TextView tv_title;
+        TextView name_gloud;
+//        final TextView content; //内容
+        cancel = (TextView) view.findViewById(R.id.call_cancel);
+        confirm = (TextView) view.findViewById(R.id.call_confirm);
+        tv_title = (TextView) view.findViewById(R.id.tv_title);//name_gloud
+        name_gloud = (TextView) view.findViewById(R.id.name_gloud);
+        name_gloud.setText(name);
+//        tv_title.setText("是否拨打119");
+//        content.setText(message);
+        //显示数据
+        final Dialog dialog = new Dialog(BuFangBaoJingPlanActivity.this, R.style.BottomDialog);
+        dialog.setContentView(view);
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
+        DisplayMetrics dm = getResources().getDisplayMetrics();
+        int displayWidth = dm.widthPixels;
+        int displayHeight = dm.heightPixels;
+        android.view.WindowManager.LayoutParams p = dialog.getWindow().getAttributes(); //获取对话框当前的参数值
+        p.width = (int) (displayWidth * 0.8); //宽度设置为屏幕的0.5
+//        p.height = (int) (displayHeight * 0.5); //宽度设置为屏幕的0.5
+//        dialog.setCanceledOnTouchOutside(false);// 设置点击屏幕Dialog不消失
+        dialog.getWindow().setAttributes(p);  //设置生效
+        dialog.show();
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        finalConvertView.closeMenu();
+                    }
+                });
+            }
+        });
+
+        confirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                sraum_deletepanel(panelNumber, type, dialog, finalConvertView);
             }
         });
     }
@@ -144,7 +232,7 @@ public class BuFangBaoJingPlanActivity extends Basecactivity implements BridgeSe
                 break;
             case R.id.next_step_txt:
                 Intent intent1 = new Intent(BuFangBaoJingPlanActivity.this,
-                        SCameraSetPushVideoTiming.class);
+                        SCameraSetPushVideoTimingActivity.class);
                 intent1.putExtra("type", 0);
                 startActivityForResult(intent1, 0);
                 break;
@@ -319,12 +407,10 @@ public class BuFangBaoJingPlanActivity extends Basecactivity implements BridgeSe
                         Log.e("1111111", "11111");
                         setSDLing();
                     }
-
                     break;
                 case 4:
                     // editUploadPicInterval.setText("");
                     break;
-
                 default:
                     break;
             }
@@ -418,7 +504,6 @@ public class BuFangBaoJingPlanActivity extends Basecactivity implements BridgeSe
             msg.arg1 = key;
             deleteHandler.sendMessage(msg);
         }
-
     }
 
 
@@ -438,7 +523,9 @@ public class BuFangBaoJingPlanActivity extends Basecactivity implements BridgeSe
                 default:
                     break;
             }
-        };
+        }
+
+        ;
     };
 
 
@@ -470,7 +557,9 @@ public class BuFangBaoJingPlanActivity extends Basecactivity implements BridgeSe
                     break;
             }
 
-        };
+        }
+
+        ;
     };
 
     private Handler setAlarmHandler = new Handler() {
@@ -482,7 +571,9 @@ public class BuFangBaoJingPlanActivity extends Basecactivity implements BridgeSe
                 default:
                     break;
             }
-        };
+        }
+
+        ;
     };
 
 

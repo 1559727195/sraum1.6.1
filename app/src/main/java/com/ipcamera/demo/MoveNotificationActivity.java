@@ -77,7 +77,17 @@ public class MoveNotificationActivity extends BaseActivity implements OnClickLis
 		rl_add_infoplan = (RelativeLayout) findViewById(R.id.rl_add_infoplan);
 		// 移动侦测推送
 				pushplan = new HashMap<Integer, Integer>();
-				pushAdapter = new PushVideoTimingAdapter(MoveNotificationActivity.this);
+				pushAdapter = new PushVideoTimingAdapter(MoveNotificationActivity.this, new PushVideoTimingAdapter.PushVideoTimingListener() {
+					@Override
+					public void delete(int position) {
+
+					}
+
+					@Override
+					public void onItemClick(int position) {
+
+					}
+				});
 				lv_info_plan.setAdapter(pushAdapter);
 				lv_info_plan.setOnItemClickListener(new OnItemClickListener() {
 

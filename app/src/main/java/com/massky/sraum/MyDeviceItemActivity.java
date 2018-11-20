@@ -140,7 +140,6 @@ public class MyDeviceItemActivity extends Basecactivity implements SwitchButton.
     SwitchButton slide_btn_plan;
     private final int ALERMPARAMS = 3;
 
-
     private int[] iconName = {R.string.yijianlight, R.string.liangjianlight, R.string.sanjianlight, R.string.sijianlight,
             R.string.yilutiaoguang, R.string.lianglutiaoguang, R.string.sanlutiao, R.string.window_panel, R.string.air_panel,
             R.string.air_mode, R.string.xinfeng_mode, R.string.dinuan_mode
@@ -161,7 +160,7 @@ public class MyDeviceItemActivity extends Basecactivity implements SwitchButton.
     private Map mapdevice = new HashMap();
     private AlermBean alermBean;
     private String strDID = "";
-
+    private String isfrom = "";
 
     @Override
     protected int viewId() {
@@ -371,12 +370,8 @@ public class MyDeviceItemActivity extends Basecactivity implements SwitchButton.
                 mac_txt.setText(panelItem_map.get("controllerId").toString());
                 break;
 
-            case "AA03"://WIFI转发模块
-                gateway_id_txt.setText(iconName[25]);
-                dev_txt.setText("WIFI");
-                banben_txt.setText(panelItem_map.get("wifi").toString());
-                //controllerId
-                mac_txt.setText(panelItem_map.get("controllerId").toString());
+            case "AA03"://摄像头
+                common_parameter(25);
                 break;
             case "A311":
                 gateway_id_txt.setText(iconName[26]);
@@ -396,26 +391,40 @@ public class MyDeviceItemActivity extends Basecactivity implements SwitchButton.
             case "A331":
                 gateway_id_txt.setText(iconName[31]);
                 break;
-            case "AA04"://WIFI摄像头
+            case "AA04"://门铃
+//                common_parameter(32);
                 gateway_id_txt.setText(iconName[32]);
                 dev_txt.setText("WIFI");
                 banben_txt.setText(panelItem_map.get("wifi").toString());
                 //controllerId
                 mac_txt.setText(panelItem_map.get("controllerId").toString());
-
-                //去获取摄像头的状态
-//                this.mapdevice = mapdevice;
-                mapdevice = new HashMap();
-                //dimmer,temperature,mode
-                mapdevice.put("dimmer", "admin");
-                mapdevice.put("temperature", "888888");
-                mapdevice.put("mode", panelItem_map.get("controllerId").toString());
-//                onitem_wifi_shexiangtou(mapdevice);//(String strUser, String strPwd, String strDID
-                //去首页获取状态，发送广播
-                tongzhi_video(mapdevice);
-                init_nativeCaller();
                 break;
         }
+    }
+
+    /**
+     * 摄像头，和门铃共同的代码
+     *
+     * @param i
+     */
+    private void common_parameter(int i) {
+        gateway_id_txt.setText(iconName[i]);
+        dev_txt.setText("WIFI");
+        banben_txt.setText(panelItem_map.get("wifi").toString());
+        //controllerId
+        mac_txt.setText(panelItem_map.get("controllerId").toString());
+
+        //去获取摄像头的状态
+//                this.mapdevice = mapdevice;
+        mapdevice = new HashMap();
+        //dimmer,temperature,mode
+        mapdevice.put("dimmer", "admin");
+        mapdevice.put("temperature", "888888");
+        mapdevice.put("mode", panelItem_map.get("controllerId").toString());
+//                onitem_wifi_shexiangtou(mapdevice);//(String strUser, String strPwd, String strDID
+        //去首页获取状态，发送广播
+        tongzhi_video(mapdevice);
+        init_nativeCaller();
     }
 
     /**
@@ -480,14 +489,13 @@ public class MyDeviceItemActivity extends Basecactivity implements SwitchButton.
             case R.id.rel_bufang_plan://布防报警计划
 //                startActivity(new Intent(MyDeviceItemActivity.this,BuFangBaoJingPlanActivity.class));
 
-                Intent  intentalam = new Intent(MyDeviceItemActivity.this,BuFangBaoJingPlanActivity.class);
+                Intent intentalam = new Intent(MyDeviceItemActivity.this, BuFangBaoJingPlanActivity.class);
                 intentalam.putExtra(ContentCommon.STR_CAMERA_PWD, "888888");
                 intentalam.putExtra(ContentCommon.STR_CAMERA_ID, strDID);
                 startActivity(intentalam);
                 break;
         }
     }
-
 
     //自定义dialog,centerDialog删除对话框
     public void showCenterDeleteDialog(final String panelNumber, final String name, final String type) {
@@ -620,6 +628,24 @@ public class MyDeviceItemActivity extends Basecactivity implements SwitchButton.
                 }
                 break;
             case R.id.slide_btn_baojing:
+//
+//                switch (isfrom) {
+//                    case "ALERMPARAMS"://回调的
+//                        isfrom = "";
+//
+//                        break;
+//                    default://主动控制的,去响应
+//                        if (isChecked) {
+////                    sensor_set_protection("1");
+//                            alermBean.setMotion_armed(1);
+//                        } else {
+////                    sensor_set_protection("0");
+//                            alermBean.setMotion_armed(0);
+//                        }
+//                        setAlerm();
+//                        break;
+//                }
+
                 if (isChecked) {
 //                    sensor_set_protection("1");
                     alermBean.setMotion_armed(1);
@@ -720,12 +746,11 @@ public class MyDeviceItemActivity extends Basecactivity implements SwitchButton.
         alermBean.setAlarm_audio(alarm_audio);
         alermBean.setAlarm_temp(input_armed);
         alermBean.setSchedule_enable(schedule_enable);
-        mHandler.sendEmptyMessage(ALERMPARAMS);
+        mHandler.sendEmptyMessage(ALERMPARAMS);//这个跳转到这个界面后的获取的
     }
 
     @Override
-    public void callBackSetSystemParamsResult(String did, int paramType,
-                                              int result) {
+    public void callBackSetSystemParamsResult(String did, int paramType, int result) {//这个是报警开关后的直接，设置后的直接回调
         mHandler.sendEmptyMessage(result);
     }
 
@@ -740,6 +765,7 @@ public class MyDeviceItemActivity extends Basecactivity implements SwitchButton.
 //                    finish();
                     break;
                 case ALERMPARAMS:
+                    isfrom = "ALERMPARAMS";
                     if (0 == alermBean.getMotion_armed()) {//首次读取报警设置
                         slide_btn_baojing.setChecked(false);
                     } else {
@@ -821,6 +847,6 @@ public class MyDeviceItemActivity extends Basecactivity implements SwitchButton.
 
     @Override
     public void onBackPressed() {
-       MyDeviceItemActivity.this.finish();
+        MyDeviceItemActivity.this.finish();
     }
 }

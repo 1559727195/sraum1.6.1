@@ -50,28 +50,26 @@ import com.andview.refreshview.XRefreshView;
 import com.base.Basecfragment;
 import com.data.Allbox;
 import com.data.User;
-import com.dialog.MyApplication;
+
 import com.gizwits.gizwifisdk.api.GizWifiDevice;
 import com.gizwits.gizwifisdk.enumration.GizWifiDeviceNetStatus;
 import com.gizwits.gizwifisdk.enumration.GizWifiErrorCode;
-import com.google.gson.Gson;
-import com.ipcamera.demo.AddCameraActivity;
+
 import com.ipcamera.demo.BridgeService;
 import com.ipcamera.demo.PlayActivity;
 import com.ipcamera.demo.utils.ContentCommon;
 import com.ipcamera.demo.utils.SystemValue;
-import com.massky.sraum.AddWifiCameraScucessActivity;
+
 import com.massky.sraum.AirControlActivity;
-import com.massky.sraum.ConnWifiCameraActivity;
+
 import com.massky.sraum.LamplightActivity;
 import com.massky.sraum.MacdetailActivity;
 import com.massky.sraum.MacdeviceActivity;
 import com.massky.sraum.MainfragmentActivity;
-import com.massky.sraum.Pm25Activity;
+
 import com.massky.sraum.Pm25SecondActivity;
 import com.massky.sraum.R;
-import com.massky.sraum.SelectInfraredForwardActivity;
-import com.massky.sraum.SelectZigbeeDeviceActivity;
+
 import com.massky.sraum.TVShowActivity;
 import com.massky.sraum.WaterSensorActivity;
 import com.yaokan.sdk.ir.YKanHttpListener;
@@ -110,6 +108,7 @@ import okhttp3.Call;
 import vstc2.nativecaller.NativeCaller;
 
 import static com.fragment.Mainviewpager.MESSAGE_TONGZHI_DOOR_FIRST;
+
 import static com.massky.sraum.MyDeviceItemActivity.MESSAGE_TONGZHI_VIDEO_FROM_MYDEVICE;
 
 /**
@@ -119,7 +118,7 @@ import static com.massky.sraum.MyDeviceItemActivity.MESSAGE_TONGZHI_VIDEO_FROM_M
 public class MacFragment extends Basecfragment implements
         AdapterView.OnItemClickListener
         , BridgeService.IpcamClientInterface, BridgeService.CallBackMessageInterface {
-    public  static final String MESSAGE_TONGZHI_VIDEO_TO_MYDEVICE = "com.sraum.massky.to.mydevice";
+    public static final String MESSAGE_TONGZHI_VIDEO_TO_MYDEVICE = "com.sraum.massky.to.mydevice";
     @InjectView(R.id.bottomimage_id)
     ImageView bottomimage_id;
     @InjectView(R.id.addmacbtn_id)
@@ -160,7 +159,7 @@ public class MacFragment extends Basecfragment implements
     private int CameraType = ContentCommon.CAMERA_TYPE_MJPEG;
     private static final String STR_DID = "did";
     private static final String STR_MSG_PARAM = "msgparam";
-    List<Map> list_wifi_camera = new ArrayList<>();
+    //    List<Map> list_wifi_camera = new ArrayList<>();
     private boolean playactivityfinsh = true;
     private String videofrom = "";
     public static String MACFRAGMENT_PM25 = "com.fragment.pm25";
@@ -265,6 +264,10 @@ public class MacFragment extends Basecfragment implements
             }
         }
     };
+    private String strUser;
+    private String strDID;
+    private String strPwd;
+    private int inde_video = 1;
 
     @Subscribe
     public void onEvent(MyEvent event) {
@@ -303,6 +306,10 @@ public class MacFragment extends Basecfragment implements
         } else {
             if (!playactivityfinsh) {
 //                        AppManager.getAppManager().finishActivity_current(PlayActivity.class);
+
+                SystemValue.deviceName = strUser;
+                SystemValue.deviceId = strDID;
+                SystemValue.devicePass = strPwd;
                 Intent intent = new Intent(getActivity(), PlayActivity.class);
                 startActivity(intent);
             }
@@ -795,7 +802,13 @@ public class MacFragment extends Basecfragment implements
     @Override
     public void initData() {
         if (isAppMainProcess()) {//断当前进程是否是 APP 默认进程，只在主进程中进行初始化操作， APP 默认进程名就是包名
-            SharedPreferencesUtil.saveData(getActivity(), "pagetag", "1");
+//            SharedPreferencesUtil.saveData(getActivity(), "pagetag", "1");
+
+            SharedPreferencesUtil.saveData_second(App.getInstance().getApplicationContext(), "pagetag", "1");
+//        boolean flag = TokenUtil.getTokenflag(getActivity());
+            String boxnumberre = (String) SharedPreferencesUtil.getData_second(App.getInstance().getApplicationContext(), "boxnumber", "");
+
+
 //        boolean flag = TokenUtil.getTokenflag(getActivity());
 //        if (flag) {
 //            if (!TokenUtil.getBoxnumber(getActivity()).equals("")) {
@@ -807,7 +820,7 @@ public class MacFragment extends Basecfragment implements
 //            }
 //        }
 
-            if (!TokenUtil.getBoxnumber(getActivity()).equals("")) {
+            if (!boxnumberre.equals("")) {
                 upload(true);
             } else {
                 list.clear();
@@ -865,8 +878,12 @@ public class MacFragment extends Basecfragment implements
     //下拉刷新
     private void upload(final boolean flag) {
         Map<String, String> mapdevice = new HashMap<>();
-        mapdevice.put("token", TokenUtil.getToken(getActivity()));
-        mapdevice.put("boxNumber", TokenUtil.getBoxnumber(getActivity()));
+        String boxnumberre = (String) SharedPreferencesUtil.getData_second(App.getInstance().getApplicationContext(), "boxnumber", "");
+//        map.put("boxNumber", TokenUtil.getBoxnumber(getActivity()));
+        mapdevice.put("boxNumber", boxnumberre);
+        mapdevice.put("token", (String) SharedPreferencesUtil.getData_second(App.getInstance().getApplicationContext(), "sraumtoken", ""));
+//        mapdevice.put("token", TokenUtil.getToken(getActivity()));
+//        mapdevice.put("boxNumber", TokenUtil.getBoxnumber(getActivity()));
         if (flag) {
             dialogUtil.loadDialog();
         }
@@ -890,9 +907,6 @@ public class MacFragment extends Basecfragment implements
         MyOkHttp.postMapString(ApiHelper.sraum_getAllDevice, mapdevice, new Mycallback(new AddTogglenInterfacer() {
             @Override
             public void addTogglenInterfacer() {//刷新togglen数据
-                Map<String, String> mapdevice = new HashMap<>();
-                mapdevice.put("token", TokenUtil.getToken(getActivity()));
-                mapdevice.put("boxNumber", TokenUtil.getBoxnumber(getActivity()));
                 uploader_refresh(mapdevice);
             }
         }, getActivity(), dialogUtil) {
@@ -1257,6 +1271,16 @@ public class MacFragment extends Basecfragment implements
         }
 
         if (tag == 1) {
+
+//            in.putExtra(ContentCommon.STR_CAMERA_ID, strDID);
+//            in.putExtra(ContentCommon.STR_CAMERA_USER, strUser);
+//            in.putExtra(ContentCommon.STR_CAMERA_PWD, strPwd);
+//            String strUser, String strPwd, String strDID
+
+            strUser = mapdevice.get("dimmer").toString();
+            strDID = mapdevice.get("mode").toString();
+            strPwd = mapdevice.get("temperature").toString();
+
             handler.sendEmptyMessage(10);//设备已经在线了
 //            Toast.makeText(getActivity(), "设备已经是在线状态了", Toast.LENGTH_SHORT).show();
         } else if (tag == 2) {
@@ -1269,7 +1293,6 @@ public class MacFragment extends Basecfragment implements
                     tongzhi_to_video("0");
                     break;
             }
-
         } else {
             done(mapdevice.get("dimmer").toString()
                     , mapdevice.get("temperature").toString()
@@ -1307,6 +1330,9 @@ public class MacFragment extends Basecfragment implements
 //        progressBar.setVisibility(View.VISIBLE);
         if (dialogUtil != null)
             dialogUtil.loadDialog();
+        this.strDID = strDID;
+        this.strPwd = strPwd;
+        this.strUser = strUser;
         SystemValue.deviceName = strUser;
         SystemValue.deviceId = strDID;
         SystemValue.devicePass = strPwd;
@@ -1982,7 +2008,6 @@ public class MacFragment extends Basecfragment implements
 
     public class MessageReceiver extends BroadcastReceiver {
 
-
         @Override
         public void onReceive(Context context, Intent intent) {
             // TODO Auto-generated method stub
@@ -2009,18 +2034,39 @@ public class MacFragment extends Basecfragment implements
 //                done(mapdevice.get("dimmer").toString()
 //                        , mapdevice.get("temperature").toString()
 //                        , mapdevice.get("mode").toString());//String strUser,String strPwd,String strDID
-                int index = (int) SharedPreferencesUtil.getData(context, "tongzhi_time", 1);
-                index--;
-                SharedPreferencesUtil.saveData(context, "tongzhi_time", index);
-                if (index == 0) {
-                    videofrom = "macfragment";
-                    onitem_wifi_shexiangtou(mapdevice);
+
+//                if (index == 0) {
+//                    videofrom = "macfragment";
+//                    onitem_wifi_shexiangtou(mapdevice);
+//                }
+
+                switch (type) {
+                    case "52"://门铃
+                    case "53"://摄像头
+                        door_rill(context, mapdevice);
+                        break;
                 }
             } else if (intent.getAction().equals(MESSAGE_TONGZHI_VIDEO_FROM_MYDEVICE)) {//来自设备页获取摄像头状态的通知
                 videofrom = "devicefragment";
                 video_item = (Map) intent.getSerializableExtra("video_item");
                 common_video(video_item);
             }
+        }
+    }
+
+    /**
+     * 门禁报警
+     *
+     * @param context
+     * @param mapdevice
+     */
+    private void door_rill(Context context, Map mapdevice) {
+        int index = (int) SharedPreferencesUtil.getData(context, "tongzhi_time", 1);
+        index--;
+        SharedPreferencesUtil.saveData(context, "tongzhi_time", index);
+        if (index == 0) {
+            videofrom = "macfragment";
+            onitem_wifi_shexiangtou(mapdevice);
         }
     }
 
@@ -2133,6 +2179,7 @@ public class MacFragment extends Basecfragment implements
                         case ContentCommon.PPPP_STATUS_DEVICE_NOT_ON_LINE://6
                             resid = R.string.device_not_on_line;
                             Log.e("fei->", "resid:" + "摄像机不在线");
+//                            ToastUtil.showToast(getActivity(),"摄像不在线");
                             tag = 0;
                             if (dialogUtil != null) dialogUtil.removeDialog();
                             break;
@@ -2181,22 +2228,33 @@ public class MacFragment extends Basecfragment implements
      *
      * @param did
      */
-    private void init_Camera(String did) {
-        int index = 0;
+    private void init_Camera(String did) {//修改并完善如果Id相同就更新，没有该Id就添加
+        List<Map> list_wifi_camera =
+                SharedPreferencesUtil.getInfo_List(getActivity(), "list_wifi_camera_first");
         Map map = new HashMap();
         map.put("did", did);
         map.put("tag", tag);
+        boolean is_has = false;
         for (int i = 0; i < list_wifi_camera.size(); i++) {
             if (list_wifi_camera.get(i).get("did").equals(did)) {
                 list_wifi_camera.get(i).put("tag", tag);
-                index--;
-            } else {
-                index++;
+                is_has = true;
+                break;
             }
         }
-        if (index == list_wifi_camera.size()) {
+
+        if (!is_has) {
             list_wifi_camera.add(map);
         }
+
+//        if (index == list_wifi_camera.size()) {
+//            list_wifi_camera.add(map);
+//        }
+
+//        Map<Integer, Integer> item = list_wifi_camera.get(position);
+//        int itemplan = item.entrySet().iterator().next().getValue();
+//        int itemplanKey = item.entrySet().iterator().next().getKey();
+
         SharedPreferencesUtil.saveInfo_List(getActivity(), "list_wifi_camera_first", list_wifi_camera);
     }
 

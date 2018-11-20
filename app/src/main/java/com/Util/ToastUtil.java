@@ -10,14 +10,17 @@ import android.widget.Toast;
 /*用于toast*/
 public class ToastUtil {
     /*用于展示toast中部位置*/
-    public static void showToast(Context context,String toastmsg){
+    public static void showToast(Context context, String toastmsg) {
         Toast toast = Toast.makeText(context,
                 toastmsg, Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
     }
+
     /*用于展示toast默认位置*/
-    public static void showDelToast(Context context,String toastmag){
+    public static void showDelToast(Context context, String toastmag) {
+        //添加必须在主进程中先显示，进行toast
+
         Toast.makeText(context, toastmag,
                 Toast.LENGTH_SHORT).show();
     }
