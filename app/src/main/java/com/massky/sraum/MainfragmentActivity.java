@@ -11,6 +11,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.os.StatFs;
 import android.provider.Settings;
@@ -150,7 +151,7 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
     private Handler handler_wifi = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            init_jizhiyun();
+//            init_jizhiyun();
         }
     };
     public static final String MESSAGE_RECEIVED_ACTION_APK_LOAD = "com.Util.MESSAGE_RECEIVED_ACTION_APK_LOAD";
@@ -163,6 +164,7 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
     private WeakReference<Context> weakReference;
     private boolean iswait_down_load;//等待NotificationListenerService这个服务唤醒
     private String isdo;
+    private int init_jizhiyun;//机智云index
 
     @Override
     protected int viewId() {
@@ -183,10 +185,11 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
 
     }
 
-
     @Override
     protected void onView() {
 //        iswait_down_load = false;
+        init_jizhiyun = 1;//机智云index
+
         dialogUtil = new DialogUtil(this);
         initPermission();
 //        toggleNotificationListenerService();
@@ -346,7 +349,6 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
 
     }// end of if
     // end of func
-
 
     /**
      * 获取指定文件大小
@@ -1385,6 +1387,23 @@ public class MainfragmentActivity extends Basecfragmentactivity implements Mainv
 
     @Override
     protected void onResume() {
+        //小苹果机智云初始化
+//        init_jizhiyun = 1;
+
+        if (init_jizhiyun == 1) {
+            init_jizhiyun = 2;
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Looper.prepare();
+//                    init_visible();
+                    init_jizhiyun();
+                    Looper.loop();
+                }
+            }).start();
+            Log.e("robin debug", "    Looper.prepare()");
+        }
+
         isForegrounds = true;
         getNotify(getIntent());//防止重启亮屏后，重复送出极光数据
         Log.e("zhu-", "MainfragmentActivity:onResume():isForegrounds:" + isForegrounds);

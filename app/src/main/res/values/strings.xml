@@ -955,4 +955,6 @@
     <string name="keshimenling">可视门铃</string>
     <string name="tuisongtongzhi">推送通知</string>
     <string name="zhinengchazuo_promat">连续按键3次，指示灯快闪</string>
+    <string name="touyingyi">投影仪</string>
+    <string name="yinxiang">音响</string>
 </resources>

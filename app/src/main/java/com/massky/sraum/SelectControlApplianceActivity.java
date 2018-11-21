@@ -40,14 +40,17 @@ public class SelectControlApplianceActivity extends Basecactivity {
 
     //wifi类型
     private String[] types_wifi = { //红外转发器类型暂定为hongwai,遥控器类型暂定为yaokong
-            "202", "206"
+            "202", "206","204","210"
     };
 
     private int[] icon_wifi = {
             R.drawable.icon_type_dianshiji_90,
-            R.drawable.icon_type_kongtiao_90
+            R.drawable.icon_type_kongtiao_90,
+            R.drawable.icon_type_touyingyi_90,
+            R.drawable.icon_type_yinxiang_90
     };
-    private int[] iconNam_wifi = {R.string.dianshiji, R.string.kongtiao};
+    private int[] iconNam_wifi = {R.string.dianshiji, R.string.kongtiao,
+    R.string.touyingyi,R.string.yinxiang};
 
     private SelectWifiDevAdapter adapter_wifi;
     private DialogUtil dialogUtil;

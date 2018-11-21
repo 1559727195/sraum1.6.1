@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.View;
 
 import com.AddTogenInterface.AddTogglenInterfacer;
@@ -54,6 +55,7 @@ public abstract class Basecfragmentactivity extends AutoLayoutFragmentActivity i
         homeListener();
         screenListener();
         onView();
+        Log.e("feis","onCreate:" + Basecfragmentactivity.this);
     }
 
     //用于监听是否锁屏状态

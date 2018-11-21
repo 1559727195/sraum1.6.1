@@ -20,6 +20,8 @@
     <color name="c7b">#7B7B7B</color>
     <color name="ea">#eaeaea</color>
     <color name="white">#ffffff</color>
+    <!--//#EFEFF2-->
+    <color name="gray_logo">#EFEFF2</color>
     <color name="c6f">#6f6f6f</color>
     <color name="colorPrimary">#3F51B5</color>
     <color name="clear" >#00000000</color>

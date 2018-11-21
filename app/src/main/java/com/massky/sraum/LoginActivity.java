@@ -90,6 +90,8 @@ public class LoginActivity extends Basecactivity {
     protected void onView() {
 //        String crashInfo = (String) SharedPreferencesUtil.getData(LoginActivity.this, "crashInfo", "");
 //        ToastUtil.showToast(LoginActivity.this, crashInfo);
+        //将window的背景图设置为空
+        getWindow().setBackgroundDrawable(null);
         intiData();
         initPermission();
     }

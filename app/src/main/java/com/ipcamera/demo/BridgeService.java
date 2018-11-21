@@ -1083,6 +1083,7 @@ public class BridgeService extends Service
                              int sensorid1, int sensorid2, int sensorid3, int sensortype,
                              int sensorstatus, int presetid, int id);
 	}
+
 	public static void setSensorListInterface(SensorListActivityAllDataInterface sensor)
 	{
 		sensorListInterfece = sensor;
@@ -1159,7 +1160,6 @@ public class BridgeService extends Service
 		{
 			sensorListInterfece.CallBackMessage(did, resultPbuf, cmd,sensorid1, sensorid2, sensorid3, sensortype, sensorstatus,presetid, index);
 		}
-
 	}
 
 	/**

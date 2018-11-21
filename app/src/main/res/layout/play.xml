@@ -3,14 +3,14 @@
     android:id="@+id/play"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
     <android.opengl.GLSurfaceView
         android:id="@+id/mysurfaceview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:longClickable="true"
-        android:layout_gravity="center" />
+        android:layout_gravity="center"
+        android:longClickable="true" />
 
     <ImageView
         android:id="@+id/vedioview"
@@ -35,7 +35,7 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:gravity="center"
-        android:orientation="vertical" >
+        android:orientation="vertical">
 
         <ProgressBar
             style="?android:attr/progressBarStyleLarge"
@@ -49,12 +49,12 @@
             android:layout_gravity="center"
             android:text="@string/connecting" />
     </LinearLayout>
-    
+
     <RelativeLayout
         android:id="@+id/osdlayout"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:orientation="horizontal" >
+        android:orientation="horizontal">
 
         <TextView
             android:id="@+id/textosd"
@@ -69,17 +69,17 @@
             android:textStyle="bold"
             android:visibility="gone" />
 
-       <LinearLayout
+        <LinearLayout
             android:id="@+id/video_lu_linear"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
-            android:layout_marginRight="10dp"
+            android:layout_alignParentRight="true"
             android:layout_marginTop="48dp"
+            android:layout_marginRight="10dp"
             android:background="#00000000"
             android:gravity="center"
-            android:visibility="gone" >
+            android:visibility="gone">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -107,7 +107,7 @@
             android:layout_width="fill_parent"
             android:layout_height="45dp"
             android:layout_alignParentTop="true"
-            android:visibility="gone" >
+            android:visibility="gone">
 
             <ImageButton
                 android:id="@+id/login_top_back"
@@ -134,16 +134,17 @@
                 android:id="@+id/linearLayout2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
-                android:orientation="horizontal" >
+                android:layout_alignParentRight="true"
+                android:orientation="horizontal">
+
                 <ToggleButton
                     android:id="@+id/ir_switch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
                     android:layout_marginRight="5dp"
                     android:background="#00000000"
-                    android:layout_gravity="center_vertical"
                     android:button="@drawable/my_switch"
                     android:textOff=""
                     android:textOn="" />
@@ -184,7 +185,7 @@
     </RelativeLayout>
 
     <!-- 底部菜单 -->
-    <HorizontalScrollView 
+    <HorizontalScrollView
         android:id="@+id/bottom_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -192,98 +193,101 @@
         android:scrollbars="none"
         android:visibility="gone">
 
-	    <LinearLayout 
-	        android:layout_width="match_parent"
-	        android:layout_height="45dp"
-	        android:layout_gravity="bottom"
-	        android:orientation="horizontal" >
-	
-	        <ImageButton
-	            android:id="@+id/ptz_audio"
-	            android:layout_width="45dp"
-	            android:layout_height="45dp"
-	            android:layout_weight="1"
-	            android:background="@drawable/ptz_takepic_selector"
-	            android:src="@drawable/ptz_audio_off" />
-	        <ImageButton
-	            android:id="@+id/ptz_talk"
-	            android:layout_width="45dp"
-	            android:layout_height="45dp"
-	            android:layout_weight="1"
-	            android:background="@drawable/ptz_takepic_selector"
-	            android:src="@drawable/ptz_microphone_off" />
-	
-	        <ImageButton
-	            android:id="@+id/ptz_brightness"
-	            android:layout_width="45dp"
-	            android:layout_height="45dp"
-	            android:layout_marginLeft="2dp"
-	            android:layout_marginRight="2dp"
-	            android:layout_weight="1"
-	            android:background="@drawable/ptz_takepic_selector"
-	            android:padding="5dp"
-	            android:src="@drawable/ptz_brightness" />
-	
-	        <ImageButton
-	            android:id="@+id/ptz_contrast"
-	            android:layout_width="45dp"
-	            android:layout_height="45dp"
-	            android:layout_marginLeft="2dp"
-	            android:layout_marginRight="2dp"
-	            android:layout_weight="1"
-	            android:background="@drawable/ptz_takepic_selector"
-	            android:padding="5dp"
-	            android:src="@drawable/ptz_contrast" />
-	
-	        <ImageButton
-	            android:id="@+id/ptz_default_set"
-	            android:layout_width="45dp"
-	            android:layout_height="45dp"
-	            android:layout_marginLeft="2dp"
-	            android:layout_marginRight="2dp"
-	            android:layout_weight="1"
-	            android:background="@drawable/ptz_takepic_selector"
-	            android:padding="5dp"
-	            android:src="@drawable/ptz_default_set" />
-	         <ImageButton
-	            android:id="@+id/ptz_take_photos"
-	            android:layout_width="45dp"
-	            android:layout_height="45dp"
-	            android:layout_marginLeft="2dp"
-	            android:layout_marginRight="2dp"
-	            android:layout_weight="1"
-	            android:background="@drawable/ptz_takepic_selector"
-	            android:padding="5dp"
-	            android:src="@drawable/ptz_takepic" />
-	          <ImageButton
-	            android:id="@+id/ptz_take_videos"
-	            android:layout_width="45dp"
-	            android:layout_height="45dp"
-	            android:layout_marginLeft="2dp"
-	            android:layout_marginRight="2dp"
-	            android:layout_weight="1"
-	            android:background="@drawable/ptz_takepic_selector"
-	            android:padding="5dp"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:layout_gravity="bottom"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/ptz_audio"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_weight="1"
+                android:background="@drawable/ptz_takepic_selector"
+                android:src="@drawable/ptz_audio_off" />
+
+            <ImageButton
+                android:id="@+id/ptz_talk"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_weight="1"
+                android:background="@drawable/ptz_takepic_selector"
+                android:src="@drawable/ptz_microphone_off" />
+
+            <ImageButton
+                android:id="@+id/ptz_brightness"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:layout_weight="1"
+                android:background="@drawable/ptz_takepic_selector"
+                android:padding="5dp"
+                android:src="@drawable/ptz_brightness" />
+
+            <ImageButton
+                android:id="@+id/ptz_contrast"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:layout_weight="1"
+                android:background="@drawable/ptz_takepic_selector"
+                android:padding="5dp"
+                android:src="@drawable/ptz_contrast" />
+
+            <ImageButton
+                android:id="@+id/ptz_default_set"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:layout_weight="1"
+                android:background="@drawable/ptz_takepic_selector"
+                android:padding="5dp"
+                android:src="@drawable/ptz_default_set" />
+
+            <ImageButton
+                android:id="@+id/ptz_take_photos"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:layout_weight="1"
+                android:background="@drawable/ptz_takepic_selector"
+                android:padding="5dp"
+                android:src="@drawable/ptz_takepic" />
+
+            <ImageButton
+                android:id="@+id/ptz_take_videos"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:layout_weight="1"
+                android:background="@drawable/ptz_takepic_selector"
+                android:padding="5dp"
                 android:src="@drawable/ptz_takevideo" />
-	
-	        <ImageButton
+
+            <ImageButton
                 android:id="@+id/ptz_resolution"
                 android:layout_width="45dp"
-	            android:layout_height="45dp"
-	            android:layout_marginLeft="2dp"
-	            android:layout_marginRight="2dp"
-	            android:layout_weight="1"
+                android:layout_height="45dp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:layout_weight="1"
                 android:background="@drawable/ptz_default_set_selector"
                 android:src="@drawable/easyicon_cn" />
-	        
-	         <ImageButton
-                    android:id="@+id/preset"
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
-                    android:layout_marginRight="5dp"
-                    android:background="@drawable/ptz_default_set_selector"
-                    android:src="@drawable/ptz_resolution_preset" />
-	          
-	    </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/preset"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_marginRight="5dp"
+                android:background="@drawable/ptz_default_set_selector"
+                android:src="@drawable/ptz_resolution_preset" />
+
+        </LinearLayout>
     </HorizontalScrollView>
 </FrameLayout>

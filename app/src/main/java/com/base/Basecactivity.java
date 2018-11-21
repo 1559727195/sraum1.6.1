@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -62,14 +63,13 @@ public abstract class Basecactivity extends AutoLayoutActivity implements View.O
         onView();
         loginPhone = (String) SharedPreferencesUtil.getData(this, "loginPhone", "");
         preferences = getSharedPreferences("sraum" + loginPhone, Context.MODE_PRIVATE);
+        Log.e("feis","onCreate:" + Basecactivity.this);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
     }
-
-
 
     /**
      * 在登录，注册，忘记密码界面不进行手势密码的验证
@@ -79,6 +79,7 @@ public abstract class Basecactivity extends AutoLayoutActivity implements View.O
                 this instanceof FindPwdoneActivity || this instanceof FindPwdtwoActivity) {
             actflag = false;
         }
+
         if (actflag) {
             AppManager.getAppManager().addActivity(this);//添加activity
             homeListener();

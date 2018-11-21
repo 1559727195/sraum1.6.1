@@ -127,6 +127,7 @@
         tools:replace="android:icon">
         <activity
             android:name=".LoginActivity"
+            android:theme="@style/GuideTheme"
             android:screenOrientation="portrait">
             <!--<intent-filter>-->
             <!--<action android:name="android.intent.action.MAIN" />-->
